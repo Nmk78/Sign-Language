@@ -1,6 +1,6 @@
-<?php include 'components/layout.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,14 +10,26 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: <?php echo json_encode(include('config/colors.php')['colors']); ?>
+                    colors: {
+                        'primary': '#4A90E2',
+                        'primary-dark': '#2A69A4',
+                        'secondary': '#7ED321',
+                        'accent': '#F5A623',
+                        'success': '#10B981',
+                        'warning': '#F1C40F',
+                        'error': '#E74C3C',
+                        'background': '#F5F5F5',
+                        'surface': '#FFFFFF',
+                        'text': '#333333',
+                        'text-light': '#7F8C8D',
+                    }
                 }
             }
         }
     </script>
 </head>
+
 <body class="bg-background">
-    <?php renderHeader('dashboard'); ?>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <!-- Stats Overview -->
@@ -30,7 +42,7 @@
                 ['label' => 'Certificates', 'value' => '8', 'color' => 'accent']
             ];
 
-            foreach($stats as $stat) {
+            foreach ($stats as $stat) {
                 echo "
                 <div class='bg-surface p-6 rounded-xl shadow-lg'>
                     <p class='text-text-light text-sm'>{$stat['label']}</p>
@@ -53,7 +65,7 @@
                         ['time' => '04:30 PM', 'title' => 'Code Review Session', 'type' => 'Group Work']
                     ];
 
-                    foreach($schedule as $item) {
+                    foreach ($schedule as $item) {
                         echo "
                         <div class='flex items-center gap-4 p-4 border border-gray-200 rounded-lg'>
                             <div class='w-24 text-sm text-text-light'>{$item['time']}</div>
@@ -78,7 +90,7 @@
                         ['title' => 'AWS Basics', 'rating' => 4.7, 'students' => '1.8k']
                     ];
 
-                    foreach($recommended as $course) {
+                    foreach ($recommended as $course) {
                         echo "
                         <div class='p-4 border border-gray-200 rounded-lg'>
                             <h3 class='font-medium text-text mb-2'>{$course['title']}</h3>
@@ -94,4 +106,5 @@
         </div>
     </div>
 </body>
+
 </html>

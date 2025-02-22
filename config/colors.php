@@ -1,16 +1,20 @@
 <?php
-return [
-    'colors' => [
-        'primary' => '#6D28D9',
-        'primary-light' => '#8B5CF6',
-        'secondary' => '#2563EB',
-        'accent' => '#DB2777',
-        'success' => '#10B981',
-        'warning' => '#F59E0B',
-        'error' => '#EF4444',
-        'background' => '#F9FAFB',
-        'surface' => '#FFFFFF',
-        'text' => '#111827',
-        'text-light' => '#6B7280',
+return json_encode([
+    'theme' => [
+        'extend' => [
+            'colors' => [
+                'primary' => '#4A90E2',
+                'primary-dark' => '#2A69A4',
+                'secondary' => '#7ED321',
+                'accent' => '#F5A623',
+                'success' => '#10B981',
+                'warning' => '#F1C40F',
+                'error' => '#E74C3C',
+                'background' => '#F5F5F5',
+                'surface' => '#FFFFFF',
+                'text' => '#333333',
+                'text-light' => '#7F8C8D',
+            ]
+        ]
     ]
-];
+], JSON_PRETTY_PRINT);

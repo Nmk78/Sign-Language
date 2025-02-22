@@ -54,13 +54,21 @@ $courses = [
     <title>EDUTOCK - Online Learning Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
+                tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#0B4D2F',
-                        secondary: '#B4FF39',
-                        beige: '#FBF7F4',
+                        'primary': '#4A90E2',
+                        'primary-dark': '#2A69A4',
+                        'secondary': '#7ED321',
+                        'accent': '#F5A623',
+                        'success': '#10B981',
+                        'warning': '#F1C40F',
+                        'error': '#E74C3C',
+                        'background': '#F5F5F5',
+                        'surface': '#FFFFFF',
+                        'text': '#333333',
+                        'text-light': '#7F8C8D',
                     }
                 }
             }
@@ -70,13 +78,13 @@ $courses = [
 
 <body class="bg-beige">
     <!-- Header -->
-    <header class="bg-primary">
+    <header class="bg-primary sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="text-white font-bold text-xl">EDUTOCK</div>
-                <?php include 'layout.php'; ?>
+                <?php include 'nav.php'; ?>
                 <div class="flex items-center space-x-4">
-                    <button class="bg-secondary px-6 py-2 rounded-md text-primary font-medium">Join Now</button>
+                    <button class="bg-white px-6 py-2 rounded-md text-primary font-medium">Join Now</button>
                     <a href="#" class="text-white">Log in</a>
                 </div>
             </div>
@@ -87,15 +95,15 @@ $courses = [
     $uri = trim($_SERVER['REQUEST_URI'], '/');
 
     if ($uri === 'dashboard') {
-        require 'components/dashboard.php';
+        require "components/dashboard.php";
     } else if ($uri === 'profile') {
         require 'components/profile.php';
     } else if ($uri === 'creator') {
-        require 'components/creator-profile.php';
+        require 'componexnts/creator-profile.php';
     } else if ($uri === 'dashboard') {
         require 'components/dashboard.php';
     } else {
-        require 'components/home.php';
+        require 'tytp.php';
     }
     ?>
 

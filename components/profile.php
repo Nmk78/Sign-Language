@@ -1,6 +1,6 @@
-<?php include 'components/layout.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,14 +10,26 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: <?php echo json_encode(include('config/colors.php')['colors']); ?>
+                    colors: {
+                        'primary': '#4A90E2',
+                        'primary-dark': '#2A69A4',
+                        'secondary': '#7ED321',
+                        'accent': '#F5A623',
+                        'success': '#10B981',
+                        'warning': '#F1C40F',
+                        'error': '#E74C3C',
+                        'background': '#F5F5F5',
+                        'surface': '#FFFFFF',
+                        'text': '#333333',
+                        'text-light': '#7F8C8D',
+                    }
                 }
             }
         }
     </script>
 </head>
+
 <body class="bg-background">
-    <?php renderHeader('profile'); ?>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <!-- Profile Header -->
@@ -62,8 +74,8 @@
                         ['title' => 'Full Stack', 'status' => 'locked']
                     ];
 
-                    foreach($journeyPoints as $point) {
-                        $statusColor = match($point['status']) {
+                    foreach ($journeyPoints as $point) {
+                        $statusColor = match ($point['status']) {
                             'completed' => 'bg-success',
                             'in-progress' => 'bg-warning',
                             'locked' => 'bg-gray-300'
@@ -92,7 +104,7 @@
                         ['title' => 'Node.js Basics', 'progress' => 30]
                     ];
 
-                    foreach($currentCourses as $course) {
+                    foreach ($currentCourses as $course) {
                         echo "
                         <div class='p-4 border border-gray-200 rounded-lg'>
                             <div class='flex justify-between items-center mb-2'>
@@ -122,7 +134,7 @@
                         ['icon' => '🎓', 'title' => 'Graduate', 'desc' => 'Finished Full Stack']
                     ];
 
-                    foreach($achievements as $achievement) {
+                    foreach ($achievements as $achievement) {
                         echo "
                         <div class='p-4 border border-gray-200 rounded-lg text-center'>
                             <div class='text-3xl mb-2'>{$achievement['icon']}</div>
@@ -136,4 +148,5 @@
         </div>
     </div>
 </body>
+
 </html>

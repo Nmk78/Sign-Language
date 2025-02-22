@@ -1,4 +1,4 @@
-<?php include 'components/layout.php'; ?>
+]
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,25 +10,28 @@
     <script>
         tailwind.config = {
             theme: {
-            extend: {
-                colors: <?php echo json_encode(include ('config/colors.php')['colors']); ?>
-            }
-            }
-        }
-    </script>
-    <script>
-        tailwind.config = {
-            theme: {
                 extend: {
-                    colors: <?php echo json_encode(include ('config/colors.php')['colors']); ?>
+                    colors: {
+                        'primary': '#4A90E2',
+                        'primary-dark': '#2A69A4',
+                        'secondary': '#7ED321',
+                        'accent': '#F5A623',
+                        'success': '#10B981',
+                        'warning': '#F1C40F',
+                        'error': '#E74C3C',
+                        'background': '#F5F5F5',
+                        'surface': '#FFFFFF',
+                        'text': '#333333',
+                        'text-light': '#7F8C8D',
+                    }
                 }
             }
         }
     </script>
+
 </head>
 
 <body class="bg-background">
-    <?php renderHeader('creators'); ?>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <!-- Creator Profile Header -->

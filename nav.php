@@ -5,10 +5,10 @@ function renderHeader($activePage = 'home')
         'home' => '/',
         'dashboard' => '/dashboard',
         'profile' => '/profile',
-        'creators' => '/creators'
+        'creator' => '/creator'
     ];
 
-    echo '<header class="bg-primary shadow-lg">
+    echo '<header class="bg-primary">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <nav class="hidden md:flex space-x-8">';

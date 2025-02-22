@@ -47,6 +47,7 @@ $courses = [
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -57,15 +58,24 @@ $courses = [
             theme: {
                 extend: {
                     colors: {
-                        primary: '#0B4D2F',
-                        secondary: '#B4FF39',
-                        beige: '#FBF7F4',
+                        'primary': '#4A90E2',
+                        'primary-dark': '#2A69A4',
+                        'secondary': '#7ED321',
+                        'accent': '#F5A623',
+                        'success': '#10B981',
+                        'warning': '#F1C40F',
+                        'error': '#E74C3C',
+                        'background': '#F5F5F5',
+                        'surface': '#FFFFFF',
+                        'text': '#333333',
+                        'text-light': '#7F8C8D',
                     }
                 }
             }
         }
     </script>
 </head>
+
 <body class="bg-beige">
     <!-- Hero Section -->
     <section class="bg-beige">
@@ -109,7 +119,7 @@ $courses = [
                 ONLINE LEARNING FOR<br>REAL LIFE, EXPLORE COURSE
             </h2>
             <div class="grid md:grid-cols-3 gap-8">
-                <?php foreach($features as $feature): ?>
+                <?php foreach ($features as $feature): ?>
                     <div class="<?php echo $feature['bg']; ?> p-8 rounded-lg">
                         <h3 class="text-xl font-bold text-primary mb-4"><?php echo $feature['title']; ?></h3>
                         <p class="text-gray-600"><?php echo $feature['description']; ?></p>
@@ -126,7 +136,7 @@ $courses = [
                 <div>
                     <h2 class="text-2xl font-bold text-primary mb-8">EXPERIENCE EXCELLENCE<br>OUR SERVICES</h2>
                     <div class="space-y-4">
-                        <?php foreach($services as $service): ?>
+                        <?php foreach ($services as $service): ?>
                             <div class="flex items-center space-x-4">
                                 <div class="w-2 h-2 bg-primary rounded-full"></div>
                                 <span class="text-gray-600"><?php echo $service; ?></span>
@@ -147,7 +157,7 @@ $courses = [
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-2xl font-bold text-primary mb-12">PERFECT ONLINE COURSE<br>FOR YOUR CAREER</h2>
             <div class="grid md:grid-cols-3 gap-8">
-                <?php foreach($courses as $course): ?>
+                <?php foreach ($courses as $course): ?>
                     <div class="bg-white rounded-lg overflow-hidden shadow-lg">
                         <div class="aspect-video bg-gray-100"></div>
                         <div class="p-6">
@@ -190,11 +200,6 @@ $courses = [
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-beige py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-primary font-bold text-xl">EDUTOCK</div>
-        </div>
-    </footer>
 </body>
+
 </html>
