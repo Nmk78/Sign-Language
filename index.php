@@ -54,7 +54,7 @@ $courses = [
     <title>EDUTOCK - Online Learning Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-                tailwind.config = {
+        tailwind.config = {
             theme: {
                 extend: {
                     colors: {
@@ -76,7 +76,7 @@ $courses = [
     </script>
 </head>
 
-<body class="bg-beige">
+<body class="bg-background">
     <!-- Header -->
     <header class="bg-primary sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -92,28 +92,42 @@ $courses = [
     </header>
 
     <?php
-    $uri = trim($_SERVER['REQUEST_URI'], '/');
+    $urlPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $uri = trim($urlPath, '/');
 
-    if ($uri === 'dashboard') {
-        require "components/dashboard.php";
-    } else if ($uri === 'profile') {
-        require 'components/profile.php';
-    } else if ($uri === 'creator') {
-        require 'componexnts/creator-profile.php';
-    } else if ($uri === 'dashboard') {
-        require 'components/dashboard.php';
-    } else {
-        require 'tytp.php';
+    switch ($uri) {
+        case 'dashboard':
+            require 'components/dashboard.php';
+            break;
+        case 'profile':
+            require 'components/profile.php';
+            break;
+        case 'creator':
+            require 'components/creator-profile.php';
+            break;
+        default:
+            require 'components/home.php';
+            break;
     }
     ?>
 
 
-    <!-- Footer -->
-    <footer class="bg-beige py-8">
+    <?php
+    $hiddenPages = ['dashboard', 'profile', 'settings']; // Pages where the footer should be hidden
+
+    // Extract the last segment of the URI (ignoring query parameters)
+    $currentPage = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+
+    if (!in_array($currentPage, $hiddenPages)) {
+        echo '<footer class="bg-background py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-primary font-bold text-xl">EDUTOCK</div>
         </div>
-    </footer>
+    </footer>';
+    }
+    ?>
+
+
 </body>
 
 </html>

@@ -1,11 +1,11 @@
 <?php
-function renderHeader($activePage = 'home')
+function renderHeader($activePage = 'home', $role = "instructor")
 {
     $navItems = [
         'home' => '/',
         'dashboard' => '/dashboard',
-        'profile' => '/profile',
-        'creator' => '/creator'
+        'profile' => $role == 'instructor' ? '/dashboard' : '/profile',
+
     ];
 
     echo '<header class="bg-primary">
@@ -33,4 +33,5 @@ function getActiveRoute($url)
 $currentUrl = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 $activePage = getActiveRoute($currentUrl);
 
-renderHeader($activePage);
+renderHeader($activePage, role: "instructor");
+?>
