@@ -55,7 +55,7 @@
                     } else if ($uri === 'creator') {
                         require 'components/creator-profile.php';
                     } else {
-                        require "instructor/dashboard/students.php";
+                        require "instructor/dashboard/course.php";
                     }
                     ?>
                 </div>

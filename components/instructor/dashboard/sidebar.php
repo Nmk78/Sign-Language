@@ -1,5 +1,5 @@
 <?php
-if (!function_exists('renderSideBar')) {
+// if (!function_exists('renderSideBar')) {
     function renderSideBar($activeTab = 'students')
     {
         // Define the tab names and icons
@@ -36,8 +36,8 @@ if (!function_exists('renderSideBar')) {
 
         echo '</div></div>';
     }
-}
-if (!function_exists('getTabIcon')) {
+// }
+// if (!function_exists('getTabIcon')) {
     function getTabIcon($iconName)
     {
         // Return the corresponding SVG icon for each tab
@@ -95,14 +95,16 @@ if (!function_exists('getTabIcon')) {
                 return '';
         }
     }
-}
+// }
 
-function getActiveTab($url)
-{
-    $path = parse_url($url, PHP_URL_PATH);
-    $segments = explode('/', rtrim($path, '/'));
-    return end($segments);
-}
+// if (!function_exists('getActiveTab')) {
+    function getActiveTab($url)
+    {
+        $path = parse_url($url, PHP_URL_PATH);
+        $segments = explode('/', rtrim($path, '/'));
+        return end($segments);
+    }
+// }
 
 $currentUrl = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 $activePage = getActiveTab($currentUrl);
@@ -111,3 +113,5 @@ $activePage = getActiveTab($currentUrl);
 $activeTab = isset($_GET['tab']) ? $_GET['tab'] : 'students';
 
 renderSideBar($activeTab);
+
+?>
