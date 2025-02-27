@@ -24,7 +24,7 @@
                         'success': '#10B981',
                         'warning': '#F1C40F',
                         'error': '#E74C3C',
-                        'background': '#F5F5F5',
+                        'background': '#f8fafb',
                         'surface': '#FFFFFF',
                         'text': '#333333',
                         'text-light': '#7F8C8D',
@@ -36,13 +36,13 @@
 </head>
 
 <body>
-    <div class="relative flex size-full min-h-[50vh] flex-col bg-[#f8fafb] group/design-root overflow-x-hidden" style='font-family: Lexend, "Noto Sans", sans-serif;'>
+    <div class="relative max-w-7xl mx-auto flex size-full h-50vh flex-col bg-background group/design-root overflow-x-hidden" style='font-family: Lexend, "Noto Sans", sans-serif;'>
         <div class="layout-container flex h-full grow flex-col">
             <div class="gap-1 mx-6 flex flex-1 justify-center py-0">
                 <div class="layout-content-container flex sticky top-5 z-50 flex-col w-60 h-96 ">
                     <?php include 'instructor/dashboard/sidebar.php'; ?>
                 </div>
-                <div class="layout-content-container flex flex-col max-h-[100vh] flex-1">
+                <div class="layout-content-container flex flex-col max-h-[100vh] h-70vh flex-1">
 
                     <?php
                     $tab = isset($_GET['tab']) ? $_GET['tab'] : 'dashboard';

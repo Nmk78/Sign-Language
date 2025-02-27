@@ -18,7 +18,7 @@
                         'success': '#10B981',
                         'warning': '#F1C40F',
                         'error': '#E74C3C',
-                        'background': '#F5F5F5',
+                        'background': '#f8fafb',
                         'surface': '#FFFFFF',
                         'text': '#333333',
                         'text-light': '#7F8C8D',

@@ -31,7 +31,7 @@ if (!function_exists('renderSideBar')) {
         $activeClass = 'bg-[#EEF2FF] text-[#1d4ed8]';
         $activeBg = 'bg-[#EEF2FF]';
 
-        echo '<div class="flex h-full min-h-[500px] flex-col justify-between bg-[#f8fafb] p-4">
+        echo '<div class="flex h-full min-h-[500px] max-h-100vh flex-col justify-between bg-[#f8fafb] p-4">
             <div class="flex flex-col gap-4">';
 
         // Loop through the tabs and render each one

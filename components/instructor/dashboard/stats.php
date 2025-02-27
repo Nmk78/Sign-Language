@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
-    <div class="min-h-screen flex flex-col">
+    <div class="flex flex-col">
 
         <!-- Main Content -->
         <main class="flex-grow container mx-auto mt-8 px-4">
@@ -73,7 +73,7 @@
             </div>
 
             <!-- Recent Messages -->
-            <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
+            <div class="mt-5 max-h-14vh bg-white p-6 rounded-lg shadow-md">
                 <h2 class="text-xl font-semibold mb-4">Recent Messages</h2>
                 <ul class="space-y-4">
                     <?php
@@ -96,11 +96,6 @@
                 </ul>
             </div>
         </main>
-
-        <!-- Footer -->
-        <footer class="bg-gray-200 text-center p-4 mt-8">
-            <p>&copy; 2023 Teacher Dashboard. All rights reserved.</p>
-        </footer>
     </div>
 </body>
 </html>
