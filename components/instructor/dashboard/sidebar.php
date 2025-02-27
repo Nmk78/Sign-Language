@@ -9,12 +9,10 @@ if (!function_exists('renderSideBar')) {
                 'label' => 'Courses', 
                 'icon' => 'book',
                 'dropdown' => [
-                    'All' => '#',
-                    'Drafts' => '#',
-                    'Assigned' => '#',
-                    'Returned' => '#',
-                    'Grading' => '#',
-                    'Plagiarism' => '#'
+                    'Opened' => '#',
+                    'Restricted' => '#',
+                    'Quiz' => '#',
+                    'Assignment' => '#',
                 ]
             ],
             'students' => [
@@ -24,7 +22,7 @@ if (!function_exists('renderSideBar')) {
                     'All Students' => '#',
                     'Active Students' => '#',
                     'Inactive Students' => '#',
-                    'Prospective Students' => '#'
+                    // 'Prospective Students' => '#'
                 ]
             ],
         ];
@@ -44,13 +42,24 @@ if (!function_exists('renderSideBar')) {
             // Select the icon for the tab
             $icon = $isActive ? '<div class="text-[#4A90E2]">' . getTabIcon($tab['icon'] . 'Active') . '</div>' : getTabIcon($tab['icon']);
 
-            echo '<div class="flex flex-col ">
-                <div class="flex items-center gap-3 px-3 py-2 rounded-t-xl ' . $isActive . '">
+            ?>
+            <div class="flex flex-col ">
+                <div class="flex items-center gap-3 px-3 py-2 rounded-t-xl <?php echo $isActive; ?>">
                     <div class="text-[#0e161b]">
-                        ' . $icon . '
+                        <?php echo $icon; ?>
                     </div>
-                    <a href="' . $tabUrl . '" class="text-[#0e161b] text-sm font-medium leading-normal">' . $tab['label'] . '</a>
-                </div>';
+                    <a href="<?php echo $tabUrl; ?>" class="text-[#0e161b] text-sm font-medium leading-normal flex items-center justify-between">
+                        <?php echo $tab['label']; ?>
+                        <?php if (isset($tab['dropdown'])): ?>
+                            <span class="ml-2 transform transition-transform duration-200 <?php echo $activeTab === $tabKey ? 'rotate-90' : ''; ?>">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M6.646 4.646a.5.5 0 0 1 .708 0L10.207 8l-2.853 2.854a.5.5 0 0 1-.708-.708L8.793 8 6.646 5.854a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </span>
+                        <?php endif; ?>
+                    </a>
+                </div>
+            <?php
 
             // If this tab has a dropdown and is active, display it
             if (isset($tab['dropdown']) && $isActive) {
