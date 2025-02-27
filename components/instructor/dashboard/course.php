@@ -15,6 +15,19 @@
 
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+  /* Hide scrollbar for all browsers */
+  body {
+    overflow: hidden;
+  }
+
+  /* If you want to hide only the vertical scrollbar */
+  body {
+    overflow-x: hidden;
+    overflow-y: hidden; /* or 'scroll' to keep scrolling but hide the scrollbar */
+  }
+</style>
+
 </head>
 
 <body>
@@ -65,50 +78,50 @@
   ];
 
   foreach ($assignments as $assignment):
-    ?>
-      <div class="p-4 @container assignment-container" id="assignment-<?php echo $assignment['id']; ?>">
-        <div class="flex flex-col items-stretch justify-start rounded-xl @xl:flex-row @xl:items-start">
-          <div
-            class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
-            style='background-image: url("<?php echo $assignment['image']; ?>");'></div>
-          <div class="flex w-full min-w-72 grow flex-col items-stretch justify-center gap-1 py-4 @xl:px-4">
-            <p class="text-[#0e161b] text-lg font-bold leading-tight tracking-[-0.015em]"><?php echo $assignment['title']; ?></p>
-            <div class="flex items-end gap-3 justify-between">
-              <p class="text-[#507a95] text-base font-normal leading-normal">Due <?php echo $assignment['due_date']; ?></p>
-              <button
-                class="view-details-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-8 px-4 bg-[#1d8cd7] text-[#f8fafb] text-sm font-medium leading-normal"
-                data-assignment-id="<?php echo $assignment['id']; ?>">
-                <span class="truncate">View details</span>
-              </button>
-            </div>
+  ?>
+    <div class="p-4 @container assignment-container" id="assignment-<?php echo $assignment['id']; ?>">
+      <div class="flex flex-col items-stretch justify-start rounded-xl @xl:flex-row @xl:items-start">
+        <div
+          class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
+          style='background-image: url("<?php echo $assignment['image']; ?>");'></div>
+        <div class="flex w-full min-w-72 grow flex-col items-stretch justify-center gap-1 py-4 @xl:px-4">
+          <p class="text-[#0e161b] text-lg font-bold leading-tight tracking-[-0.015em]"><?php echo $assignment['title']; ?></p>
+          <div class="flex items-end gap-3 justify-between">
+            <p class="text-[#507a95] text-base font-normal leading-normal">Due <?php echo $assignment['due_date']; ?></p>
+            <button
+              class="view-details-btn flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-8 px-4 bg-[#1d8cd7] text-[#f8fafb] text-sm font-medium leading-normal"
+              data-assignment-id="<?php echo $assignment['id']; ?>">
+              <span class="truncate">View details</span>
+            </button>
           </div>
         </div>
-        <div class="assignment-details hidden mt-4 p-4 bg-[#e8eef3] rounded-xl">
-          <h3 class="text-[#0e161b] text-base font-bold mb-2">Assignment Details:</h3>
-          <p class="text-[#507a95] text-sm"><?php echo $assignment['details']; ?></p>
-        </div>
       </div>
-    <?php endforeach; ?>
-  
-    <script>
-      $(document).ready(function() {
-        $('.view-details-btn').click(function() {
-          var assignmentId = $(this).data('assignment-id');
-          var container = $('#assignment-' + assignmentId);
-          var detailsSection = container.find('.assignment-details');
-          
-          $('.assignment-details').not(detailsSection).slideUp();
-          detailsSection.slideToggle();
-          
-          container.toggleClass('expanded');
-          
-          if (container.hasClass('expanded')) {
-            $(this).html('<span class="truncate">Hide details</span>');
-          } else {
-            $(this).html('<span class="truncate">View details</span>');
-          }
-        });
+      <div class="assignment-details hidden mt-4 p-4 bg-[#e8eef3] rounded-xl">
+        <h3 class="text-[#0e161b] text-base font-bold mb-2">Assignment Details:</h3>
+        <p class="text-[#507a95] text-sm"><?php echo $assignment['details']; ?></p>
+      </div>
+    </div>
+  <?php endforeach; ?>
+
+  <script>
+    $(document).ready(function() {
+      $('.view-details-btn').click(function() {
+        var assignmentId = $(this).data('assignment-id');
+        var container = $('#assignment-' + assignmentId);
+        var detailsSection = container.find('.assignment-details');
+        
+        $('.assignment-details').not(detailsSection).slideUp();
+        detailsSection.slideToggle();
+        
+        container.toggleClass('expanded');
+        
+        if (container.hasClass('expanded')) {
+          $(this).html('<span class="truncate">Hide details</span>');
+        } else {
+          $(this).html('<span class="truncate">View details</span>');
+        }
       });
-    </script>
-  </body>
-  </html>
+    });
+  </script>
+</body>
+</html>
