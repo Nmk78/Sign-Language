@@ -85,7 +85,7 @@ $courses = [
                 <?php include 'nav.php'; ?>
                 <div class="flex items-center space-x-4">
                     <button class="bg-white px-6 py-2 rounded-md text-primary font-medium">Join Now</button>
-                    <a href="#" class="text-white">Log in</a>
+                    <a href="/signin" class="text-white">Log in</a>
                 </div>
             </div>
         </div>
@@ -96,8 +96,17 @@ $courses = [
     $uri = trim($urlPath, '/');
 
     switch ($uri) {
+        case 'signin':
+            require 'components/signin.php';
+            break;
+        case 'signup':
+            require 'components/signup.php';
+            break;
         case 'dashboard':
             require 'components/dashboard.php';
+            break;
+        case 'category':
+            require 'components/categories.php';
             break;
         case 'profile':
             require 'components/profile.php';

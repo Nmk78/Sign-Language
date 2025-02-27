@@ -38,24 +38,34 @@
 <body>
     <div class="relative flex size-full min-h-[50vh] flex-col bg-[#f8fafb] group/design-root overflow-x-hidden" style='font-family: Lexend, "Noto Sans", sans-serif;'>
         <div class="layout-container flex h-full grow flex-col">
-            <div class="gap-1 px-6 flex flex-1 justify-center py-0">
-                <div class="layout-content-container flex flex-col w-1/6 h-96 ">
+            <div class="gap-1 mx-6 flex flex-1 justify-center py-0">
+                <div class="layout-content-container flex sticky top-5 z-50 flex-col w-60 h-96 ">
                     <?php include 'instructor/dashboard/sidebar.php'; ?>
-
                 </div>
-                <div class="layout-content-container flex flex-col max-w-[1100px] max-h-[100vh] flex-1">
+                <div class="layout-content-container flex flex-col max-h-[100vh] flex-1">
 
                     <?php
-                    $uri = trim($_SERVER['REQUEST_URI'], '/');
+                    $tab = isset($_GET['tab']) ? $_GET['tab'] : 'dashboard';
 
-                    if ($uri === 'dashboard') {
-                        require "components/dashboard.php";
-                    } else if ($uri === 'profile') {
-                        require 'components/profile.php';
-                    } else if ($uri === 'creator') {
-                        require 'components/creator-profile.php';
-                    } else {
-                        require "instructor/dashboard/course.php";
+                    switch ($tab) {
+                        case 'dashboard':
+                            require "components/dashboard.php";
+                            break;
+                        case 'profile':
+                            require 'components/profile.php';
+                            break;
+                        case 'creator':
+                            require 'components/creator-profile.php';
+                            break;
+                        case 'statistics':
+                            require 'instructor/dashboard/stats.php';
+                            break;
+                        case 'students':
+                            require 'instructor/dashboard/students.php';
+                            break;
+                        default:
+                            require "instructor/dashboard/course.php";
+                            break;
                     }
                     ?>
                 </div>
