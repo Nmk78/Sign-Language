@@ -4,16 +4,34 @@ if (!function_exists('renderSideBar')) {
     {
         // Define the tab names and icons
         $tabs = [
-            'home' => ['label' => 'Home', 'icon' => 'house'],
-            'courses' => ['label' => 'Courses', 'icon' => 'book'],
-            'lessons' => ['label' => 'Lessons', 'icon' => 'list'],
-            'notes' => ['label' => 'Notes', 'icon' => 'pencil'],
-            'students' => ['label' => 'Students', 'icon' => 'users'],
-            'messages' => ['label' => 'Messages', 'icon' => 'chat'],
+            'statistics' => ['label' => 'Statistics', 'icon' => 'statistics'],
+            'courses' => [
+                'label' => 'Courses', 
+                'icon' => 'book',
+                'dropdown' => [
+                    'All' => '#',
+                    'Drafts' => '#',
+                    'Assigned' => '#',
+                    'Returned' => '#',
+                    'Grading' => '#',
+                    'Plagiarism' => '#'
+                ]
+            ],
+            'students' => [
+                'label' => 'Students', 
+                'icon' => 'users',
+                'dropdown' => [
+                    'All Students' => '#',
+                    'Active Students' => '#',
+                    'Inactive Students' => '#',
+                    'Prospective Students' => '#'
+                ]
+            ],
         ];
 
         // Define active tab class
         $activeClass = 'bg-[#EEF2FF] text-[#1d4ed8]';
+        $activeBg = 'bg-[#EEF2FF]';
 
         echo '<div class="flex h-full min-h-[500px] flex-col justify-between bg-[#f8fafb] p-4">
             <div class="flex flex-col gap-4">';
@@ -26,26 +44,54 @@ if (!function_exists('renderSideBar')) {
             // Select the icon for the tab
             $icon = $isActive ? '<div class="text-[#4A90E2]">' . getTabIcon($tab['icon'] . 'Active') . '</div>' : getTabIcon($tab['icon']);
 
-            echo '<div class="flex items-center gap-3 px-3 py-2 rounded-xl ' . $isActive . '">
-                <div class="text-[#0e161b]">
-                    ' . $icon . '
-                </div>
-                <a href="' . $tabUrl . '" class="text-[#0e161b] text-sm font-medium leading-normal">' . $tab['label'] . '</a>
-            </div>';
+            echo '<div class="flex flex-col ">
+                <div class="flex items-center gap-3 px-3 py-2 rounded-t-xl ' . $isActive . '">
+                    <div class="text-[#0e161b]">
+                        ' . $icon . '
+                    </div>
+                    <a href="' . $tabUrl . '" class="text-[#0e161b] text-sm font-medium leading-normal">' . $tab['label'] . '</a>
+                </div>';
+
+            // If this tab has a dropdown and is active, display it
+            if (isset($tab['dropdown']) && $isActive) {
+                echo '<div class="w-full rounded-b-xl ' . $activeBg . '">';
+                if ($tabKey === 'courses') {
+                    echo '<div class="flex flex-col px-2">';
+                    foreach ($tab['dropdown'] as $item => $link) {
+                        $itemClass = $item === 'All' ? ' text-[#1d8cd7]' : ' text-[#507a95]';
+                        echo '<a class="flex flex-col items-start justify-center  ' . $itemClass . ' py-2" href="' . $link . '">
+                            <p class="text-sm font-bold leading-normal tracking-[0.015em]">' . $item . '</p>
+                        </a>';
+                    }
+                    echo '</div>';
+                } elseif ($tabKey === 'students') {
+                    echo '<div class="flex flex-col px-4 justify-between">';
+                    foreach ($tab['dropdown'] as $item => $link) {
+                        $itemClass = $item === 'All Students' ? ' text-[#1d8cd7]' : 'text-[#507a95]';
+                        echo '<a class="flex flex-col justify-center' . $itemClass . ' pb-[13px] pt-4 flex-1" href="' . $link . '">
+                            <p class="text-sm font-bold leading-normal tracking-[0.015em]">' . $item . '</p>
+                        </a>';
+                    }
+                    echo '</div>';
+                }
+                echo '</div>';
+            }
+
+            echo '</div>';
         }
 
         echo '</div></div>';
     }
 }
+
+
 if (!function_exists('getTabIcon')) {
     function getTabIcon($iconName)
     {
         // Return the corresponding SVG icon for each tab
         switch ($iconName) {
-            case 'house':
-                return '<svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                        <path d="M218.83,103.77l-80-75.48a1.14,1.14,0,0,1-.11-.11,16,16,0,0,0-21.53,0l-.11.11L37.17,103.77A16,16,0,0,0,32,115.55V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V160h32v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V115.55A16,16,0,0,0,218.83,103.77ZM208,208H160V160a16,16,0,0,0-16-16H112a16,16,0,0,0-16,16v48H48V115.55l.11-.1L128,40l79.9,75.43.11.1Z"></path>
-                    </svg>';
+            case 'statistics':
+                return '<svg viewBox="0 0 24 24" width="24px" height="24px" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><defs><style>.a,.b{fill:none;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px;}.a{fill-rule:evenodd;}</style></defs><path class="a" d="M2,2V20a2,2,0,0,0,2,2H22"></path><rect class="b" height="6" rx="1.5" width="3" x="6" y="12"></rect><rect class="b" height="6" rx="1.5" width="3" x="12" y="7"></rect><rect class="b" height="6" rx="1.5" width="3" x="18" y="3"></rect></g></svg>';
             case 'book':
                 return '<svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path d="M208,24H72A32,32,0,0,0,40,56V224a8,8,0,0,0,8,8H192a8,8,0,0,0,0-16H56a16,16,0,0,1,16-16H208a8,8,0,0,0,8-8V32A8,8,0,0,0,208,24Zm-8,160H72a31.82,31.82,0,0,0-16,4.29V56A16,16,0,0,1,72,40H200Z"></path>
@@ -67,10 +113,9 @@ if (!function_exists('getTabIcon')) {
                         <path d="M0,116V196a16,16,0,0,0,16,16h42.15l25.92,25.91a8,8,0,0,0,13.73-5.66L87.81,188H192a16,16,0,0,0,16-16V60a16,16,0,0,0-16-16H64a16,16,0,0,0-16,16v60H16A16,16,0,0,0,0,116ZM64,60h128v104H64Z"></path>
                     </svg>';
 
-            case 'houseActive':
-                return '<svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                                    <path d="M218.83,103.77l-80-75.48a1.14,1.14,0,0,1-.11-.11,16,16,0,0,0-21.53,0l-.11.11L37.17,103.77A16,16,0,0,0,32,115.55V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V160h32v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V115.55A16,16,0,0,0,218.83,103.77ZM208,208H160V160a16,16,0,0,0-16-16H112a16,16,0,0,0-16,16v48H48V115.55l.11-.1L128,40l79.9,75.43.11.1Z"></path>
-                                </svg>';
+            case 'statisticsActive':
+                return '<svg viewBox="0 0 24 24" width="24px" height="24px" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><defs><style>.a,.b{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px;}.a{fill-rule:evenodd;}</style></defs><path class="a" d="M2,2V20a2,2,0,0,0,2,2H22"></path><rect class="b" height="6" rx="1.5" width="3" x="6" y="12"></rect><rect class="b" height="6" rx="1.5" width="3" x="12" y="7"></rect><rect class="b" height="6" rx="1.5" width="3" x="18" y="3"></rect></g></svg>';
+
             case 'bookActive':
                 return '<svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                                     <path d="M208,24H72A32,32,0,0,0,40,56V224a8,8,0,0,0,8,8H192a8,8,0,0,0,0-16H56a16,16,0,0,1,16-16H208a8,8,0,0,0,8-8V32A8,8,0,0,0,208,24Zm-8,160H72a31.82,31.82,0,0,0-16,4.29V56A16,16,0,0,1,72,40H200Z"></path>
@@ -97,17 +142,9 @@ if (!function_exists('getTabIcon')) {
     }
 }
 
-function getActiveTab($url)
-{
-    $path = parse_url($url, PHP_URL_PATH);
-    $segments = explode('/', rtrim($path, '/'));
-    return end($segments);
-}
-
-$currentUrl = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-$activePage = getActiveTab($currentUrl);
 
 // Get the tab parameter from the query, default to 'students' if not set
 $activeTab = isset($_GET['tab']) ? $_GET['tab'] : 'students';
 
 renderSideBar($activeTab);
+?>

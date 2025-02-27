@@ -3,8 +3,9 @@ function renderHeader($activePage = 'home', $role = "instructor")
 {
     $navItems = [
         'home' => '/',
-        'dashboard' => '/dashboard',
-        'profile' => $role == 'instructor' ? '/dashboard' : '/profile',
+        // 'category' => '/category',
+        'dashboard' => '/dashboard?tab=statistics',
+        'profile' => '/profile',
 
     ];
 

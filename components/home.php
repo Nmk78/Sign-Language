@@ -4,17 +4,22 @@ $features = [
     [
         "title" => "CLASS PROGRAM OPTIONS",
         "description" => "Some theorists focus on a single to overarching purpose of education and see.",
-        "bg" => "bg-primary"
+        "bg" => "bg-primary",
+        "text" => "text-[#fafafa]"
     ],
     [
         "title" => "ACCESS ANYWHERE",
         "description" => "Some theorists focus on a single to overarching purpose of education and see.",
-        "bg" => "bg-[#FBF7F4]"
+        "bg" => "bg-[#FBF7F4]",
+        "text" => "text-primary"
+
     ],
     [
         "title" => "FLEXIBLE TIME",
         "description" => "Some theorists focus on a single to overarching purpose of education and see.",
-        "bg" => "bg-[#FBF7F4]"
+        "bg" => "bg-[#FBF7F4]",
+        "text" => "text-primary"
+
     ]
 ];
 
@@ -90,7 +95,7 @@ $courses = [
                         GETWAY TO YOUR<br>KNOWLEDGE<br>UNIVERSE
                     </h1>
                 </div>
-                <div class="relative">
+                <div class="relative max-h-[550px] overflow-hidden">
                     <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-jNLOT8D3ifET6hAc7vRlsBqodzVLf8.png" alt="Student" class="w-full">
                 </div>
             </div>
@@ -102,12 +107,12 @@ $courses = [
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-center text-xl font-semibold text-primary mb-12">WE ARE SUPPORTED BY</h2>
             <div class="grid grid-cols-6 gap-8 items-center justify-items-center opacity-60">
-                <img src="path-to-merck-logo.png" alt="Merck" class="h-8">
-                <img src="path-to-nio-logo.png" alt="NIO" class="h-8">
-                <img src="path-to-defist-logo.png" alt="DeFist" class="h-8">
-                <img src="path-to-merck-logo.png" alt="Merck" class="h-8">
-                <img src="path-to-shopify-logo.png" alt="Shopify" class="h-8">
-                <img src="path-to-demio-logo.png" alt="Demio" class="h-8">
+                <img src="https://placehold.co/200x80?text=Sponsor+1" alt="Merck" class="h-18">
+                <img src="https://placehold.co/200x80?text=Sponsor+2" alt="NIO" class="h-18">
+                <img src="https://placehold.co/200x80?text=Sponsor+3" alt="DeFist" class="h-18">
+                <img src="https://placehold.co/200x80?text=Sponsor+4" alt="Merck" class="h-18">
+                <img src="https://placehold.co/200x80?text=Sponsor+5" alt="Shopify" class="h-18">
+                <img src="https://placehold.co/200x80?text=Sponsor+6" alt="Demio" class="h-18">
             </div>
         </div>
     </section>
@@ -121,7 +126,7 @@ $courses = [
             <div class="grid md:grid-cols-3 gap-8">
                 <?php foreach ($features as $feature): ?>
                     <div class="<?php echo $feature['bg']; ?> p-8 rounded-lg">
-                        <h3 class="text-xl font-bold text-primary mb-4"><?php echo $feature['title']; ?></h3>
+                        <h3 class="<?php echo $feature['text']; ?> text-xl font-bold text-primary mb-4"><?php echo $feature['title']; ?></h3>
                         <p class="text-gray-600"><?php echo $feature['description']; ?></p>
                     </div>
                 <?php endforeach; ?>
@@ -144,7 +149,7 @@ $courses = [
                         <?php endforeach; ?>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-4 max-h-96 overflow-hidden">
                     <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-5PTvlftctpgPVeHoeVoKmAvWN0Azyx.png" alt="Interior Design" class="w-full rounded-lg">
                     <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-5PTvlftctpgPVeHoeVoKmAvWN0Azyx.png" alt="Product Design" class="w-full rounded-lg">
                 </div>
@@ -159,7 +164,9 @@ $courses = [
             <div class="grid md:grid-cols-3 gap-8">
                 <?php foreach ($courses as $course): ?>
                     <div class="bg-white rounded-lg overflow-hidden shadow-lg">
-                        <div class="aspect-video bg-gray-100"></div>
+                        <div class="aspect-video bg-gray-100">
+                            <img src="/assets/image.png" alt="">
+                        </div>
                         <div class="p-6">
                             <h3 class="font-semibold text-primary"><?php echo $course['title']; ?></h3>
                             <div class="flex justify-between items-center mt-4">
