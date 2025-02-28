@@ -125,6 +125,9 @@ $courses = [
         case 'creator':
             require 'components/creator-profile.php';
             break;
+        case 'ai':
+            require 'components/ai.php';
+            break;
         default:
             require 'components/home.php';
             break;
