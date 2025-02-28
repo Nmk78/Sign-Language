@@ -16,10 +16,11 @@ if ($conn->connect_error) {
 $username = $_POST['username'];
 $email = $_POST['email'];
 $password = $_POST['password'];
-$role = $_POST['role'];
+$role = "admin";
 
 // Hash the password
 $password_hash = password_hash($password, PASSWORD_BCRYPT);
+echo "🚀 ~ $password_hash, $password_hash";
 
 // Prepare and bind
 $stmt = $conn->prepare("INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, ?)");

@@ -16,10 +16,10 @@
             <div class="text-center mb-6">
                 <p class="text-gray-600">Signup to your account</p>
             </div>
-            <form action="#" method="POST" class="space-y-6">
+            <form action="register" method="POST" class="space-y-6">
                 <div>
                     <label for="fullname" class="block text-sm font-medium text-gray-700">Full Name</label>
-                    <input type="text" id="fullname" name="fullname" required
+                    <input type="text" id="fullname" name="username" required
                         class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                 </div>
 

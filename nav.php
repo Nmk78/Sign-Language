@@ -35,4 +35,3 @@ $currentUrl = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 $activePage = getActiveRoute($currentUrl);
 
 renderHeader($activePage, role: "instructor");
-?>
