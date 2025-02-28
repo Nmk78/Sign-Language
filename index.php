@@ -117,6 +117,9 @@ $courses = [
         case 'creator':
             require 'components/creator-profile.php';
             break;
+        case 'ai':
+            require 'components/ai.php';
+            break;
         default:
             require 'components/home.php';
             break;
@@ -125,7 +128,7 @@ $courses = [
 
 
     <?php
-    $hiddenPages = ['dashboard', 'profile', 'settings','signin','signup']; // Pages where the footer should be hidden
+    $hiddenPages = ['dashboard', 'profile', 'settings','signin','signup','ai']; // Pages where the footer should be hidden
 
     // Extract the last segment of the URI (ignoring query parameters)
     $currentPage = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
