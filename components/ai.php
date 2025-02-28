@@ -52,40 +52,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_message'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Chatbot</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        .chat-widget { position: fixed; bottom: 20px; right: 20px; }
-        .chat-icon { width: 60px; height: 60px; background-color: #007bff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 24px; }
-        .chat-box { display: none; position: fixed; bottom: 90px; right: 20px; width: 300px; border: 1px solid #ccc; background: white; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); padding: 10px; border-radius: 10px; }
-        .chat-history { max-height: 200px; overflow-y: auto; }
-        .chat-message { margin-bottom: 10px; padding: 10px; border-radius: 5px; }
-        .user { background-color: #e1ffc7; text-align: right; }
-        .assistant { background-color: #f1f1f1; text-align: left; }
-    </style>
-    <script>
-        function toggleChat() {
-            let chatBox = document.getElementById("chatBox");
-            chatBox.style.display = (chatBox.style.display === "none" || chatBox.style.display === "") ? "block" : "none";
-        }
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="chat-widget">
-        <div class="chat-icon" onclick="toggleChat()">💬</div>
-        <div class="chat-box" id="chatBox">
-            <h4>AI Chatbot</h4>
-            <div class="chat-history">
-                <?php foreach ($_SESSION['chat_history'] as $message): ?>
-                    <div class="chat-message <?= $message['role'] ?>">
-                        <strong><?= ucfirst($message['role']) ?>:</strong> <?= htmlspecialchars($message['content']) ?>
-                    </div>
-                <?php endforeach; ?>
+<body class="bg-gray-100">
+    <div class="fixed bottom-6 right-6">
+        <div class="relative">
+            <button id="chatIcon" class="w-16 h-16 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-300">
+                💬
+            </button>
+            <div id="chatBox" class="hidden absolute bottom-20 right-0 w-80 bg-white shadow-lg rounded-lg p-4 transition-all duration-500 transform scale-95 opacity-0">
+                <h4 class="text-lg font-bold mb-2">AI Chatbot</h4>
+                <div class="max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 space-y-2 p-2 border rounded-lg">
+                    <?php foreach ($_SESSION['chat_history'] as $message): ?>
+                        <div class="p-2 rounded-md text-sm <?php echo $message['role'] === 'user' ? 'bg-green-100 text-right' : 'bg-gray-200 text-left'; ?>">
+                            <strong><?php echo ucfirst($message['role']); ?>:</strong> <?php echo htmlspecialchars($message['content']); ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <form method="POST" class="mt-3 flex space-x-2">
+                    <input type="text" name="user_message" class="flex-1 border p-2 rounded-lg" placeholder="Type a message..." required>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Send</button>
+                </form>
             </div>
-            <form method="POST">
-                <input type="text" name="user_message" placeholder="Type a message..." required>
-                <button type="submit">Send</button>
-            </form>
         </div>
     </div>
+    
+    <script>
+        const chatIcon = document.getElementById("chatIcon");
+        const chatBox = document.getElementById("chatBox");
+        
+        chatIcon.addEventListener("click", () => {
+            chatBox.classList.toggle("hidden");
+            if (!chatBox.classList.contains("hidden")) {
+                chatBox.classList.add("scale-100", "opacity-100");
+                chatBox.classList.remove("scale-95", "opacity-0");
+            } else {
+                chatBox.classList.add("scale-95", "opacity-0");
+                chatBox.classList.remove("scale-100", "opacity-100");
+            }
+        });
+    </script>
 </body>
 </html>
