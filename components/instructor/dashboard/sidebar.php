@@ -31,7 +31,7 @@ if (!function_exists('renderSideBar')) {
         $activeClass = 'bg-[#EEF2FF] text-[#1d4ed8]';
         $activeBg = 'bg-[#EEF2FF]';
 
-        echo '<div class="flex h-full min-h-[500px] max-h-100vh flex-col justify-between bg-[#f8fafb] p-4">
+        echo '<div class="flex h-full min-h-[500px] max-h-100vh z-30 flex-col justify-between bg-[#f8fafb] p-4">
             <div class="flex flex-col gap-4">';
 
         // Loop through the tabs and render each one
@@ -63,7 +63,7 @@ if (!function_exists('renderSideBar')) {
 
             // If this tab has a dropdown and is active, display it
             if (isset($tab['dropdown']) && $isActive) {
-                echo '<div class="w-full rounded-b-xl ' . $activeBg . '">';
+                echo '<div class="w-full rounded-b-xl pl-6 ' . $activeBg . '">';
                 if ($tabKey === 'courses') {
                     echo '<div class="flex flex-col px-2">';
                     foreach ($tab['dropdown'] as $item => $link) {

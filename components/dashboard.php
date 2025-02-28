@@ -36,42 +36,42 @@
 </head>
 
 <body>
-    <div class="relative max-w-7xl mx-auto flex size-full h-50vh flex-col bg-background group/design-root overflow-x-hidden" style='font-family: Lexend, "Noto Sans", sans-serif;'>
-        <div class="layout-container flex h-full grow flex-col">
-            <div class="gap-1 mx-6 flex flex-1 justify-center py-0">
-                <div class="layout-content-container flex sticky top-5 z-50 flex-col w-60 h-96 ">
-                    <?php include 'instructor/dashboard/sidebar.php'; ?>
-                </div>
-                <div class="layout-content-container flex flex-col max-h-[100vh] h-70vh flex-1">
-
-                    <?php
-                    $tab = isset($_GET['tab']) ? $_GET['tab'] : 'dashboard';
-
-                    switch ($tab) {
-                        case 'dashboard':
-                            require "components/dashboard.php";
-                            break;
-                        case 'profile':
-                            require 'components/profile.php';
-                            break;
-                        case 'creator':
-                            require 'components/creator-profile.php';
-                            break;
-                        case 'statistics':
-                            require 'instructor/dashboard/stats.php';
-                            break;
-                        case 'students':
-                            require 'instructor/dashboard/students.php';
-                            break;
-                        default:
-                            require "instructor/dashboard/course.php";
-                            break;
-                    }
-                    ?>
-                </div>
+    <!-- <div class="relative max-w-7xl mx-auto flex size-full h-50vh flex-col bg-background group/design-root overflow-x-hidden" style='font-family: Lexend, "Noto Sans", sans-serif;'> -->
+        <div class="layout-container grid grid-cols-11 gap-4 h-full">
+            <div class="col-span-1"></div>
+            <div class="layout-content-container col-span-2 sticky top-5 z-30 flex flex-col h-96">
+                <?php include 'instructor/dashboard/sidebar.php'; ?>
             </div>
+            <div class="layout-content-container col-span-7 flex flex-col max-h-[100vh] h-70vh">
+                <?php
+                $tab = isset($_GET['tab']) ? $_GET['tab'] : 'dashboard';
+
+                switch ($tab) {
+                    case 'dashboard':
+                        require "components/dashboard.php";
+                        break;
+                    case 'profile':
+                        require 'components/profile.php';
+                        break;
+                    case 'creator':
+                        require 'components/creator-profile.php';
+                        break;
+                    case 'statistics':
+                        require 'instructor/dashboard/stats.php';
+                        break;
+                    case 'students':
+                        require 'instructor/dashboard/students.php';
+                        break;
+                    default:
+                        require "instructor/dashboard/course.php";
+                        break;
+                }
+                ?>
+            </div>
+            <div class="col-span-1"></div>
+
         </div>
-    </div>
+    <!-- </div> -->
 </body>
 
 </html>
