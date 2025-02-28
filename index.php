@@ -96,6 +96,9 @@ $courses = [
     $uri = trim($urlPath, '/');
 
     switch ($uri) {
+        case 'upl':
+            require 'components/instructor/dashboard/addCourse.php';
+            break;
         case 'signin':
             require 'components/signin.php';
             break;

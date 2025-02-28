@@ -82,7 +82,7 @@
     <div id="new-course-modal" class="fixed w-screen h-screen inset-0 top-5 z-40 hidden flex items-center justify-center bg-black bg-opacity-50">
       <div class="bg-surface rounded-lg p-6 w-full max-w-lg">
         <h2 class="text-2xl text-primary-dark font-bold mb-4">Add New Course</h2>
-        <form id="new-course-form" action="/home" method="POST" enctype="multipart/form-data">
+        <form id="new-course-form" action="/upl" method="POST" enctype="multipart/form-data">
           <div class="mb-4">
             <label for="course-title" class="block text-sm font-medium text-primary-dark">Title</label>
             <input type="text" id="course-title" name="title" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
@@ -164,9 +164,7 @@
           $('#new-course-modal').addClass('hidden');
         });
 
-        $('#new-course-form').submit(function(e) {
-          e.preventDefault();
-          // Add your AJAX form submission logic here
+        $('#new-course-form').submit(function() {
           $('#new-course-modal').addClass('hidden');
         });
       });
