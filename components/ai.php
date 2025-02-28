@@ -10,12 +10,12 @@ if (!isset($_SESSION['chat_history'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_message'])) {
     $userMessage = trim($_POST['user_message']);
-    
+
     if (!empty($userMessage)) {
         $_SESSION['chat_history'][] = ["role" => "user", "content" => $userMessage];
-        
+
         $data = [
-            "model" => "gpt-4o",
+            "model" => "gpt-3.5-turbo",
             "messages" => $_SESSION['chat_history'],
             "max_tokens" => 512,
             "stream" => false
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_message'])) {
         if ($response !== false) {
             $responseData = json_decode($response, true);
             $botResponse = $responseData['choices'][0]['message']['content'] ?? "No response found";
-            
+
             $_SESSION['chat_history'][] = ["role" => "assistant", "content" => $botResponse];
         }
     }
@@ -48,44 +48,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_message'])) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Chatbot</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        .chat-widget { position: fixed; bottom: 20px; right: 20px; }
-        .chat-icon { width: 60px; height: 60px; background-color: #007bff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 24px; }
-        .chat-box { display: none; position: fixed; bottom: 90px; right: 20px; width: 300px; border: 1px solid #ccc; background: white; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); padding: 10px; border-radius: 10px; }
-        .chat-history { max-height: 200px; overflow-y: auto; }
-        .chat-message { margin-bottom: 10px; padding: 10px; border-radius: 5px; }
-        .user { background-color: #e1ffc7; text-align: right; }
-        .assistant { background-color: #f1f1f1; text-align: left; }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        function toggleChat() {
-            let chatBox = document.getElementById("chatBox");
-            chatBox.style.display = (chatBox.style.display === "none" || chatBox.style.display === "") ? "block" : "none";
+        // Function to check URL query parameters and open/close chatbox accordingly
+        function checkChatState() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const chatState = urlParams.get('chat'); // Get 'chat' parameter from URL
+
+            let chatBox = document.getElementById("chat-box");
+            if (chatState === 'open') {
+                chatBox.classList.add("block"); // Show the chatbox
+            } else {
+                chatBox.classList.add("hidden"); // Hide the chatbox using Tailwind's 'hidden' class
+            }
         }
+
+        // Run the checkChatState function when the page loads
+        window.onload = checkChatState;
     </script>
 </head>
-<body>
-    <div class="chat-widget">
-        <div class="chat-icon" onclick="toggleChat()">💬</div>
-        <div class="chat-box" id="chatBox">
-            <h4>AI Chatbot</h4>
-            <div class="chat-history">
+
+<body class="font-sans bg-gray-100">
+    <div class="chat-widget fixed bottom-5 right-5">
+        <div class="chat-icon w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center cursor-pointer text-white text-2xl">
+            <!-- This link will toggle the state of the chatbox via URL parameter -->
+            <a href="<?php echo (isset($_GET['chat']) && $_GET['chat'] === 'open') ? '?' : '?chat=open'; ?>" class="text-white">💬</a>
+        </div>
+        <div id="chat-box" class="chat-box fixed bottom-24 right-5 w-80 p-4 bg-white border border-gray-300 rounded-lg shadow-lg">
+            <h4 class="text-lg font-semibold mb-3">AI Chatbot</h4>
+            <div class="chat-history max-h-52 overflow-y-auto mb-4">
                 <?php foreach ($_SESSION['chat_history'] as $message): ?>
-                    <div class="chat-message <?= $message['role'] ?>">
-                        <strong><?= ucfirst($message['role']) ?>:</strong> <?= htmlspecialchars($message['content']) ?>
+                    <div class="chat-message mb-2 p-2 rounded-lg <?= $message['role'] === 'user' ? 'bg-green-100 text-right' : 'bg-gray-200 text-left' ?>">
+                        <strong class="font-semibold"><?= ucfirst($message['role']) ?>:</strong> <?= htmlspecialchars($message['content']) ?>
                     </div>
                 <?php endforeach; ?>
             </div>
-            <form method="POST">
-                <input type="text" name="user_message" placeholder="Type a message..." required>
-                <button type="submit">Send</button>
+            <form method="POST" class="flex">
+                <input type="text" name="user_message" placeholder="Type a message..." required class="w-full p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-600" />
+                <button type="submit" class="p-2 bg-blue-600 text-white rounded-r-lg hover:bg-blue-700 focus:outline-none">Send</button>
             </form>
         </div>
     </div>
 </body>
+
 </html>

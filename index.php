@@ -134,6 +134,7 @@ $courses = [
     }
     ?>
 
+    <?php include 'components/ai.php' ?>
 
     <?php
     $hiddenPages = ['dashboard', 'profile', 'settings', 'signin', 'signup']; // Pages where the footer should be hidden
