@@ -125,7 +125,7 @@ $courses = [
 
 
     <?php
-    $hiddenPages = ['dashboard', 'profile', 'settings']; // Pages where the footer should be hidden
+    $hiddenPages = ['dashboard', 'profile', 'settings','signin','signup']; // Pages where the footer should be hidden
 
     // Extract the last segment of the URI (ignoring query parameters)
     $currentPage = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
