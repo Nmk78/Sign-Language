@@ -12,7 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_message'])) {
     $userMessage = trim($_POST['user_message']);
     
     if (!empty($userMessage)) {
-        // Add user's message to chat history
         $_SESSION['chat_history'][] = ["role" => "user", "content" => $userMessage];
         
         $data = [
@@ -41,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_message'])) {
             $responseData = json_decode($response, true);
             $botResponse = $responseData['choices'][0]['message']['content'] ?? "No response found";
             
-            // Add AI's response to chat history
             $_SESSION['chat_history'][] = ["role" => "assistant", "content" => $botResponse];
         }
     }
@@ -56,26 +54,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_message'])) {
     <title>AI Chatbot</title>
     <style>
         body { font-family: Arial, sans-serif; }
-        .chat-box { width: 50%; margin: auto; padding: 20px; border: 1px solid #ccc; }
+        .chat-widget { position: fixed; bottom: 20px; right: 20px; }
+        .chat-icon { width: 60px; height: 60px; background-color: #007bff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; font-size: 24px; }
+        .chat-box { display: none; position: fixed; bottom: 90px; right: 20px; width: 300px; border: 1px solid #ccc; background: white; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); padding: 10px; border-radius: 10px; }
+        .chat-history { max-height: 200px; overflow-y: auto; }
         .chat-message { margin-bottom: 10px; padding: 10px; border-radius: 5px; }
         .user { background-color: #e1ffc7; text-align: right; }
         .assistant { background-color: #f1f1f1; text-align: left; }
     </style>
+    <script>
+        function toggleChat() {
+            let chatBox = document.getElementById("chatBox");
+            chatBox.style.display = (chatBox.style.display === "none" || chatBox.style.display === "") ? "block" : "none";
+        }
+    </script>
 </head>
 <body>
-    <div class="chat-box">
-        <h2>AI Chatbot</h2>
-        <div class="chat-history">
-            <?php foreach ($_SESSION['chat_history'] as $message): ?>
-                <div class="chat-message <?= $message['role'] ?>">
-                    <strong><?= ucfirst($message['role']) ?>:</strong> <?= htmlspecialchars($message['content']) ?>
-                </div>
-            <?php endforeach; ?>
+    <div class="chat-widget">
+        <div class="chat-icon" onclick="toggleChat()">💬</div>
+        <div class="chat-box" id="chatBox">
+            <h4>AI Chatbot</h4>
+            <div class="chat-history">
+                <?php foreach ($_SESSION['chat_history'] as $message): ?>
+                    <div class="chat-message <?= $message['role'] ?>">
+                        <strong><?= ucfirst($message['role']) ?>:</strong> <?= htmlspecialchars($message['content']) ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <form method="POST">
+                <input type="text" name="user_message" placeholder="Type a message..." required>
+                <button type="submit">Send</button>
+            </form>
         </div>
-        <form method="POST">
-            <input type="text" name="user_message" placeholder="Type a message..." required>
-            <button type="submit">Send</button>
-        </form>
     </div>
 </body>
 </html>
