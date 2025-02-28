@@ -77,8 +77,8 @@
       </div>
     </label>
 
-    <button id="new-course-btn" class="py-2 px-2 rounded-xl text-surface gap-2 text-lg bg-primary ">➕New Course</button>
-
+    <button id="new-course-btn" class="py-2 px-2 rounded-xl text-surface font-semibold gap-2 text-md bg-primary ">➕&nbsp;New Course</button>
+    
     <!-- New Course Modal -->
     <div id="new-course-modal" class="fixed w-screen h-screen inset-0 top-5 z-40 hidden flex items-center justify-center bg-black bg-opacity-50">
       <div class="bg-surface rounded-lg p-6 w-full max-w-lg">
