@@ -1,6 +1,5 @@
 <?php
-// Database connection
-// if (isset($_GET['loading']) && $_GET['loading'] == 'true') {
+
     echo '
         <div id="loading" class="fixed w-screen h-screen inset-0 top-5 z-40 flex items-center justify-center bg-black bg-opacity-50">
             <div class="bg-surface opacity-80 p-8 rounded-lg w-96">
@@ -12,9 +11,8 @@
             </div>  
         </div>';
 
-    include 'components/signin.php';
-    // exit;
-// }
+    include 'components/signup.php';
+
 
 $servername = "localhost";
 $username = "root";

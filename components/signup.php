@@ -16,7 +16,7 @@
             <div class="text-center mb-6">
                 <p class="text-gray-600">Signup to your account</p>
             </div>
-            <form action="register" method="POST" class="space-y-6">
+            <form action="signingup" method="POST" class="space-y-6">
                 <div>
                     <label for="fullname" class="block text-sm font-medium text-gray-700">Full Name</label>
                     <input type="text" id="fullname" name="username" required
