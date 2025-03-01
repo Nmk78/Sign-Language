@@ -1,4 +1,7 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $navItems = ["Learning", "Instructor", "Enterprise", "Scholarship"];
 $features = [
     [
@@ -54,11 +57,24 @@ $courses = [
     <title>EDUTOCK - Online Learning Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <head>
-        <script src="utils/toaster.js"></script>
-    </head>
+    <script src="utils/toaster.js"></script>
 
     <script>
+        // Function to check URL query parameters and open/close chatbox accordingly
+        function checkChatState() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const chatState = urlParams.get('chat');
+            let chatBox = document.getElementById("chat-box");
+
+            if (chatBox) {
+                chatBox.classList.toggle("hidden", chatState !== 'open');
+            }
+        }
+
+
+        // Run the checkChatState function when the page loads
+        window.onload = checkChatState;
+
         tailwind.config = {
             theme: {
                 extend: {
@@ -78,7 +94,13 @@ $courses = [
                 }
             }
         }
+
+        function toggleChat() {
+            let chatBox = document.getElementById('chat-box');
+            chatBox.classList.toggle('hidden');
+        }
     </script>
+
 </head>
 
 <body class="bg-background">
@@ -142,7 +164,7 @@ $courses = [
     // Extract the last segment of the URI (ignoring query parameters)
     $currentPage = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 
-    if (!in_array($currentPage, $hiddenPages)) {
+    if (!in_array($uri, $hiddenPages)) {
         echo '<footer class="bg-background py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-primary font-bold text-xl">EDUTOCK</div>
