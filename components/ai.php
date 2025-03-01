@@ -11,9 +11,10 @@ if (!isset($_SESSION['chat_history'])) {
 function sendMessage($userMessage) {
     global $apiUrl, $apiKey;
 
+    // Only send the current user message instead of the entire chat history
     $data = [
         "model" => "gpt-4o",
-        "messages" => array_merge($_SESSION['chat_history'], [["role" => "user", "content" => $userMessage]]),
+        "messages" => [["role" => "user", "content" => $userMessage]],
         "max_tokens" => 512,
         "stream" => false
     ];
@@ -45,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_message'])) {
     $userMessage = trim($_POST['user_message']);
     
     if (!empty($userMessage)) {
+        // Still add to chat history for display purposes
         $_SESSION['chat_history'][] = ["role" => "user", "content" => $userMessage];
         $botResponse = sendMessage($userMessage);
         $_SESSION['chat_history'][] = ["role" => "assistant", "content" => $botResponse];
