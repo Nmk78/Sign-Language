@@ -50,10 +50,12 @@ if ($stmt->num_rows > 0) {
     // Verify the entered password with the hashed password
     if (password_verify($password, $password_hash)) {
         // Store user info in session
-        $_SESSION['user_id'] = $id;
-        $_SESSION['username'] = $username;
-        $_SESSION['role'] = $role;
-        $_SESSION['logged_in'] = true;
+        $_SESSION['user'] = [
+            'user_id' => $id,
+            'username' => $username,
+            'role' => $role,
+            'logged_in' => true
+        ];
 
         // Display success toast and redirect after a delay
         echo "<script>
