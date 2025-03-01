@@ -117,8 +117,10 @@ $courses = [
                 <?php include 'nav.php'; ?>
                 <div class="flex items-center space-x-4">
                     <?php if (isset($_SESSION['user']) && $_SESSION['user']['logged_in']): ?>
-                        <span class="text-white font-bold">Hello, <?php echo htmlspecialchars($_SESSION['user']['username']); ?></span>
-                        <img class="size-5" src="/assets/userAvatar.svg" alt="">
+                        <a href="/profile" class="text-white font-bold hover:underline">
+                            Hello, <?php echo htmlspecialchars($_SESSION['user']['username']); ?>
+                        </a>
+                        <img class="size-5 cursor-pointer" src="/assets/userAvatar.svg" alt="" onclick="window.location.href='/profile';">
                     <?php else: ?>
                         <a href="/signup" class="bg-white px-6 py-2 rounded-md text-primary font-medium">Join Now</a>
                         <a href="/signin" class="text-white">Log in</a>

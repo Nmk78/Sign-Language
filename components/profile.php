@@ -25,7 +25,7 @@
                     }
                 }
             }
-        }
+        };
     </script>
 </head>
 
@@ -35,11 +35,18 @@
         <!-- Profile Header -->
         <div class="bg-surface rounded-xl shadow-lg p-8 mb-8">
             <div class="flex items-start gap-8">
-                <div class="w-32 h-32 rounded-full bg-primary flex items-center justify-center text-white text-4xl">
-                    JD
+                <!-- Avatar -->
+                <div class="w-32 h-32 rounded-full overflow-hidden bg-primary flex items-center justify-center">
+                    <img id="profile-avatar" src="assets\avatar1.svg" alt="User Avatar" class="w-full h-full object-cover">
                 </div>
+
                 <div class="flex-1">
-                    <h1 class="text-3xl font-bold text-text mb-2">John Doe</h1>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-3xl font-bold text-text mb-2">John Doe</h1>
+                        <button onclick="openAvatarModal()" class="text-sm bg-primary text-white px-3 py-1 rounded-lg hover:bg-primary-dark">
+                            Edit Avatar
+                        </button>
+                    </div>
                     <p class="text-text-light mb-4">Web Development Enthusiast</p>
                     <div class="flex gap-4">
                         <div class="bg-primary/10 px-4 py-2 rounded-lg">
@@ -147,6 +154,52 @@
             </div>
         </div>
     </div>
-</body>
 
+    <!-- Avatar Selection Modal -->
+    <div id="avatar-modal" class="fixed inset-0 bg-black bg-opacity-50 flex z-10 items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-md">
+            <h2 class="text-xl font-bold text-text mb-4">Select an Avatar</h2>
+            <div class="grid grid-cols-3 gap-4">
+                <!-- PHP Loop to generate avatar images -->
+                <?php
+                for ($i = 1; $i <= 15; $i++) {
+                    $avatarPath = "assets/avatar{$i}.svg"; // Dynamic path to avatar
+                    echo "
+                        <img src='{$avatarPath}' class='w-16 h-16 rounded-full cursor-pointer border-2 border-transparent hover:border-primary' onclick='selectAvatar(\"{$avatarPath}\")'>
+                    ";
+                }
+                ?>
+            </div>
+            <button onclick="closeAvatarModal()" class="mt-4 px-4 py-2 bg-error text-white rounded-lg">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // Open Modal
+        function openAvatarModal() {
+            document.getElementById('avatar-modal').classList.remove('hidden');
+        }
+
+        // Close Modal
+        function closeAvatarModal() {
+            document.getElementById('avatar-modal').classList.add('hidden');
+        }
+
+        // Select Avatar
+        function selectAvatar(avatarPath) {
+            localStorage.setItem('selectedAvatar', avatarPath);
+            document.getElementById('profile-avatar').src = avatarPath;
+            closeAvatarModal();
+        }
+
+        // Load Avatar from Local Storage
+        document.addEventListener('DOMContentLoaded', function() {
+            const storedAvatar = localStorage.getItem('selectedAvatar');
+            if (storedAvatar) {
+                document.getElementById('profile-avatar').src = storedAvatar;
+            }
+        });
+    </script>
+
+</body>
 </html>
