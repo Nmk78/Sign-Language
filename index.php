@@ -162,6 +162,9 @@ $courses = [
         case 'ai':
             require 'components/ai.php';
             break;
+        case 'courseDetails':
+            require 'components/courseDetails.php';
+            break;
         default:
             require 'components/home.php';
             break;

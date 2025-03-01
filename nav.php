@@ -7,6 +7,7 @@ function renderHeader($activePage = 'home', $role = "instructor")
         'dashboard' => '/dashboard?tab=statistics',
         'profile' => '/profile',
         'ai' => '/ai',
+        'courseDetails' => '/courseDetails',
     ];
 
     echo '<header class="bg-primary">
