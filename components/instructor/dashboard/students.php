@@ -74,7 +74,7 @@
                     <tr class="bg-[#f8fafb]">
                         <th class="table-5a24c0bc-ebfc-4bfd-9cd6-04bf15c81ef0-column-56 px-4 py-3 text-left text-[#0e161b] w-14 text-sm font-medium leading-normal">Student</th>
                         <th class="table-5a24c0bc-ebfc-4bfd-9cd6-04bf15c81ef0-column-176 px-4 py-3 text-left text-[#0e161b] w-[400px] text-sm font-medium leading-normal">Grade</th>
-                        <th class="table-5a24c0bc-ebfc-4bfd-9cd6-04bf15c81ef0-column-296 px-4 py-3 text-left text-[#0e161b] w-60 text-[#507a95] text-sm font-medium leading-normal">
+                        <th class="table-5a24c0bc-ebfc-4bfd-9cd6-04bf15c81ef0-column-296 px-4 py-3 text-left text-[#0e161b] w-60 text-sm font-medium leading-normal">
                             Attendance
                         </th>
                         <th class="table-5a24c0bc-ebfc-4bfd-9cd6-04bf15c81ef0-column-416 px-4 py-3 text-left text-[#0e161b] w-[400px] text-sm font-medium leading-normal">

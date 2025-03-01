@@ -53,6 +53,11 @@ $courses = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EDUTOCK - Online Learning Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <head>
+        <script src="utils/toaster.js"></script>
+    </head>
+
     <script>
         tailwind.config = {
             theme: {
@@ -96,6 +101,12 @@ $courses = [
     $uri = trim($urlPath, '/');
 
     switch ($uri) {
+        case 'signingup':
+            require 'handlers/signup.php';
+            break;
+        case 'signingin':
+            require 'handlers/signin.php';
+            break;
         case 'signin':
             require 'components/signin.php';
             break;
@@ -123,9 +134,10 @@ $courses = [
     }
     ?>
 
+    <?php include 'components/ai.php' ?>
 
     <?php
-    $hiddenPages = ['dashboard', 'profile', 'settings','signin','signup','ai']; // Pages where the footer should be hidden
+    $hiddenPages = ['dashboard', 'profile', 'settings', 'signin', 'signup']; // Pages where the footer should be hidden
 
     // Extract the last segment of the URI (ignoring query parameters)
     $currentPage = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
@@ -138,7 +150,6 @@ $courses = [
     </footer>';
     }
     ?>
-
 
 </body>
 
