@@ -120,7 +120,7 @@ $courses = [
                         <a href="/profile" class="text-white font-bold hover:underline">
                             Hello, <?php echo htmlspecialchars($_SESSION['user']['username']); ?>
                         </a>
-                        <img class="size-5 cursor-pointer" src="/assets/userAvatar.svg" alt="" onclick="window.location.href='/profile';">
+                        <img id="profile-avatar" class="size-8 cursor-pointer" src="/assets/userAvatar.svg" alt="" onclick="window.location.href='/profile';">
                     <?php else: ?>
                         <a href="/signup" class="bg-white px-6 py-2 rounded-md text-primary font-medium">Join Now</a>
                         <a href="/signin" class="text-white">Log in</a>
@@ -184,6 +184,36 @@ $courses = [
     </footer>';
     }
     ?>
+
+    <script>
+        function openAvatarModal() {
+            document.getElementById('avatar-modal').classList.remove('hidden');
+        }
+
+        // Close Modal
+        function closeAvatarModal() {
+            document.getElementById('avatar-modal').classList.add('hidden');
+        }
+
+        // Select Avatar
+        function selectAvatar(avatarPath) {
+            localStorage.setItem('selectedAvatar', avatarPath);
+            document.querySelectorAll('#profile-avatar').forEach(function(avatar) {
+                avatar.src = avatarPath;
+            });
+            closeAvatarModal();
+        }
+
+        // Load Avatar from Local Storage
+        document.addEventListener('DOMContentLoaded', function() {
+            const storedAvatar = localStorage.getItem('selectedAvatar');
+            if (storedAvatar) {
+                document.querySelectorAll('#profile-avatar').forEach(function(avatar) {
+                avatar.src = storedAvatar;
+            });
+            }
+        });
+    </script>
 
 </body>
 

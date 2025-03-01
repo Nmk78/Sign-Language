@@ -3,7 +3,7 @@ function renderHeader($activePage = 'home', $role = "instructor")
 {
     $navItems = [
         'home' => '/',
-        // 'category' => '/category',
+        'category' => '/category',
         'dashboard' => '/dashboard?tab=statistics',
         'profile' => '/profile',
         'ai' => '/ai',

@@ -36,16 +36,17 @@
         <div class="bg-surface rounded-xl shadow-lg p-8 mb-8">
             <div class="flex items-start gap-8">
                 <!-- Avatar -->
-                <div class="w-32 h-32 rounded-full overflow-hidden bg-primary flex items-center justify-center">
+                <div class="w-32 h-32 relative group rounded-full overflow-hidden bg-primary flex items-center justify-center">
                     <img id="profile-avatar" src="assets\avatar1.svg" alt="User Avatar" class="w-full h-full object-cover">
+                    <button onclick="openAvatarModal()" class="absolute hidden group-hover:block size-18 top-1/2 right-1/2 transform translate-x-1/2 -translate-y-1/2">
+                        <img src="/assets/changePen.svg" alt="">
+                    </button>
                 </div>
 
                 <div class="flex-1">
                     <div class="flex items-center gap-2">
                         <h1 class="text-3xl font-bold text-text mb-2">John Doe</h1>
-                        <button onclick="openAvatarModal()" class="text-sm bg-primary text-white px-3 py-1 rounded-lg hover:bg-primary-dark">
-                            Edit Avatar
-                        </button>
+
                     </div>
                     <p class="text-text-light mb-4">Web Development Enthusiast</p>
                     <div class="flex gap-4">
@@ -158,8 +159,13 @@
     <!-- Avatar Selection Modal -->
     <div id="avatar-modal" class="fixed inset-0 bg-black bg-opacity-50 flex z-10 items-center justify-center hidden">
         <div class="bg-white p-6 rounded-lg shadow-lg max-w-md">
-            <h2 class="text-xl font-bold text-text mb-4">Select an Avatar</h2>
-            <div class="grid grid-cols-3 gap-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-text mb-4">Select an Avatar</h2>
+                <button onclick="closeAvatarModal()" class=" size-7">
+                    <img src="/assets/close.svg" alt="">
+                </button>
+            </div>
+            <div class="flex justify-center items-center flex-wrap gap-4">
                 <!-- PHP Loop to generate avatar images -->
                 <?php
                 for ($i = 1; $i <= 15; $i++) {
@@ -170,36 +176,9 @@
                 }
                 ?>
             </div>
-            <button onclick="closeAvatarModal()" class="mt-4 px-4 py-2 bg-error text-white rounded-lg">Cancel</button>
         </div>
     </div>
 
-    <script>
-        // Open Modal
-        function openAvatarModal() {
-            document.getElementById('avatar-modal').classList.remove('hidden');
-        }
-
-        // Close Modal
-        function closeAvatarModal() {
-            document.getElementById('avatar-modal').classList.add('hidden');
-        }
-
-        // Select Avatar
-        function selectAvatar(avatarPath) {
-            localStorage.setItem('selectedAvatar', avatarPath);
-            document.getElementById('profile-avatar').src = avatarPath;
-            closeAvatarModal();
-        }
-
-        // Load Avatar from Local Storage
-        document.addEventListener('DOMContentLoaded', function() {
-            const storedAvatar = localStorage.getItem('selectedAvatar');
-            if (storedAvatar) {
-                document.getElementById('profile-avatar').src = storedAvatar;
-            }
-        });
-    </script>
-
 </body>
+
 </html>
