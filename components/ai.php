@@ -2,54 +2,78 @@
 session_start();
 
 $apiUrl = "https://api.aimlapi.com/chat/completions";
-$apiKey = "a85337536d384bda8674be80259d73b0";
+$apiKeys = [
+    "a85337536d384bda8674be80259d73b0",
+    "e81209f5615d4746afc95ddc97dd3470",
+    "e504ab0e5df14852b1d9ea362a15c7ec",
+    "3fe5f4b992bc41239b25d2742bbe538c",
+    "8039dd75b5d745a69bf0b3bba15efb46"
+];
 
 if (!isset($_SESSION['chat_history'])) {
     $_SESSION['chat_history'] = [];
 }
 
+if (!isset($_SESSION['current_api_key_index'])) {
+    $_SESSION['current_api_key_index'] = 0;
+}
+
 function sendMessage($userMessage) {
-    global $apiUrl, $apiKey;
+    global $apiUrl, $apiKeys;
 
     $data = [
         "model" => "gpt-4o",
-        "messages" => array_merge($_SESSION['chat_history'], [["role" => "user", "content" => $userMessage]]),
+        "messages" => [["role" => "user", "content" => $userMessage]], // Only store the latest message
         "max_tokens" => 512,
         "stream" => false
     ];
 
-    $curl = curl_init();
-    curl_setopt_array($curl, [
-        CURLOPT_URL => $apiUrl,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => [
-            "Authorization: Bearer $apiKey",
-            "Content-Type: application/json"
-        ],
-        CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => json_encode($data)
-    ]);
+    $maxAttempts = count($apiKeys);
+    $attempt = 0;
 
-    $response = curl_exec($curl);
-    curl_close($curl);
+    while ($attempt < $maxAttempts) {
+        $currentApiKey = $apiKeys[$_SESSION['current_api_key_index']];
 
-    if ($response !== false) {
-        $responseData = json_decode($response, true);
-        return $responseData['choices'][0]['message']['content'] ?? "No response found";
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_URL => $apiUrl,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                "Authorization: Bearer $currentApiKey",
+                "Content-Type: application/json"
+            ],
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => json_encode($data)
+        ]);
+
+        $response = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        if ($response !== false && $httpCode === 200) {
+            $responseData = json_decode($response, true);
+            return $responseData['choices'][0]['message']['content'] ?? "No response found";
+        }
+
+        // If there's an error, switch to the next API key
+        $_SESSION['current_api_key_index'] = ($_SESSION['current_api_key_index'] + 1) % count($apiKeys);
+        $attempt++;
     }
 
-    return "Error: Unable to get a response";
+    return "Error: Unable to get a response after trying all API keys";
 }
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_message'])) {
     $userMessage = trim($_POST['user_message']);
     
     if (!empty($userMessage)) {
-        $_SESSION['chat_history'][] = ["role" => "user", "content" => $userMessage];
+        $_SESSION['latest_user_message'] = $userMessage; // Store only the latest user message
         $botResponse = sendMessage($userMessage);
-        $_SESSION['chat_history'][] = ["role" => "assistant", "content" => $botResponse];
+        $_SESSION['latest_bot_response'] = $botResponse; // Store only the latest response
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -88,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_message'])) {
                 <div class="bg-blue-500 text-white p-4">
                     <h4 class="text-lg font-bold">AI Chatbot</h4>
                 </div>
-                <div class="h-96 overflow-y-auto scrollbar-custom p-4 space-y-4">
+                <div id="chatMessages" class="h-96 overflow-y-auto scrollbar-custom p-4 space-y-4">
                     <?php foreach ($_SESSION['chat_history'] as $message): ?>
                         <div class="flex <?php echo $message['role'] === 'user' ? 'justify-end' : 'justify-start'; ?>">
                             <div class="max-w-3/4 p-3 rounded-lg <?php echo $message['role'] === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'; ?>">
@@ -97,9 +121,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_message'])) {
                         </div>
                     <?php endforeach; ?>
                 </div>
-                <form method="POST" class="p-4 bg-gray-50 border-t border-gray-200">
+                <form id="chatForm" method="POST" class="p-4 bg-gray-50 border-t border-gray-200">
                     <div class="flex space-x-2">
-                        <input type="text" name="user_message" class="flex-1 border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Type a message..." required>
+                        <input type="text" name="user_message" id="userMessage" class="flex-1 border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Type a message..." required>
                         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -114,6 +138,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_message'])) {
     <script>
         const chatIcon = document.getElementById("chatIcon");
         const chatBox = document.getElementById("chatBox");
+        const chatMessages = document.getElementById("chatMessages");
+        const chatForm = document.getElementById("chatForm");
+        const userMessageInput = document.getElementById("userMessage");
         
         chatIcon.addEventListener("click", () => {
             chatBox.classList.toggle("hidden");
@@ -121,12 +148,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_message'])) {
                 setTimeout(() => {
                     chatBox.classList.add("scale-100", "opacity-100");
                     chatBox.classList.remove("scale-95", "opacity-0");
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
                 }, 10);
             } else {
                 chatBox.classList.add("scale-95", "opacity-0");
                 chatBox.classList.remove("scale-100", "opacity-100");
             }
         });
+
+        chatForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const userMessage = userMessageInput.value.trim();
+            if (userMessage) {
+                appendMessage("user", userMessage);
+                userMessageInput.value = "";
+                
+                const response = await fetch("", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: `user_message=${encodeURIComponent(userMessage)}`,
+                });
+                
+                const text = await response.text();
+                const botResponse = extractBotResponse(text);
+                appendMessage("assistant", botResponse);
+            }
+        });
+
+        function appendMessage(role, content) {
+            const messageDiv = document.createElement("div");
+            messageDiv.className = `flex ${role === "user" ? "justify-end" : "justify-start"}`;
+            messageDiv.innerHTML = `
+                <div class="max-w-3/4 p-3 rounded-lg ${role === "user" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}">
+                    <p class="text-sm">${content}</p>
+                </div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function extractBotResponse(html) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            const lastMessage = doc.querySelector("#chatMessages > div:last-child p");
+            return lastMessage ? lastMessage.textContent : "No response found";
+        }
     </script>
 </body>
 </html>
