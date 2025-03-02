@@ -3,64 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Language LMS - Login</title>
+    <title>Sign In - Sign Language Project</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center w-full min-h-screen">
-    <div class="bg-white mt-32 flex rounded-lg shadow-lg w-full max-w-4xl mx-auto overflow-hidden">
-        <!-- Left Side -->
-        <div class="hidden md:flex flex-col justify-center items-center w-1/2 bg-indigo-600 text-white p-10">
-            <h2 class="text-3xl font-bold">Welcome to Sign Language LMS</h2>
-            <p class="mt-4 text-center text-lg">Learn sign language effortlessly with our interactive lessons and expert guidance.</p>
-        </div>
+<body class="flex justify-center items-center min-h-screen bg-gray-100">
 
-        <!-- Right Side (Login Form) -->
-        <div class="w-full md:w-1/2 p-8">
-            <div class="text-center mb-6">
-                <h1 class="text-2xl font-bold text-gray-800">Welcome Back!</h1>
-                <p class="text-gray-600 mt-1">Login to continue learning</p>
+    <div class="bg-white p-6 rounded-2xl shadow-lg w-full max-w-md">
+        <h2 class="text-2xl font-bold text-center text-gray-700 mb-4">Sign In (Staff)</h2>
+        
+        <form class="space-y-4">
+            <!-- Email -->
+            <div>
+                <label class="block text-gray-600 font-semibold">Email</label>
+                <input type="email" placeholder="Enter your email"
+                    class="w-full px-4 py-2 mt-1 border rounded-lg focus:ring focus:ring-blue-300"
+                    required>
             </div>
 
-            <form action="signingin" method="POST" class="space-y-6">
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" id="email" name="email" required 
-                        class="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                    <input type="password" id="password" name="password" required 
-                        class="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-
-                <!-- <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <input type="checkbox" id="remember-me" name="remember-me" 
-                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                        <label for="remember-me" class="ml-2 text-sm text-gray-900">Remember me</label>
-                    </div>
-
-                    <div class="text-sm">
-                        <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Forgot password?</a>
-                    </div>
-                </div> -->
-
-                <div>
-                    <button type="submit" 
-                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Sign in
-                    </button>
-                </div>
-            </form>
-
-            <div class="mt-6 text-center">
-                <p class="text-sm text-gray-600">
-                    Don't have an account? 
-                    <a href="/signup" class="font-medium text-indigo-600 hover:text-indigo-500">Sign up</a>
-                </p>
+            <!-- Password -->
+            <div>
+                <label class="block text-gray-600 font-semibold">Password</label>
+                <input type="password" placeholder="Enter your password"
+                    class="w-full px-4 py-2 mt-1 border rounded-lg focus:ring focus:ring-blue-300"
+                    required>
             </div>
+
+            <!-- Video Authentication (Optional) -->
+            <div>
+                <label class="block text-gray-600 font-semibold">Sign-In with Video (Optional)</label>
+                <input type="file" accept="video/*"
+                    class="w-full px-4 py-2 mt-1 border rounded-lg focus:ring focus:ring-blue-300">
+                <p class="text-xs text-gray-500 mt-1">Upload a short video signing your name for identity verification.</p>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit"
+                class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">
+                Sign In
+            </button>
+        </form>
+
+        <!-- Forgot Password & Sign Up Links -->
+        <div class="text-sm text-center text-gray-500 mt-4">
+            <a href="#" class="text-blue-500 hover:underline">Forgot password?</a> <br>
+            Don't have an account? <a href="#" class="text-blue-500 hover:underline">Sign up</a>
         </div>
     </div>
+
 </body>
 </html>
