@@ -1,5 +1,5 @@
 <?php
-if (!function_exists('renderSideBar')) {
+if (!function_exists(function: 'renderSideBar')) {
     function renderSideBar($activeTab = 'students')
     {
         // Define the tab names and icons

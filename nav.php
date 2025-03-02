@@ -6,7 +6,6 @@ function renderHeader($activePage = 'home', $role = "instructor")
         'category' => '/category',
         'dashboard' => '/dashboard?tab=statistics',
         'profile' => '/profile',
-        'ai' => '/ai',
         'courseDetails' => '/courseDetails',
     ];
 
