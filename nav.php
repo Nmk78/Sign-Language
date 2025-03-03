@@ -1,6 +1,12 @@
 <?php
 function renderHeader($activePage = 'home', $role = "instructor")
 {
+
+    // TODO Test
+    //FIXME  FIx this
+
+    //improve this
+
     $navItems = [
         'home' => '/',
         'category' => '/category',
@@ -11,6 +17,9 @@ function renderHeader($activePage = 'home', $role = "instructor")
         'courseDetails' => '/courseDetails',
     ];
 
+    // TODO
+
+    //ImGay Hello
     echo '<header class="bg-primary">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
