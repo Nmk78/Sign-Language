@@ -13,7 +13,7 @@ if ($conn->connect_error) {
 // Fetch all courses
 $courses = $conn->query("SELECT * FROM courses");
 
-if (isset($_POST['add_lesson'])) {
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $course_id = $_POST['course_id'];
     $title = $_POST['title'];
     $content = $_POST['content'];
@@ -28,18 +28,13 @@ if (isset($_POST['add_lesson'])) {
     $stmt = $conn->prepare("INSERT INTO lesson (course_id, title, description, video_data) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("isss", $course_id, $title, $content, $video_data);
     $stmt->execute();
-    // header("Location: components/instructor/dashboard/course.php");
+    $stmt->close();
 }
 
 if (isset($_GET['delete_lesson'])) {
     $lesson_id = $_GET['delete_lesson'];
     $conn->query("DELETE FROM lesson WHERE id = $lesson_id");
-    // header("Location: components/instructor/dashboard/course.php");
 }
-?>
-
-<?php
-// ... (PHP code remains the same)
 ?>
 
 <!DOCTYPE html>
@@ -91,7 +86,7 @@ if (isset($_GET['delete_lesson'])) {
                         <div id="lessonList" class="text-left mb-4"></div>
 
                         <!-- Add Lesson Form -->
-                        <form id="addLessonForm" class="mt-4">
+                        <form id="addLessonForm" method="POST" enctype="multipart/form-data">
                             <input type="hidden" id="modalCourseId" name="course_id">
                             <div class="mb-4">
                                 <input type="text" id="lessonTitle" name="title" placeholder="Lesson Title" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -141,57 +136,29 @@ if (isset($_GET['delete_lesson'])) {
         }
 
         function fetchLessons(courseId) {
-            // In a real application, you would fetch this data from the server
-            // For this example, we'll use dummy data
-            const dummyLessons = [{
-                    id: 1,
-                    title: "Introduction to the Course"
-                },
-                {
-                    id: 2,
-                    title: "Basic Concepts"
-                },
-                {
-                    id: 3,
-                    title: "Advanced Techniques"
-                }
-            ];
-
-            lessonList.innerHTML = dummyLessons.map(lesson => `
-                <div class="flex justify-between items-center bg-gray-100 p-2 mb-2 rounded">
-                    <div class="aspect-video rounded-lg border-black"><i class="fas fa-play-circle text-indigo-600"></i></div>
-
-                    <span>${lesson.title}</span>
-                    <div>
-                        <button class="text-blue-500 hover:text-blue-700 mr-2" onclick="editLesson(${lesson.id})">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="text-red-500 hover:text-red-700" onclick="deleteLesson(${lesson.id})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
+            // Fetch lessons from the server
+            fetch(`fetch_lessons.php?course_id=${courseId}`)
+                .then(response => response.json())
+                .then(lessons => {
+                    lessonList.innerHTML = lessons.map(lesson => `
+                        <div class="flex justify-between items-center bg-gray-100 p-2 mb-2 rounded">
+                            <div class="aspect-video rounded-lg border-black"><i class="fas fa-play-circle text-indigo-600"></i></div>
+                            <span>${lesson.title}</span>
+                            <div>
+                                <button class="text-blue-500 hover:text-blue-700 mr-2" onclick="editLesson(${lesson.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="text-red-500 hover:text-red-700" onclick="deleteLesson(${lesson.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                });
         }
 
         addLessonForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const title = document.getElementById('lessonTitle').value;
-            const content = document.getElementById('lessonContent').value;
-            const video = document.getElementById('lessonVideo').files[0];
-
-            // Here you would typically send this data to the server
-            console.log('Adding lesson:', {
-                title,
-                content,
-                video
-            });
-
-            // Clear the form
-            this.reset();
-
-            // Refresh the lesson list
-            fetchLessons(modalCourseId.value);
+            // Allow form submission
         });
 
         function editLesson(lessonId) {
@@ -210,10 +177,12 @@ if (isset($_GET['delete_lesson'])) {
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Here you would typically send a delete request to the server
-                    console.log('Deleting lesson:', lessonId);
-                    // Refresh the lesson list
-                    fetchLessons(modalCourseId.value);
+                    // Send a delete request to the server
+                    fetch(`delete_lesson.php?lesson_id=${lessonId}`)
+                        .then(() => {
+                            // Refresh the lesson list
+                            fetchLessons(modalCourseId.value);
+                        });
                 }
             });
         }
