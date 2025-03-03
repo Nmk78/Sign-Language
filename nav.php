@@ -8,7 +8,6 @@ function renderHeader($activePage = 'home', $role = "instructor")
         'Content' => '/content',
         'dashboard' => '/dashboard?tab=statistics',
         'profile' => '/profile',
-        'ai' => '/ai',
         'courseDetails' => '/courseDetails',
     ];
 

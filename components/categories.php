@@ -21,7 +21,7 @@ $categoryStmt = $pdo->query("SELECT DISTINCT category FROM courses WHERE categor
 $categories = $categoryStmt->fetchAll(PDO::FETCH_COLUMN);
 
 // Pagination
-$itemsPerPage = 6;
+$itemsPerPage = 9;
 $totalCourses = count($courses);
 $totalPages = ceil($totalCourses / $itemsPerPage);
 $currentPage = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
@@ -83,11 +83,11 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
     </style>
 </head>
 <body class="bg-background font-sans">
-    <div class="max-w-7xl mx-auto p-4 md:p-8">
-        <header class="mb-8 text-center">
+    <div class="max-w-7xl mx-auto pt-4">
+        <!-- <header class="mb-8 text-center">
             <h1 class="text-3xl md:text-4xl font-bold text-text">Course Catalog</h1>
             <p class="text-text-light mt-2">Explore our wide range of courses</p>
-        </header>
+        </header> -->
         
         <!-- Category Filter -->
         <div id="categoryFilter" class="mb-6 flex flex-wrap justify-center gap-2">
@@ -102,18 +102,18 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
         </div>
 
         <!-- Courses Grid -->
-        <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             <?php foreach ($pagedCourses as $course): ?>
-                <div class="bg-white p-4 rounded-lg shadow-md">
+                <div class="bg-white p-4 rounded-lg shadow-md relative ">
                     <img src="<?php echo $course['thumbnail_url'] ? htmlspecialchars($course['thumbnail_url']) : 'https://via.placeholder.com/300x200.png?text=Course+Thumbnail'; ?>" alt="<?php echo htmlspecialchars($course['title']); ?>" class="w-full h-40 object-cover rounded-lg">
-                    <h2 class="text-xl font-semibold mt-2"><?php echo htmlspecialchars($course['title']); ?></h2>
+                    <h2 class="text-xl font-semibold mt-1"><?php echo htmlspecialchars($course['title']); ?></h2>
                     <p class="text-gray-600 text-sm"><?php echo htmlspecialchars($course['category'] ?? 'Uncategorized'); ?></p>
-                    <p class="mt-2 text-gray-800"><?php echo htmlspecialchars(substr($course['description'], 0, 80)) . '...'; ?></p>
-                    <div class="flex justify-between items-center mt-4">
-                        <button class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors">
+                    <p class="mt-1 text-gray-800"><?php echo htmlspecialchars(substr($course['description'], 0, 80)) . '...'; ?></p>
+                    <div class="flex justify-between items-center mt-2 absolute right-3 top-2">
+                        <!-- <button class="px-3 py-1 bg-primary text-white rounded hover:bg-primary-dark transition-colors">
                             Enroll Now
-                        </button>
-                        <button onclick="toggleSave(<?php echo $course['id']; ?>)" class="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none">
+                        </button> -->
+                        <button onclick="toggleSave(<?php echo $course['id']; ?>)" class=" p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-colors duration-300 ease-in-out text-blue-400" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                             </svg>
