@@ -43,7 +43,7 @@ if (!function_exists(function: 'renderSideBar')) {
             $icon = $isActive ? '<div class="text-[#4A90E2]">' . getTabIcon($tab['icon'] . 'Active') . '</div>' : getTabIcon($tab['icon']);
 
             ?>
-            <div class="flex flex-col ">
+            <div class="flex flex-col z-30">
                 <div class="flex items-center gap-3 px-3 py-2 rounded-t-xl <?php echo $isActive; ?>">
                     <div class="text-[#0e161b]">
                         <?php echo $icon; ?>
