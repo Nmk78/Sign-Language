@@ -4,6 +4,8 @@ function renderHeader($activePage = 'home', $role = "instructor")
     $navItems = [
         'home' => '/',
         'category' => '/category',
+        'About' => '/about',
+        'Content' => '/content',
         'dashboard' => '/dashboard?tab=statistics',
         'profile' => '/profile',
         'ai' => '/ai',
@@ -16,7 +18,7 @@ function renderHeader($activePage = 'home', $role = "instructor")
                 <nav class="hidden md:flex space-x-8">';
     foreach ($navItems as $name => $url) {
         $activeClass = $activePage === $name ? 'text-white underline' : 'text-white';
-        echo "<a href='{$url}' class='{$activeClass} hover:text-accent transition-colors'>" . ucfirst($name) . "</a>";
+        echo "<a href='{$url}' class='{$activeClass} hover:text-accent transition-colors'>" . ucfirst(strtolower($name)) . "</a>";
     }
     echo        '</nav>
                 

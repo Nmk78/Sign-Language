@@ -84,8 +84,7 @@ $courses = [
             theme: {
                 extend: {
                     colors: {
-                        'primary': '#4A90E2',
-                        'primary-dark': '#2A69A4',
+                        'primary': '#4A90E2',                        'primary-dark': '#2A69A4',
                         'secondary': '#7ED321',
                         'accent': '#F5A623',
                         'success': '#10B981',
@@ -165,8 +164,11 @@ $courses = [
         case 'courseDetails':
             require 'components/courseDetails.php';
             break;
-        default:
+        case '':
             require 'components/home.php';
+            break;
+        default:
+            require 'components/notfound.php';
             break;
     }
     ?>
@@ -212,8 +214,8 @@ $courses = [
             const storedAvatar = localStorage.getItem('selectedAvatar');
             if (storedAvatar) {
                 document.querySelectorAll('#profile-avatar').forEach(function(avatar) {
-                avatar.src = storedAvatar;
-            });
+                    avatar.src = storedAvatar;
+                });
             }
         });
     </script>
