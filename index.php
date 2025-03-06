@@ -1,12 +1,32 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
+    if (isset($_SESSION['user'])) {
+        $username = $_SESSION['user']['username']; 
+    } else {
+        $username = null; // If not logged in
+    }
 }
+// echo $username;
+
+// session_unset();  // Unset all session variables
+// session_destroy(); // Destroy the session
 
 // echo '<pre>';
 // print_r($_SESSION);
 // echo '</pre>';
+?>
+<script>
+     // Get username from PHP session and store in localStorage
+     let username = <?php echo json_encode($username); ?>;
+        // console.log(username);
+        if (username) {
+            localStorage.setItem("username", username);
+        }
 
+        // localStorage.removeItem("username"); // Clears username from localStorage
+</script>
+<?php
 $navItems = ["Learning", "Instructor", "Enterprise", "Scholarship"];
 $features = [
     [

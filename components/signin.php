@@ -21,7 +21,7 @@
                 <p class="text-gray-600 mt-1">Login to continue learning</p>
             </div>
 
-            <form action="signingin" method="POST" class="space-y-6">
+            <form action="signingin" id="signinForm" method="POST" class="space-y-6">
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                     <input type="email" id="email" name="email" required 
@@ -64,3 +64,12 @@
     </div>
 </body>
 </html>
+<script>
+        document.getElementById("signinForm").addEventListener("submit", function(event) {
+            // Get the username from the input field
+            let username = document.getElementById("fullname").value;
+
+            // Store in local storage
+            localStorage.setItem("username", username);
+        });
+</script>
