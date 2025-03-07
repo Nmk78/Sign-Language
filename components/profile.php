@@ -48,7 +48,7 @@
                         <!-- <h1 class="text-3xl font-bold text-text mb-2">John Doe</h1> -->
                         <h1 id="profile-name" class="text-3xl font-bold text-text mb-2">Loading...</h1>
                     </div>
-                    <p class="text-text-light mb-4">Web Development Enthusiast</p>
+                    <p class="text-text-light mb-4"  id="user-email">loading...</p>
                     <div class="flex gap-4">
                         <div class="bg-primary/10 px-4 py-2 rounded-lg">
                             <span class="text-primary font-bold">12</span>
@@ -196,6 +196,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     // Set the username and profile image on the profile page
                     document.getElementById("profile-name").textContent = data.username;
                     document.getElementById("profile-avatar").src = data.profile;
+                    document.getElementById("user-email").textContent = data.email;
                 } else {
                     console.error(data.error);  // Handle error if user is not found
                 }
