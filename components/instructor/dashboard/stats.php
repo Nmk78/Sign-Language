@@ -38,10 +38,10 @@
                             ["name" => "History Essay", "date" => "2023-05-25"]
                         ];
                         foreach ($assignments as $assignment) {
-                            echo "<li class='flex justify-between bg-gray-100 p-2 rounded'>";
-                            echo "<span>{$assignment['name']}</span>";
-                            echo "<span class='text-gray-600'>{$assignment['date']}</span>";
-                            echo "</li>";
+                            echo "<li class='flex justify-between bg-gray-100 p-2 rounded'> 
+                                    <span>{$assignment['name']}</span> 
+                                    <span class='text-gray-600'>{$assignment['date']}</span> 
+                                  </li>";
                         }
                         ?>
                     </ul>
@@ -59,39 +59,56 @@
                             ["class" => "History 303", "average" => 92]
                         ];
                         foreach ($performances as $performance) {
-                            echo "<div>";
-                            echo "<h3 class='font-medium'>{$performance['class']}</h3>";
-                            echo "<div class='bg-gray-200 rounded-full h-4 mt-2'>";
-                            echo "<div class='bg-green-500 rounded-full h-4' style='width: {$performance['average']}%'></div>";
-                            echo "</div>";
-                            echo "<p class='text-sm text-gray-600 mt-1'>Class Average: {$performance['average']}%</p>";
-                            echo "</div>";
+                            echo "<div>
+                                    <h3 class='font-medium'>{$performance['class']}</h3>
+                                    <div class='bg-gray-200 rounded-full h-4 mt-2'>
+                                        <div class='bg-green-500 rounded-full h-4' style='width: {$performance['average']}%'></div>
+                                    </div>
+                                    <p class='text-sm text-gray-600 mt-1'>Class Average: {$performance['average']}%</p>
+                                  </div>";
                         }
                         ?>
                     </div>
                 </div>
             </div>
 
-            <!-- Recent Messages -->
-            <div class="mt-5 max-h-14vh bg-white p-6 rounded-lg shadow-md">
-                <h2 class="text-xl font-semibold mb-4">Recent Messages</h2>
+            <!-- Recent Activities (Using Logs Table) -->
+            <div class="mt-5 max-h-64 overflow-y-auto bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Recent Activities</h2>
                 <ul class="space-y-4">
                     <?php
-                    // Replace with actual PHP code to fetch and display messages
-                    $messages = [
-                        ["from" => "John Doe", "subject" => "Question about homework", "time" => "2 hours ago"],
-                        ["from" => "Jane Smith", "subject" => "Absence notification", "time" => "1 day ago"],
-                        ["from" => "Admin", "subject" => "Staff meeting reminder", "time" => "3 days ago"]
-                    ];
-                    foreach ($messages as $message) {
-                        echo "<li class='flex items-center justify-between border-b pb-2'>";
-                        echo "<div>";
-                        echo "<h3 class='font-medium'>{$message['from']}</h3>";
-                        echo "<p class='text-sm text-gray-600'>{$message['subject']}</p>";
-                        echo "</div>";
-                        echo "<span class='text-xs text-gray-500'>{$message['time']}</span>";
-                        echo "</li>";
+                    // Connect to MySQL Database
+                    $conn = new mysqli("localhost", "root", "root", "sign_language");
+                    
+                    // Check connection
+                    if ($conn->connect_error) {
+                        die("Connection failed: " . $conn->connect_error);
                     }
+
+                    // Fetch recent activities from logs table
+                    $sql = "SELECT users.username, logs.action, logs.details, logs.timestamp 
+                            FROM logs 
+                            JOIN users ON logs.user_id = users.id 
+                            ORDER BY logs.timestamp DESC 
+                            LIMIT 5"; // Show latest 5 activities
+
+                    $result = $conn->query($sql);
+
+                    if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            echo "<li class='flex items-center justify-between border-b pb-2'>
+                                    <div>
+                                        <h3 class='font-medium'>{$row['username']} <span class='text-gray-600 text-sm'>({$row['action']})</span></h3>
+                                        <p class='text-sm text-gray-600'>{$row['details']}</p>
+                                    </div>
+                                    <span class='text-xs text-gray-500'>{$row['timestamp']}</span>
+                                  </li>";
+                        }
+                    } else {
+                        echo "<li class='text-gray-500'>No recent activities</li>";
+                    }
+
+                    $conn->close();
                     ?>
                 </ul>
             </div>
