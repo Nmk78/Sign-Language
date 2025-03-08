@@ -136,6 +136,8 @@ $courses = [
 
     switch ($uri) {
         case 'signingup':
+            require 'components/a.html';
+            break;
             require 'handlers/signup.php';
             break;
         case 'signingin':
@@ -177,7 +179,7 @@ $courses = [
     <?php include 'components/ai.php' ?>
 
     <?php
-    $hiddenPages = ['dashboard', 'profile', 'settings', 'signin', 'signup','category']; // Pages where the footer should be hidden
+    $hiddenPages = ['dashboard', 'profile', 'settings', 'signin', 'signup', 'category']; // Pages where the footer should be hidden
 
     // Extract the last segment of the URI (ignoring query parameters)
     $currentPage = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
