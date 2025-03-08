@@ -11,7 +11,8 @@
             theme: {
                 extend: {
                     colors: {
-                        'primary': '#4A90E2',                        'primary-dark': '#2A69A4',
+                        'primary': '#4A90E2',                        
+                        'primary-dark': '#2A69A4',
                         'secondary': '#7ED321',
                         'accent': '#F5A623',
                         'success': '#10B981',
@@ -36,7 +37,7 @@
             <div class="flex items-start gap-8">
                 <!-- Avatar -->
                 <div class="w-32 h-32 relative group rounded-full overflow-hidden bg-primary flex items-center justify-center">
-                    <img id="profile-avatar" src="assets\avatar1.svg" alt="User Avatar" class="w-full h-full object-cover">
+                    <img id="profile-avatar" src="" alt="User Avatar" class="w-full h-full object-cover">
                     <button onclick="openAvatarModal()" class="absolute hidden group-hover:block size-18 top-1/2 right-1/2 transform translate-x-1/2 -translate-y-1/2">
                         <img src="/assets/changePen.svg" alt="">
                     </button>
@@ -44,10 +45,10 @@
 
                 <div class="flex-1">
                     <div class="flex items-center gap-2">
-                        <h1 class="text-3xl font-bold text-text mb-2">John Doe</h1>
-
+                        <!-- <h1 class="text-3xl font-bold text-text mb-2">John Doe</h1> -->
+                        <h1 id="profile-name" class="text-3xl font-bold text-text mb-2">Loading...</h1>
                     </div>
-                    <p class="text-text-light mb-4">Web Development Enthusiast</p>
+                    <p class="text-text-light mb-4"  id="user-email">loading...</p>
                     <div class="flex gap-4">
                         <div class="bg-primary/10 px-4 py-2 rounded-lg">
                             <span class="text-primary font-bold">12</span>
@@ -169,6 +170,7 @@
                 <?php
                 for ($i = 1; $i <= 15; $i++) {
                     $avatarPath = "assets/avatar{$i}.svg"; // Dynamic path to avatar
+                    
                     echo "
                         <img src='{$avatarPath}' class='w-16 h-16 rounded-full cursor-pointer border-2 border-transparent hover:border-primary' onclick='selectAvatar(\"{$avatarPath}\")'>
                     ";
@@ -181,3 +183,47 @@
 </body>
 
 </html>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    let storedUsername = localStorage.getItem("username");
+    let avatarPath = localStorage.getItem("selectedAvatar");
+
+    if (storedUsername) {
+        fetch(`components/get_user.php?username=${encodeURIComponent(storedUsername)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.error) {
+                    // Set the username and profile image on the profile page
+                    document.getElementById("profile-name").textContent = data.username;
+                    document.getElementById("profile-avatar").src = data.profile;
+                    document.getElementById("user-email").textContent = data.email;
+                } else {
+                    console.error(data.error);  // Handle error if user is not found
+                }
+            })
+            .catch(error => console.error("Error fetching user data:", error));
+    }
+    if (storedUsername&&avatarPath) {
+        fetch("components/update_avatar.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ username: storedUsername, avatar: avatarPath })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log("Avatar updated successfully!");
+                // // ✅ Auto-refresh 
+                // setTimeout(() => {
+                //             location.reload();
+                //         }, 10000);
+            } else {
+                console.error("Failed to update avatar:", data.message);
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    }
+});
+</script>

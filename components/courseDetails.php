@@ -1,10 +1,75 @@
+<?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+$a = 34;
+$isEnrolled = true;
+$current_lesson_id = 0;
+
+// Database connection parameters
+$servername = "localhost";
+$username = "root";
+$password = "root";
+$dbname = "sign_language";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Get course ID from URL parameter
+$course_id = isset($_GET['course_id']) ? intval($_GET['course_id']) : 0;
+
+// if ($course_id <= 0) {
+//     die("Invalid course ID");
+// }
+
+// Fetch course information
+$course_stmt = $conn->prepare("SELECT title, description FROM courses WHERE id = ?");
+if (!$course_stmt) {
+    die("Prepare failed: " . $conn->error);
+}
+// $course_stmt->bind_param("i", $course_id);
+$course_stmt->bind_param("i", $a);
+if (!$course_stmt->execute()) {
+    die("Execute failed: " . $course_stmt->error);
+}
+$course_result = $course_stmt->get_result();
+$course = $course_result->fetch_assoc();
+$course_stmt->close();
+
+if (!$course) {
+    die("Course not found");
+}
+
+// Fetch all lessons for this course
+$lessons_stmt = $conn->prepare("SELECT id, title, description, created_at FROM lesson WHERE course_id = ? ORDER BY id ASC");
+if (!$lessons_stmt) {
+    die("Prepare failed: " . $conn->error);
+}
+// $lessons_stmt->bind_param("i", $course_id);
+$lessons_stmt->bind_param("i", $a);
+
+if (!$lessons_stmt->execute()) {
+    die("Execute failed: " . $lessons_stmt->error);
+}
+$lessons_result = $lessons_stmt->get_result();
+$lessons = $lessons_result->fetch_all(MYSQLI_ASSOC);
+$lessons_stmt->close();
+
+$conn->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Language Course</title>
+    <title><?php echo htmlspecialchars($course['title'] ?? 'Course View'); ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -47,6 +112,9 @@
                 <!-- Comments Section -->
                 <div class="bg-white p-6 rounded-lg shadow-sm">
                     <h3 class="text-lg font-semibold mb-4">Comments</h3>
+                    <?php
+                    // You could fetch comments here
+                    ?>
                     <div class="border-b pb-4">
                         <div class="flex items-start space-x-4">
                             <div class="w-10 h-10 bg-gray-200 rounded-full"></div>
@@ -308,6 +376,5 @@
     });
     </script>
 </body>
-
 </html>
 

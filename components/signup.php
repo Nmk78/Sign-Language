@@ -16,7 +16,7 @@
             <div class="text-center mb-6">
                 <p class="text-gray-600">Signup to your account</p>
             </div>
-            <form action="signingup" method="POST" class="space-y-6">
+            <form action="signingup" id="signinForm" method="POST" class="space-y-6">
                 <div>
                     <label for="fullname" class="block text-sm font-medium text-gray-700">Full Name</label>
                     <input type="text" id="fullname" name="username" required
@@ -67,3 +67,13 @@
 </body>
 
 </html>
+
+<script>
+        document.getElementById("signupForm").addEventListener("submit", function(event) {
+            // Get the username from the input field
+            let username = document.getElementById("fullname").value;
+
+            // Store in local storage
+            localStorage.setItem("username", username);
+        });
+    </script>
