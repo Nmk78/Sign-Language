@@ -104,7 +104,7 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
         <!-- Courses Grid -->
         <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             <?php foreach ($pagedCourses as $course): ?>
-                <div class="bg-white p-4 rounded-lg shadow-md relative ">
+                <a href="<?php echo '/courseDetails?course='.htmlspecialchars($course['id']) ;?>" class="bg-white p-4 rounded-lg shadow-md relative ">
                     <img src="<?php echo $course['thumbnail_url'] ? htmlspecialchars($course['thumbnail_url']) : 'https://via.placeholder.com/300x200.png?text=Course+Thumbnail'; ?>" alt="<?php echo htmlspecialchars($course['title']); ?>" class="w-full h-40 object-cover rounded-lg">
                     <h2 class="text-xl font-semibold mt-1"><?php echo htmlspecialchars($course['title']); ?></h2>
                     <p class="text-gray-600 text-sm"><?php echo htmlspecialchars($course['category'] ?? 'Uncategorized'); ?></p>
@@ -119,7 +119,7 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
                             </svg>
                         </button>
                     </div>
-                </div>
+                </a>
             <?php endforeach; ?>
         </div>
 
