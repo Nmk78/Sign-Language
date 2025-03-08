@@ -14,9 +14,9 @@ if (session_status() === PHP_SESSION_NONE) {
 // session_unset();  // Unset all session variables
 // session_destroy(); // Destroy the session
 
-echo '<pre>';
-print_r($_SESSION);
-echo '</pre>';
+// echo '<pre>';
+// print_r($_SESSION);
+// echo '</pre>';
 ?>
 <script>
      // Get username from PHP session and store in localStorage
