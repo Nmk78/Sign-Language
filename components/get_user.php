@@ -1,5 +1,16 @@
 <?php
-require 'D:\Programming\Sign-Language\utils\db.php'; // Ensure this file connects to your MySQL database
+// Database connection
+$servername = "localhost";
+$username = "root";
+$password = "root";
+$dbname = "sign_language";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 if (isset($_GET['username'])) {  // Get username from AJAX request
     $username = $_GET['username'];

@@ -47,6 +47,7 @@
                     <div class="flex items-center gap-2">
                         <!-- <h1 class="text-3xl font-bold text-text mb-2">John Doe</h1> -->
                         <h1 id="profile-name" class="text-3xl font-bold text-text mb-2">Loading...</h1>
+                        <button onclick="logout()" class="ml-auto bg-error text-white px-4 py-2 rounded-lg">Logout</button>
                     </div>
                     <p class="text-text-light mb-4"  id="user-email">loading...</p>
                     <div class="flex gap-4">
@@ -226,4 +227,18 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Error:", error));
     }
 });
+
+function logout() {
+    localStorage.removeItem("username");
+    localStorage.removeItem("role");
+
+    fetch("components/logout.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    }).then(() => {
+        window.location.href = "/";
+    }).catch(error => console.error("Error:", error));
+}
 </script>

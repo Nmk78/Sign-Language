@@ -43,7 +43,7 @@ $stmt->bind_param("ssss", $username, $email, $password_hash, $role);
 if ($stmt->execute()) {
     echo "New record created successfully";
     echo "<script>
-            window.location.href = '/';
+            window.location.href = '/signup';
           </script>";
 } else {
     // echo "Error: " . $stmt->error;

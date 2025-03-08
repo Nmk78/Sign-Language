@@ -3,6 +3,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
     if (isset($_SESSION['user'])) {
         $username = $_SESSION['user']['username']; 
+        $role = $_SESSION['user']['role']; 
+        $id = $_SESSION['user']['user_id']; 
     } else {
         $username = null; // If not logged in
     }
@@ -12,16 +14,20 @@ if (session_status() === PHP_SESSION_NONE) {
 // session_unset();  // Unset all session variables
 // session_destroy(); // Destroy the session
 
-// echo '<pre>';
-// print_r($_SESSION);
-// echo '</pre>';
+echo '<pre>';
+print_r($_SESSION);
+echo '</pre>';
 ?>
 <script>
      // Get username from PHP session and store in localStorage
      let username = <?php echo json_encode($username); ?>;
+     let role = <?php echo json_encode($role); ?>;
+     let id = <?php echo json_encode($id); ?>;
         // console.log(username);
         if (username) {
             localStorage.setItem("username", username);
+            localStorage.setItem("role", role);
+            localStorage.setItem("id", id);
         }
 
         // localStorage.removeItem("username"); // Clears username from localStorage
@@ -156,8 +162,6 @@ $courses = [
 
     switch ($uri) {
         case 'signingup':
-            require 'components/a.html';
-            break;
             require 'handlers/signup.php';
             break;
         case 'signingin':

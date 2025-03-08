@@ -2,10 +2,6 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$a = 34;
-$isEnrolled = true;
-$current_lesson_id = 0;
-
 // Database connection parameters
 $servername = "localhost";
 $username = "root";
@@ -20,47 +16,98 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Get course ID from URL parameter
-$course_id = isset($_GET['course_id']) ? intval($_GET['course_id']) : 0;
-
-// if ($course_id <= 0) {
-//     die("Invalid course ID");
-// }
+// Get course and lesson IDs from URL parameters
+$course_id = isset($_GET['course']) ? intval($_GET['course']) : 0;
+$lesson_id = isset($_GET['lesson']) ? intval($_GET['lesson']) : 0;
 
 // Fetch course information
 $course_stmt = $conn->prepare("SELECT title, description FROM courses WHERE id = ?");
-if (!$course_stmt) {
-    die("Prepare failed: " . $conn->error);
-}
-// $course_stmt->bind_param("i", $course_id);
-$course_stmt->bind_param("i", $a);
-if (!$course_stmt->execute()) {
-    die("Execute failed: " . $course_stmt->error);
-}
+$course_stmt->bind_param("i", $course_id);
+$course_stmt->execute();
 $course_result = $course_stmt->get_result();
 $course = $course_result->fetch_assoc();
 $course_stmt->close();
 
 if (!$course) {
-    die("Course not found");
+    $course = ['title' => 'Course Not Found', 'description' => 'The requested course could not be found.'];
+}
+
+// Fetch current lesson information if a lesson ID is provided
+$current_lesson = null;
+if ($lesson_id > 0) {
+    $lesson_stmt = $conn->prepare("SELECT id, title, description, category, created_by, created_at, course_id, rating, video_url FROM lesson WHERE id = ?");
+    $lesson_stmt->bind_param("i", $lesson_id);
+    $lesson_stmt->execute();
+    $lesson_result = $lesson_stmt->get_result();
+    $current_lesson = $lesson_result->fetch_assoc();
+    $lesson_stmt->close();
 }
 
 // Fetch all lessons for this course
 $lessons_stmt = $conn->prepare("SELECT id, title, description, created_at FROM lesson WHERE course_id = ? ORDER BY id ASC");
-if (!$lessons_stmt) {
-    die("Prepare failed: " . $conn->error);
-}
-// $lessons_stmt->bind_param("i", $course_id);
-$lessons_stmt->bind_param("i", $a);
-
-if (!$lessons_stmt->execute()) {
-    die("Execute failed: " . $lessons_stmt->error);
-}
+$lessons_stmt->bind_param("i", $course_id);
+$lessons_stmt->execute();
 $lessons_result = $lessons_stmt->get_result();
 $lessons = $lessons_result->fetch_all(MYSQLI_ASSOC);
 $lessons_stmt->close();
 
+// Fetch comments for the current lesson
+$comments = [];
+if ($lesson_id > 0) {
+    $comments_stmt = $conn->prepare("
+        SELECT lc.id, lc.comment, lc.created_at, u.username, u.profile 
+        FROM lesson_comments lc
+        JOIN users u ON lc.user_id = u.id
+        WHERE lc.lesson_id = ?
+        ORDER BY lc.created_at DESC
+    ");
+
+    // If the join with users table fails (e.g., if the users table has a different structure),
+    // use this simpler query instead:
+    /*
+    $comments_stmt = $conn->prepare("
+        SELECT id, user_id, comment, created_at
+        FROM lesson_comments
+        WHERE lesson_id = ? AND parent_comment_id IS NULL
+        ORDER BY created_at DESC
+    ");
+    */
+
+    $comments_stmt->bind_param("i", $lesson_id);
+    $comments_stmt->execute();
+    $comments_result = $comments_stmt->get_result();
+    $comments = $comments_result->fetch_all(MYSQLI_ASSOC);
+    $comments_stmt->close();
+}
+
+// Close the database connection
 $conn->close();
+
+// Helper function to format dates
+function formatTimeAgo($datetime)
+{
+    $time = strtotime($datetime);
+    $now = time();
+    $diff = $now - $time;
+
+    if ($diff < 60) {
+        return "just now";
+    } elseif ($diff < 3600) {
+        $mins = floor($diff / 60);
+        return $mins . " minute" . ($mins > 1 ? "s" : "") . " ago";
+    } elseif ($diff < 86400) {
+        $hours = floor($diff / 3600);
+        return $hours . " hour" . ($hours > 1 ? "s" : "") . " ago";
+    } elseif ($diff < 604800) {
+        $days = floor($diff / 86400);
+        return $days . " day" . ($days > 1 ? "s" : "") . " ago";
+    } elseif ($diff < 2592000) {
+        $weeks = floor($diff / 604800);
+        return $weeks . " week" . ($weeks > 1 ? "s" : "") . " ago";
+    } else {
+        return date("M j, Y", $time);
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -74,14 +121,19 @@ $conn->close();
 </head>
 
 <body class="bg-gray-50">
-
     <!-- Main Content -->
     <div class="container mx-auto px-6 py-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Left Column -->
-            <div class="space-y-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column (2/3 width on large screens) -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Course Title -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h1 class="text-2xl font-bold text-gray-900"><?php echo htmlspecialchars($course['title']); ?></h1>
+                    <p class="mt-2 text-gray-600"><?php echo htmlspecialchars($course['description']); ?></p>
+                </div>
+
                 <!-- Loading State -->
-                <div id="loadingState" class="bg-white p-6 rounded-lg shadow-sm">
+                <div id="loadingState" class="bg-white p-6 rounded-lg shadow-sm <?php echo $current_lesson ? 'hidden' : ''; ?>">
                     <div class="animate-pulse flex flex-col space-y-4">
                         <div class="rounded-lg bg-gray-200 h-64 w-full"></div>
                         <div class="h-6 bg-gray-200 rounded w-3/4"></div>
@@ -107,28 +159,71 @@ $conn->close();
                 </div>
 
                 <!-- Lesson Content -->
-                <div id="courseContent" class="hidden"></div>
-
-                <!-- Comments Section -->
-                <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <h3 class="text-lg font-semibold mb-4">Comments</h3>
-                    <?php
-                    // You could fetch comments here
-                    ?>
-                    <div class="border-b pb-4">
-                        <div class="flex items-start space-x-4">
-                            <div class="w-10 h-10 bg-gray-200 rounded-full"></div>
-                            <div>
-                                <p class="font-medium">User123</p>
-                                <p class="text-gray-600 mb-2">Great course! Really informative.</p>
-                                <p class="text-sm text-gray-500">2 days ago</p>
+                <div id="courseContent" class="<?php echo $current_lesson ? '' : 'hidden'; ?>">
+                    <?php if ($current_lesson): ?>
+                        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                            <div class="aspect-video bg-">
+                                <?php if (!empty($current_lesson['video_url'])): ?>
+                                    <video controls class="w-full h-full" id="lessonVideo" preload="metadata">
+                                        <source src="<?php echo htmlspecialchars($current_lesson['video_url']); ?>" type="video/mp4">
+                                        <source src="<?php echo htmlspecialchars($current_lesson['video_url']); ?>" type="video/mov">
+                                        <source src="<?php echo htmlspecialchars($current_lesson['video_url']); ?>" type="video/webm">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div id="videoError" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-2">
+                                        <p>Video playback error. Please try a different browser or contact support.</p>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="flex items-center justify-center h-full bg-gray-800 text-white">
+                                        <p>No video available for this lesson</p>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="p-4">
+                                <h2 class="text-xl font-semibold mb-2"><?php echo htmlspecialchars($current_lesson['title']); ?></h2>
+                                <p class="text-sm text-gray-600 mb-4"><?php echo htmlspecialchars($current_lesson['description']); ?></p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-500">Category: <?php echo htmlspecialchars($current_lesson['category'] ?? 'Uncategorized'); ?></span>
+                                    <div class="flex space-x-2">
+                                        <button onclick="navigateToNextLesson(<?php echo $current_lesson['id']; ?>)" class="bg-gray-200 text-gray-800 px-3 py-1 rounded-md text-sm hover:bg-gray-300">
+                                            <svg class="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                            </svg>
+                                            Next Lesson
+                                        </button>
+                                        <button onclick="markLessonComplete(<?php echo $current_lesson['id']; ?>)" class="bg-[#4A90E2] text-white px-3 py-1 rounded-md text-sm hover:bg-[#357abd]">
+                                            Complete Lesson
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                    <?php endif; ?>
+                </div>
+
+                <?php include 'components/comments.php'; ?>
+            </div>
+
+            <!-- Right Column (1/3 width on large screens) -->
+            <div class="lg:col-span-1">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-lg font-semibold mb-4">Course Lessons</h3>
+                    <div class="space-y-3">
+                        <?php if (empty($lessons)): ?>
+                            <p class="text-gray-500">No lessons available for this course.</p>
+                        <?php else: ?>
+                            <?php foreach ($lessons as $lesson): ?>
+                                <a
+                                    href="?course=<?php echo $course_id; ?>&lesson=<?php echo $lesson['id']; ?>"
+                                    class="block p-3 rounded-md hover:bg-gray-50 <?php echo ($lesson_id == $lesson['id']) ? 'bg-blue-50 border-l-4 border-[#4A90E2]' : ''; ?>">
+                                    <h4 class="font-medium"><?php echo htmlspecialchars($lesson['title']); ?></h4>
+                                    <p class="text-sm text-gray-500 truncate"><?php echo htmlspecialchars(substr($lesson['description'], 0, 60) . (strlen($lesson['description']) > 60 ? '...' : '')); ?></p>
+                                </a>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
-            <!-- Right Column -->
-            <?php include 'components/currentLessons.php'; ?>
         </div>
     </div>
 
@@ -142,239 +237,153 @@ $conn->close();
     </div>
 
     <script>
-    // Get lesson ID from URL
-    function getLessonId() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('lesson');
-    }
+        // DOM elements
+        const courseContent = document.getElementById('courseContent');
+        const loadingState = document.getElementById('loadingState');
+        const errorState = document.getElementById('errorState');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorDetails = document.getElementById('errorDetails');
+        const commentForm = document.getElementById('commentForm');
+        const commentText = document.getElementById('commentText');
+        const commentsList = document.getElementById('commentsList');
 
-    // Check if user is enrolled (this should be replaced with actual authentication logic)
-    // For now, we'll assume the user is enrolled if a lesson ID is provided
-    const isEnrolled = getLessonId() ? true : false;
-
-    // DOM elements
-    const courseContent = document.getElementById('courseContent');
-    const loadingState = document.getElementById('loadingState');
-    const errorState = document.getElementById('errorState');
-    const errorMessage = document.getElementById('errorMessage');
-    const errorDetails = document.getElementById('errorDetails');
-
-    // Show loading state
-    function showLoading() {
-        loadingState.classList.remove('hidden');
-        courseContent.classList.add('hidden');
-        errorState.classList.add('hidden');
-    }
-
-    // Show error state
-    function showError(message, details = '') {
-        loadingState.classList.add('hidden');
-        courseContent.classList.add('hidden');
-        errorState.classList.remove('hidden');
-        errorMessage.textContent = message;
-        errorDetails.textContent = details;
-    }
-
-    // Show content
-    function showContent() {
-
-        console.log("Show")
-        loadingState.classList.add('hidden');
-        courseContent.classList.remove('hidden');
-        errorState.classList.add('hidden');
-    }
-
-    // Helper function to validate base64 data
-    function isValidBase64(str) {
-        try {
-            return btoa(atob(str)) == str;
-        } catch (err) {
-            return false;
-        }
-    }
-
-    // Helper function to create Blob URL from base64
-    function createVideoUrl(base64Data) {
-        try {
-            // Remove any potential data URL prefix
-            const base64String = base64Data.replace(/^data:video\/\w+;base64,/, '');
-            
-            // Validate base64 data
-            if (!isValidBase64(base64String)) {
-                throw new Error('Invalid video data');
-            }
-
-            // Convert base64 to binary
-            const binaryString = atob(base64String);
-            const bytes = new Uint8Array(binaryString.length);
-            
-            for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-
-            // Create blob and URL
-            const blob = new Blob([bytes], { type: 'video/mp4' });
-            return URL.createObjectURL(blob);
-        } catch (error) {
-            console.error('Error creating video URL:', error);
-            return null;
-        }
-    }
-
-    // Fetch lesson data
-    function fetchLesson(lessonId) {
-        if (!lessonId) {
-            showError('No Lesson Selected', 'Please select a lesson from the list.');
-            return;
-        }
-
-        showLoading();
-
-        fetch(`/handlers/getLesson.php?lesson=${lessonId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(response.status === 404 ? 'Lesson not found' : 'Failed to load lesson');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-
-                let videoElement = '';
-                if (data.video_data) {
-                    const videoUrl = createVideoUrl(data.video_data);
-                    
-                    if (videoUrl) {
-                        videoElement = `
-                            <div class="aspect-video bg-black">
-                                <video 
-                                    controls 
-                                    class="w-full h-full" 
-                                    id="lessonVideo"
-                                    preload="metadata"
-                                >
-                                    <source src="${videoUrl}" type="video/mp4">
-                                    Your browser does not support the video tag.
-                                </video>
-                            </div>
-                            <div id="videoError" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-2">
-                                <p>Video playback error. Please try a different browser or contact support.</p>
-                            </div>
-                        `;
-                    } else {
-                        videoElement = `
-                            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
-                                <p>Error loading video. Please try refreshing the page or contact support.</p>
-                            </div>
-                        `;
-                    }
-                } else {
-                    videoElement = `
-                        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
-                            <p>No video available for this lesson.</p>
-                        </div>
-                    `;
-                }
-
-                courseContent.innerHTML = `
-                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                        ${videoElement}
-                        <div class="p-4">
-                            <h2 class="text-xl font-semibold mb-2">${data.title}</h2>
-                            <p class="text-sm text-gray-600 mb-4">${data.description}</p>
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500">Category: ${data.category}</span>
-                                <div class="flex space-x-2">
-                                    <button onclick="navigateToNextLesson(${data.id})" class="bg-gray-200 text-gray-800 px-3 py-1 rounded-md text-sm hover:bg-gray-300">
-                                        <svg class="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                                        </svg>
-                                        Next Lesson
-                                    </button>
-                                    <button onclick="markLessonComplete(${data.id})" class="bg-[#4A90E2] text-white px-3 py-1 rounded-md text-sm hover:bg-[#357abd]">
-                                        Complete Lesson
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                showContent();
-
-                // Add video error handling
-                const video = document.getElementById('lessonVideo');
-                const videoError = document.getElementById('videoError');
-                
-                if (video) {
-                    video.addEventListener('error', (e) => {
-                        console.error('Video Error:', e);
-                        if (videoError) {
-                            videoError.classList.remove('hidden');
-                        }
-                    });
-
-                    // Clean up Blob URL when video is removed
-                    video.addEventListener('emptied', () => {
-                        if (video.src.startsWith('blob:')) {
-                            URL.revokeObjectURL(video.src);
-                        }
-                    });
-                }
-            })
-            .catch(error => {
-                showError('Error Loading Lesson', error.message);
-                console.error('Fetch error:', error);
-            });
-    }
-
-    // Navigate to next lesson
-    function navigateToNextLesson(currentLessonId) {
-        // This is a placeholder - in a real app, you would fetch the next lesson ID from the server
-        const nextLessonId = currentLessonId + 1;
-        changeLesson(nextLessonId);
-    }
-
-    // Mark lesson as complete
-    function markLessonComplete(lessonId) {
-        // This is a placeholder - in a real app, you would send a request to mark the lesson as complete
-        alert(`Lesson ${lessonId} marked as complete!`);
-        // Then potentially navigate to the next lesson
-        navigateToNextLesson(lessonId);
-    }
-
-    // Change lesson and update URL
-    function changeLesson(lessonId) {
-        const newUrl = `${window.location.pathname}?lesson=${lessonId}`;
-        history.pushState({}, '', newUrl);
-        fetchLesson(lessonId);
-    }
-
-    // Listen for changes in URL parameters (browser back/forward)
-    window.addEventListener('popstate', function () {
-        fetchLesson(getLessonId());
-    });
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
-        const lessonId = getLessonId();
-        if (lessonId) {
-            fetchLesson(lessonId);
-        } else {
-            showError('No Lesson Selected', 'Please select a lesson from the list.');
-        }
-    });
-
-    // Clean up any Blob URLs when navigating away
-    window.addEventListener('beforeunload', () => {
+        // Add video error handling
         const video = document.getElementById('lessonVideo');
-        if (video && video.src.startsWith('blob:')) {
-            URL.revokeObjectURL(video.src);
+        const videoError = document.getElementById('videoError');
+
+        if (video) {
+            video.addEventListener('error', (e) => {
+                console.error('Video Error:', e);
+                if (videoError) {
+                    videoError.classList.remove('hidden');
+                }
+            });
         }
-    });
+
+        // Handle comment form submission
+        if (commentForm) {
+            commentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                if (!commentText.value.trim()) {
+                    alert('Please enter a comment');
+                    return;
+                }
+
+                const lessonId = <?php echo $lesson_id ?: 0; ?>;
+
+                if (!lessonId) {
+                    alert('No lesson selected');
+                    return;
+                }
+
+                // In a real application, you would send this to the server
+                // For now, we'll just add it to the UI
+                const now = new Date();
+                const comment = {
+                    username: 'You',
+                    comment: commentText.value,
+                    created_at: now.toISOString()
+                };
+
+                // Add the new comment to the top of the list
+                const commentElement = document.createElement('div');
+                commentElement.className = 'border-b pb-4 mb-4';
+                commentElement.innerHTML = `
+                <div class="flex items-start space-x-4">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-semibold">
+                        Y
+                    </div>
+                    <div>
+                        <p class="font-medium">${comment.username}</p>
+                        <p class="text-gray-600 mb-2">${comment.comment}</p>
+                        <p class="text-sm text-gray-500">just now</p>
+                    </div>
+                </div>
+            `;
+
+                // If there's a "no comments" message, remove it
+                const noCommentsMessage = commentsList.querySelector('.text-center');
+                if (noCommentsMessage) {
+                    noCommentsMessage.remove();
+                }
+
+                // Add the new comment at the top
+                commentsList.insertBefore(commentElement, commentsList.firstChild);
+
+                // Clear the form
+                commentText.value = '';
+
+                // In a real application, you would send an AJAX request like this:
+                /*
+                fetch('/handlers/addComment.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        lesson_id: lessonId,
+                        comment: comment.comment
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to post comment. Please try again.');
+                });
+                */
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const userId = localStorage.getItem('id');
+            if (userId) {
+                document.getElementById('userId').value = userId;
+            } else {
+                alert('User ID not found in local storage.');
+            }
+        });
+        // Navigate to next lesson
+        function navigateToNextLesson(currentLessonId) {
+            // Get all lesson links
+            const lessonLinks = document.querySelectorAll('a[href^="?course="]');
+            let nextLessonLink = null;
+            let foundCurrent = false;
+
+            // Find the current lesson and get the next one
+            for (const link of lessonLinks) {
+                if (foundCurrent) {
+                    nextLessonLink = link;
+                    break;
+                }
+
+                if (link.href.includes(`lesson=${currentLessonId}`)) {
+                    foundCurrent = true;
+                }
+            }
+
+            // Navigate to the next lesson if found
+            if (nextLessonLink) {
+                window.location.href = nextLessonLink.href;
+            } else {
+                alert('This is the last lesson in the course.');
+            }
+        }
+
+        // Mark lesson as complete
+        function markLessonComplete(lessonId) {
+            // In a real application, you would send an AJAX request to mark the lesson as complete
+            alert(`Lesson ${lessonId} marked as complete!`);
+
+            // Then navigate to the next lesson
+            navigateToNextLesson(lessonId);
+        }
     </script>
 </body>
-</html>
 
+</html>
