@@ -11,7 +11,7 @@ if (!function_exists(function: 'renderSideBar')) {
                 'dropdown' => [
                     'Opened' => '#',
                     'Restricted' => '#',
-                    'Quiz' => '#',
+                    'Quiz' => '/dashboard?tab=quiz',
                     'Assignment' => '#',
                 ]
             ],

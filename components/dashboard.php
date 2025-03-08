@@ -17,7 +17,8 @@
             theme: {
                 extend: {
                     colors: {
-                        'primary': '#4A90E2',                        'primary-dark': '#2A69A4',
+                        'primary': '#4A90E2',
+                        'primary-dark': '#2A69A4',
                         'secondary': '#7ED321',
                         'accent': '#F5A623',
                         'success': '#10B981',
@@ -54,6 +55,9 @@
                     break;
                 case 'courses':
                     require 'instructor/dashboard/course.php';
+                    break;
+                case 'quiz':
+                    require 'instructor/dashboard/quiz.php';
                     break;
                 case 'students':
                     require 'instructor/dashboard/students.php';
