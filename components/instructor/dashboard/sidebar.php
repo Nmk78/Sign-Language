@@ -9,10 +9,8 @@ if (!function_exists(function: 'renderSideBar')) {
                 'label' => 'Courses', 
                 'icon' => 'book',
                 'dropdown' => [
-                    'Opened' => '#',
-                    'Restricted' => '#',
+                    'Enrollments' => 'dashboard?tab=enrollements',
                     'Quiz' => '/dashboard?tab=quiz',
-                    'Assignment' => '#',
                 ]
             ],
             'students' => [
@@ -31,7 +29,7 @@ if (!function_exists(function: 'renderSideBar')) {
         $activeClass = 'bg-[#EEF2FF] text-[#1d4ed8]';
         $activeBg = 'bg-[#EEF2FF]';
 
-        echo '<div class="flex h-full min-h-[500px] max-h-100vh z-30 flex-col justify-between bg-[#f8fafb] p-4">
+        echo '<div class="flex h-full static top-20 min-h-[500px] max-h-100vh z-30 flex-col justify-between bg-[#f8fafb] p-4">
             <div class="flex flex-col gap-4">';
 
         // Loop through the tabs and render each one
@@ -89,7 +87,25 @@ if (!function_exists(function: 'renderSideBar')) {
             echo '</div>';
         }
 
-        echo '</div></div>';
+        echo '</div>
+                        <button onclick="logout()" class=" mb-10 hover:bg-error text-error border-error border-2 hover:text-white px-4 py-2 rounded-lg">Logout</button>
+            
+        <script>
+            function logout() {
+    localStorage.removeItem("username");
+    localStorage.removeItem("role");
+
+    fetch("components/logout.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    }).then(() => {
+        window.location.href = "/";
+    }).catch(error => console.error("Error:", error));
+}
+        </script>
+        </div>';
     }
 }
 

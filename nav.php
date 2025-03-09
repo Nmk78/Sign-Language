@@ -12,9 +12,9 @@ function renderHeader($activePage = 'home', $role = "instructor")
         'category' => '/category',
         'About' => '/about',
         'Content' => '/content',
-        'dashboard' => '/dashboard?tab=statistics',
-        'profile' => '/profile',
-        'courseDetails' => '/courseDetails',
+        // 'dashboard' => '/dashboard?tab=statistics',
+        // 'profile' => '/profile',
+        // 'courseDetails' => '/courseDetails',
     ];
 
     // TODO

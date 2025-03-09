@@ -9,14 +9,25 @@ if (session_status() === PHP_SESSION_NONE) {
         $username = null; // If not logged in
     }
 }
+
+// if (session_status() === PHP_SESSION_NONE) {
+//     session_start();
+//     if (isset($_SESSION['user'])) {
+//         $username = $_SESSION['user']['username']; 
+//         $role = $_SESSION['user']['role']; 
+//         $id = $_SESSION['user']['user_id']; 
+//     } else {
+//         $username = null; // If not logged in
+//     }
+// }
 // echo $username;
 
 // session_unset();  // Unset all session variables
 // session_destroy(); // Destroy the session
+// echo '<pre>';
+// print_r($_SESSION);
+// echo '</pre>';
 
-echo '<pre>';
-print_r($_SESSION);
-echo '</pre>';
 ?>
 <script>
      // Get username from PHP session and store in localStorage
@@ -132,9 +143,26 @@ $courses = [
         }
     </script>
 
+    <style>
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 2px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+
 </head>
 
-<body class="bg-background">
+<body class="bg-background scrollbar-thin">
     <!-- Header -->
     <header class="bg-primary sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -143,15 +171,31 @@ $courses = [
                 <?php include 'nav.php'; ?>
                 <div class="flex items-center space-x-4">
                     <?php if (isset($_SESSION['user']) && $_SESSION['user']['logged_in']): ?>
-                        <a href="/profile" class="text-white font-bold hover:underline">
+                        <a href="<?php echo ($_SESSION['user']['role'] === 'teacher') ? '/dashboard?tab=statistics' : '/profile'; ?>" class="text-white font-bold hover:underline">
                             Hello, <?php echo htmlspecialchars($_SESSION['user']['username']); ?>
                         </a>
-                        <img id="profile-avatar" class="size-8 cursor-pointer" src="/assets/userAvatar.svg" alt="" onclick="window.location.href='/profile';">
+                        <img id="profile-avatar" class="size-8 cursor-pointer" src="/assets/userAvatar.svg" alt="" onclick="window.location.href='<?php echo ($_SESSION['user']['role'] === 'teacher') ? '/dashboard?tab=statistics' : '/profile'; ?>';">
                     <?php else: ?>
                         <a href="/signup" class="bg-white px-6 py-2 rounded-md text-primary font-medium">Join Now</a>
                         <a href="/signin" class="text-white">Log in</a>
                     <?php endif; ?>
                 </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        let username = localStorage.getItem("username");
+                        let role = localStorage.getItem("role");
+                        if (username && role) {
+                            let profileLink = document.querySelector('.flex.items-center.space-x-4 a');
+                            let avatarImg = document.getElementById('profile-avatar');
+                            if (profileLink && avatarImg) {
+                                profileLink.href = (role === 'teacher') ? '/dashboard' : '/profile';
+                                avatarImg.onclick = function() {
+                                    window.location.href = (role === 'teacher') ? '/dashboard' : '/profile';
+                                };
+                            }
+                        }
+                    });
+                </script>
             </div>
         </div>
     </header>
@@ -247,6 +291,8 @@ $courses = [
         });
     </script>
 
+
 </body>
 
 </html>
+
