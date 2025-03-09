@@ -16,30 +16,76 @@ $lessonId = isset($_GET['lesson_id']) ? intval($_GET['lesson_id']) : 17;
 // Handle quiz creation form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_quiz'])) {
     $question = $_POST['question'] ?? '';
-    $option_a = $_POST['option_a'] ?? '';
-    $option_b = $_POST['option_b'] ?? '';
-    $option_c = $_POST['option_c'] ?? '';
-    $option_d = $_POST['option_d'] ?? '';
     $correct_option = $_POST['correct_option'] ?? '';
     
     // Validate form data
-    if (empty($question) || empty($option_a) || empty($option_b) || empty($option_c) || empty($option_d) || empty($correct_option)) {
-        $error_message = "All fields are required.";
+    if (empty($question) || empty($correct_option)) {
+        $error_message = "Question and correct answer are required.";
     } else {
-        // Insert new quiz question
-        $sql = "INSERT INTO quizzes (lesson_id, question, option_a, option_b, option_c, option_d, correct_option) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)";
+        // Define upload directory
+        $upload_dir = "uploads/quiz_images/";
         
-        // Points based on difficulty
-        $points = 1;
+        // Create directory if it doesn't exist
+        if (!file_exists($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
         
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("isssssssssi", $lessonId, $question, $option_a, $option_b, $option_c, $option_d, $correct_option);
+        // Initialize option paths
+        $option_paths = ['', '', '', ''];
+        $upload_success = true;
         
-        if ($stmt->execute()) {
-            $success_message = "Quiz question created successfully!";
-        } else {
-            $error_message = "Error creating quiz question: " . $conn->error;
+        // Process each file upload
+        for ($i = 0; $i < 4; $i++) {
+            $option_letter = chr(65 + $i); // A, B, C, D
+            $file_key = "option_" . strtolower($option_letter);
+            
+            // Check if file was uploaded
+            if (isset($_FILES[$file_key]) && $_FILES[$file_key]['error'] == 0) {
+                $file_tmp = $_FILES[$file_key]['tmp_name'];
+                $file_name = $_FILES[$file_key]['name'];
+                $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                
+                // Validate file extension
+                $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
+                if (in_array($file_ext, $allowed_extensions)) {
+                    // Generate unique filename
+                    $new_file_name = "option_" . strtolower($option_letter) . "_" . time() . "_" . rand(1000, 9999) . "." . $file_ext;
+                    $file_path = $upload_dir . $new_file_name;
+                    
+                    // Move uploaded file
+                    if (move_uploaded_file($file_tmp, $file_path)) {
+                        $option_paths[$i] = $file_path;
+                    } else {
+                        $error_message = "Failed to upload image for Option $option_letter.";
+                        $upload_success = false;
+                        break;
+                    }
+                } else {
+                    $error_message = "Invalid file format for Option $option_letter. Allowed formats: JPG, JPEG, PNG, GIF.";
+                    $upload_success = false;
+                    break;
+                }
+            } else {
+                $error_message = "Please upload an image for Option $option_letter.";
+                $upload_success = false;
+                break;
+            }
+        }
+        
+        // If all files uploaded successfully, insert into database
+        if ($upload_success) {
+            // Insert new quiz question
+            $sql = "INSERT INTO quizzes (lesson_id, question, option_a, option_b, option_c, option_d, correct_option) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?)";
+            
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("issssss", $lessonId, $question, $option_paths[0], $option_paths[1], $option_paths[2], $option_paths[3], $correct_option);
+            
+            if ($stmt->execute()) {
+                $success_message = "Quiz question created successfully!";
+            } else {
+                $error_message = "Error creating quiz question: " . $conn->error;
+            }
         }
     }
 }
@@ -168,6 +214,54 @@ $conn->close();
         input[type=number] {
             -moz-appearance: textfield;
         }
+        
+        /* Confetti animation */
+        @keyframes confetti-fall {
+            0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        .confetti {
+            position: fixed;
+            z-index: 1000;
+            animation: confetti-fall 5s ease-out forwards;
+            border-radius: 2px;
+        }
+        
+        /* File input styling */
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            cursor: pointer;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-preview {
+            width: 100%;
+            height: 150px;
+            border-radius: 0.5rem;
+            object-fit: cover;
+            background-color: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .file-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
@@ -187,10 +281,10 @@ $conn->close();
         </div>
     </header>
 
-    <main class=" py-8 ">
+    <main class="py-8">
         <!-- Status Messages -->
         <?php if (!empty($success_message)): ?>
-            <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-md">
+            <div id="success-message" class="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-md">
                 <div class="flex items-center">
                     <i class="fas fa-check-circle text-green-500 mr-2"></i>
                     <p class="text-green-700"><?php echo $success_message; ?></p>
@@ -199,7 +293,7 @@ $conn->close();
         <?php endif; ?>
         
         <?php if (!empty($error_message)): ?>
-            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-md">
+            <div id="error-message" class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-md">
                 <div class="flex items-center">
                     <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
                     <p class="text-red-700"><?php echo $error_message; ?></p>
@@ -215,38 +309,84 @@ $conn->close();
             </div>
             
             <div class="p-6">
-                <form method="POST" action="" class="space-y-6">
+                <!-- Modified form to accept file uploads -->
+                <form method="POST" action="" enctype="multipart/form-data" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
                         <div class="space-y-4">
-                                <label for="question" class="block text-sm font-medium text-gray-700 mb-1">Question</label>
-                                <input type="text" id="question" name="question" required
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                            <label for="question" class="block text-sm font-medium text-gray-700 mb-1">Question</label>
+                            <input type="text" id="question" name="question" required
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
                         </div>
                         
-                        <div class="space-y-4">
-                            <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-6">
+                            <h3 class="text-lg font-medium text-gray-900">Upload Option Images</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Option A File Upload -->
                                 <div>
-                                    <label for="option_a" class="block text-sm font-medium text-gray-700 mb-1">Option A (URL)</label>
-                                    <input type="text" id="option_a" name="option_a" required placeholder="https://example.com/image-a.jpg"
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                                    <label for="option_a" class="block text-sm font-medium text-gray-700 mb-2">Option A Image</label>
+                                    <div class="space-y-2">
+                                        <div class="file-preview" id="preview_a">
+                                            <i class="fas fa-image text-gray-400 text-4xl"></i>
+                                        </div>
+                                        <div class="file-input-wrapper w-full">
+                                            <button type="button" class="w-full bg-gray-50 border border-gray-300 rounded-lg py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 transition flex items-center justify-center">
+                                                <i class="fas fa-upload mr-2"></i>
+                                                <span>Choose Image</span>
+                                            </button>
+                                            <input type="file" id="option_a" name="option_a" accept="image/*" required onchange="previewImage(this, 'preview_a')">
+                                        </div>
+                                    </div>
                                 </div>
                                 
+                                <!-- Option B File Upload -->
                                 <div>
-                                    <label for="option_b" class="block text-sm font-medium text-gray-700 mb-1">Option B (URL)</label>
-                                    <input type="text" id="option_b" name="option_b" required placeholder="https://example.com/image-b.jpg"
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                                    <label for="option_b" class="block text-sm font-medium text-gray-700 mb-2">Option B Image</label>
+                                    <div class="space-y-2">
+                                        <div class="file-preview" id="preview_b">
+                                            <i class="fas fa-image text-gray-400 text-4xl"></i>
+                                        </div>
+                                        <div class="file-input-wrapper w-full">
+                                            <button type="button" class="w-full bg-gray-50 border border-gray-300 rounded-lg py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 transition flex items-center justify-center">
+                                                <i class="fas fa-upload mr-2"></i>
+                                                <span>Choose Image</span>
+                                            </button>
+                                            <input type="file" id="option_b" name="option_b" accept="image/*" required onchange="previewImage(this, 'preview_b')">
+                                        </div>
+                                    </div>
                                 </div>
                                 
+                                <!-- Option C File Upload -->
                                 <div>
-                                    <label for="option_c" class="block text-sm font-medium text-gray-700 mb-1">Option C (URL)</label>
-                                    <input type="text" id="option_c" name="option_c" required placeholder="https://example.com/image-c.jpg"
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                                    <label for="option_c" class="block text-sm font-medium text-gray-700 mb-2">Option C Image</label>
+                                    <div class="space-y-2">
+                                        <div class="file-preview" id="preview_c">
+                                            <i class="fas fa-image text-gray-400 text-4xl"></i>
+                                        </div>
+                                        <div class="file-input-wrapper w-full">
+                                            <button type="button" class="w-full bg-gray-50 border border-gray-300 rounded-lg py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 transition flex items-center justify-center">
+                                                <i class="fas fa-upload mr-2"></i>
+                                                <span>Choose Image</span>
+                                            </button>
+                                            <input type="file" id="option_c" name="option_c" accept="image/*" required onchange="previewImage(this, 'preview_c')">
+                                        </div>
+                                    </div>
                                 </div>
                                 
+                                <!-- Option D File Upload -->
                                 <div>
-                                    <label for="option_d" class="block text-sm font-medium text-gray-700 mb-1">Option D (URL)</label>
-                                    <input type="text" id="option_d" name="option_d" required placeholder="https://example.com/image-d.jpg"
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                                    <label for="option_d" class="block text-sm font-medium text-gray-700 mb-2">Option D Image</label>
+                                    <div class="space-y-2">
+                                        <div class="file-preview" id="preview_d">
+                                            <i class="fas fa-image text-gray-400 text-4xl"></i>
+                                        </div>
+                                        <div class="file-input-wrapper w-full">
+                                            <button type="button" class="w-full bg-gray-50 border border-gray-300 rounded-lg py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 transition flex items-center justify-center">
+                                                <i class="fas fa-upload mr-2"></i>
+                                                <span>Choose Image</span>
+                                            </button>
+                                            <input type="file" id="option_d" name="option_d" accept="image/*" required onchange="previewImage(this, 'preview_d')">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -291,6 +431,7 @@ $conn->close();
             </div>
         </div>
         
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
             <div class="bg-gradient-to-r from-secondary-600 to-primary-600 py-5 px-6">
                 <h2 class="text-2xl font-bold text-white">Existing Quiz Questions</h2>
                 <p class="text-primary-100 mt-1">Manage your existing sign language quiz questions</p>
@@ -341,7 +482,7 @@ $conn->close();
         </div>
     </main>
     
-    <!-- Quiz Modal (Pop-up) -->
+    <!-- Quiz Modal (Pop-up) - MODIFIED FOR VERTICAL SCROLLING -->
     <div id="quizModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
             <div class="bg-gradient-to-r from-primary-600 to-secondary-600 py-5 px-6 flex justify-between items-center">
@@ -352,130 +493,119 @@ $conn->close();
             </div>
             
             <div class="p-6 overflow-y-auto max-h-[calc(90vh-80px)]" id="quiz-content">
-                <div id="quiz-progress" class="mb-8">
-                    <div class="flex justify-between text-sm text-gray-600 mb-1">
-                        <span>Progress</span>
-                        <span id="progress-text">0%</span>
-                    </div>
-                    <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div id="progress-value" class="h-full bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full transition-all duration-500" style="width: 0%"></div>
-                    </div>
-                </div>
-                
-                <form id="quizForm">
-                    <?php foreach ($quizQuestions as $index => $question): ?>
-                    <div class="mb-10 question-container <?php echo $index > 0 ? 'hidden' : ''; ?>" data-question="<?php echo $index + 1; ?>">
-                        <div class="flex items-center mb-4">
-                            <div class="bg-primary-100 text-primary-700 rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">
-                                <?php echo $index + 1; ?>
-                            </div>
-                            <h3 class="text-xl font-semibold text-gray-800"><?php echo htmlspecialchars($question['question']); ?></h3>
+                <!-- Quiz Form - All questions visible for scrolling -->
+                <div id="quiz-form-container">
+                    <div id="quiz-progress" class="mb-8 sticky top-0 bg-white pt-2 pb-4 z-10">
+                        <div class="flex justify-between text-sm text-gray-600 mb-1">
+                            <span>Progress</span>
+                            <span id="progress-text">0%</span>
                         </div>
-                        
-                        <div class="grid grid-cols-4 gap-6">
-
-                            <!-- option A -->
-                            <label class="cursor-pointer">
-                                <input type="radio" name="answer_<?php echo $question['id']; ?>" value="A" class="hidden peer" 
-                                       data-correct-option="<?php echo $question['correct_option']; ?>" 
-                                       data-question-num="<?php echo $index + 1; ?>"
-                                       onclick="updateSelection(this)">
-                                <div class="relative border-4 border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 peer-checked:border-primary-500 peer-checked:shadow-md peer-checked:shadow-primary-200 group">
-                                    <div class="absolute top-3 left-3 z-10 bg-white/90 text-primary-600 font-bold w-8 h-8 rounded-full flex items-center justify-center shadow-sm">A</div>
-                                    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 pointer-events-none"></div>
-                                    <img src="<?php echo $question['option_a']; ?>" alt="Option A" class="w-full h-48 object-cover">
-                                    <div class="p-3 bg-gray-50">
-                                        <div class="flex justify-between items-center">
-                                            <span class="font-medium text-gray-700">Option A</span>
-                                            <span class="result-icon hidden"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </label>
-                            <!-- option B -->
-                            <label class="cursor-pointer">
-                                <input type="radio" name="answer_<?php echo $question['id']; ?>" value="B" class="hidden peer" 
-                                       data-correct-option="<?php echo $question['correct_option']; ?>" 
-                                       data-question-num="<?php echo $index + 1; ?>"
-                                       onclick="updateSelection(this)">
-                                <div class="relative border-4 border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 peer-checked:border-primary-500 peer-checked:shadow-md peer-checked:shadow-primary-200 group">
-                                    <div class="absolute top-3 left-3 z-10 bg-white/90 text-primary-600 font-bold w-8 h-8 rounded-full flex items-center justify-center shadow-sm">B</div>
-                                    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 pointer-events-none"></div>
-                                    <img src="<?php echo $question['option_b']; ?>" alt="Option B" class="w-full h-48 object-cover">
-                                    <div class="p-3 bg-gray-50">
-                                        <div class="flex justify-between items-center">
-                                            <span class="font-medium text-gray-700">Option B</span>
-                                            <span class="result-icon hidden"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </label>
-                            <!-- option C -->
-                            <label class="cursor-pointer">
-                                <input type="radio" name="answer_<?php echo $question['id']; ?>" value="C" class="hidden peer" 
-                                       data-correct-option="<?php echo $question['correct_option']; ?>" 
-                                       data-question-num="<?php echo $index + 1; ?>"
-                                       onclick="updateSelection(this)">
-                                <div class="relative border-4 border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 peer-checked:border-primary-500 peer-checked:shadow-md peer-checked:shadow-primary-200 group">
-                                    <div class="absolute top-3 left-3 z-10 bg-white/90 text-primary-600 font-bold w-8 h-8 rounded-full flex items-center justify-center shadow-sm">C</div>
-                                    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 pointer-events-none"></div>
-                                    <img src="<?php echo $question['option_c']; ?>" alt="Option C" class="w-full h-48 object-cover">
-                                    <div class="p-3 bg-gray-50">
-                                        <div class="flex justify-between items-center">
-                                            <span class="font-medium text-gray-700">Option C</span>
-                                            <span class="result-icon hidden"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </label>
-                            <!-- option D -->
-                            <label class="cursor-pointer">
-                                <input type="radio" name="answer_<?php echo $question['id']; ?>" value="D" class="hidden peer" 
-                                       data-correct-option="<?php echo $question['correct_option']; ?>" 
-                                       data-question-num="<?php echo $index + 1; ?>"
-                                       onclick="updateSelection(this)">
-                                <div class="relative border-4 border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 peer-checked:border-primary-500 peer-checked:shadow-md peer-checked:shadow-primary-200 group">
-                                    <div class="absolute top-3 left-3 z-10 bg-white/90 text-primary-600 font-bold w-8 h-8 rounded-full flex items-center justify-center shadow-sm">D</div>
-                                    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 pointer-events-none"></div>
-                                    <img src="<?php echo $question['option_d']; ?>" alt="Option D" class="w-full h-48 object-cover">
-                                    <div class="p-3 bg-gray-50">
-                                        <div class="flex justify-between items-center">
-                                            <span class="font-medium text-gray-700">Option D</span>
-                                            <span class="result-icon hidden"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </label>
-
+                        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div id="progress-value" class="h-full bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full transition-all duration-500" style="width: 0%"></div>
                         </div>
                     </div>
-                    <?php endforeach; ?>
                     
-                    <!-- Quiz Navigation -->
-                    <div class="flex justify-between items-center mt-8">
-                        <div class="flex gap-2">
-                            <button type="button" id="prev-btn" onclick="prevQuestion()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                                <i class="fas fa-arrow-left"></i>
-                                <span>Previous</span>
-                            </button>
+                    <form id="quizForm">
+                        <?php foreach ($quizQuestions as $index => $question): ?>
+                        <div class="mb-10 pb-10 border-b border-gray-200 last:border-b-0 question-container" data-question-id="<?php echo $question['id']; ?>">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-primary-100 text-primary-700 rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">
+                                    <?php echo $index + 1; ?>
+                                </div>
+                                <h3 class="text-xl font-semibold text-gray-800"><?php echo htmlspecialchars($question['question']); ?></h3>
+                            </div>
                             
-                            <button type="button" id="next-btn" onclick="nextQuestion()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                                <span>Next</span>
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <!-- Option A -->
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="answer_<?php echo $question['id']; ?>" value="A" class="hidden answer-input" 
+                                           data-correct-option="<?php echo $question['correct_option']; ?>" 
+                                           data-question-id="<?php echo $question['id']; ?>"
+                                           onclick="updateSelection(this)">
+                                    <div class="relative border-4 border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 option-card">
+                                        <div class="absolute top-3 left-3 z-10 bg-white/90 text-primary-600 font-bold w-8 h-8 rounded-full flex items-center justify-center shadow-sm">A</div>
+                                        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 pointer-events-none"></div>
+                                        <img src="<?php echo $question['option_a']; ?>" alt="Option A" class="w-full h-48 object-cover">
+                                        <div class="p-3 bg-gray-50">
+                                            <div class="flex justify-between items-center">
+                                                <span class="font-medium text-gray-700">Option A</span>
+                                                <span class="result-icon hidden"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                                
+                                <!-- Option B -->
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="answer_<?php echo $question['id']; ?>" value="B" class="hidden answer-input" 
+                                           data-correct-option="<?php echo $question['correct_option']; ?>" 
+                                           data-question-id="<?php echo $question['id']; ?>"
+                                           onclick="updateSelection(this)">
+                                    <div class="relative border-4 border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 option-card">
+                                        <div class="absolute top-3 left-3 z-10 bg-white/90 text-primary-600 font-bold w-8 h-8 rounded-full flex items-center justify-center shadow-sm">B</div>
+                                        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 pointer-events-none"></div>
+                                        <img src="<?php echo $question['option_b']; ?>" alt="Option B" class="w-full h-48 object-cover">
+                                        <div class="p-3 bg-gray-50">
+                                            <div class="flex justify-between items-center">
+                                                <span class="font-medium text-gray-700">Option B</span>
+                                                <span class="result-icon hidden"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                                
+                                <!-- Option C -->
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="answer_<?php echo $question['id']; ?>" value="C" class="hidden answer-input" 
+                                           data-correct-option="<?php echo $question['correct_option']; ?>" 
+                                           data-question-id="<?php echo $question['id']; ?>"
+                                           onclick="updateSelection(this)">
+                                    <div class="relative border-4 border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 option-card">
+                                        <div class="absolute top-3 left-3 z-10 bg-white/90 text-primary-600 font-bold w-8 h-8 rounded-full flex items-center justify-center shadow-sm">C</div>
+                                        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 pointer-events-none"></div>
+                                        <img src="<?php echo $question['option_c']; ?>" alt="Option C" class="w-full h-48 object-cover">
+                                        <div class="p-3 bg-gray-50">
+                                            <div class="flex justify-between items-center">
+                                                <span class="font-medium text-gray-700">Option C</span>
+                                                <span class="result-icon hidden"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                                
+                                <!-- Option D -->
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="answer_<?php echo $question['id']; ?>" value="D" class="hidden answer-input" 
+                                           data-correct-option="<?php echo $question['correct_option']; ?>" 
+                                           data-question-id="<?php echo $question['id']; ?>"
+                                           onclick="updateSelection(this)">
+                                    <div class="relative border-4 border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 option-card">
+                                        <div class="absolute top-3 left-3 z-10 bg-white/90 text-primary-600 font-bold w-8 h-8 rounded-full flex items-center justify-center shadow-sm">D</div>
+                                        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 pointer-events-none"></div>
+                                        <img src="<?php echo $question['option_d']; ?>" alt="Option D" class="w-full h-48 object-cover">
+                                        <div class="p-3 bg-gray-50">
+                                            <div class="flex justify-between items-center">
+                                                <span class="font-medium text-gray-700">Option D</span>
+                                                <span class="result-icon hidden"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
+                        <?php endforeach; ?>
                         
-                        <div class="flex items-center">
-                            <span id="question-counter" class="text-sm text-gray-600 mr-4">Question 1 of <?php echo count($quizQuestions); ?></span>
-                            
+                        <!-- Submit Button - Fixed at the bottom -->
+                        <div class="mt-8 flex justify-end sticky bottom-0 pt-4 pb-2 bg-white">
                             <button type="button" onclick="submitQuiz()" class="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-2 rounded-xl font-medium hover:from-primary-700 hover:to-primary-800 transition shadow-lg hover:shadow-xl flex items-center gap-2">
                                 <span>Submit Quiz</span>
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
 
+                <!-- Quiz Results - Initially Hidden -->
                 <div id="quizResult" class="mt-10 hidden">
                     <div class="bg-gradient-to-r from-primary-50 to-secondary-50 rounded-xl p-8 text-center transform transition-all duration-500">
                         <div id="result-icon" class="text-5xl mb-4 mx-auto w-20 h-20 rounded-full flex items-center justify-center"></div>
@@ -489,7 +619,7 @@ $conn->close();
                         </div>
                         
                         <div class="flex flex-col sm:flex-row justify-center gap-4 mt-6">
-                            <button onclick="closeQuizModal(); resetQuiz();" class="bg-white text-primary-600 border border-primary-200 px-6 py-2 rounded-lg transition-colors duration-300 hover:bg-primary-50 flex items-center justify-center gap-2">
+                            <button onclick="resetQuiz()" class="bg-white text-primary-600 border border-primary-200 px-6 py-2 rounded-lg transition-colors duration-300 hover:bg-primary-50 flex items-center justify-center gap-2">
                                 <i class="fas fa-redo"></i>
                                 <span>Try Again</span>
                             </button>
@@ -518,7 +648,7 @@ $conn->close();
                 <!-- Question details will be loaded here via AJAX -->
                 <div class="animate-pulse">
                     <div class="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-                    <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="grid grid-cols-4 gap-4 mb-4">
                         <div class="h-48 bg-gray-200 rounded"></div>
                         <div class="h-48 bg-gray-200 rounded"></div>
                         <div class="h-48 bg-gray-200 rounded"></div>
@@ -535,7 +665,6 @@ $conn->close();
         // Track answered questions with a Set to avoid duplicates
         const answeredQuestionsSet = new Set();
         const totalQuestions = <?php echo count($quizQuestions); ?>;
-        let currentQuestion = 1;
         
         // Function to open quiz modal
         function openQuizModal() {
@@ -552,14 +681,11 @@ $conn->close();
             document.body.style.overflow = 'auto'; // Re-enable scrolling
         }
         
-        // Function to reset quiz
+        // Function to reset quiz - FIXED to properly clear all answers
         function resetQuiz() {
             // Hide results, show questions
             document.getElementById('quizResult').classList.add('hidden');
-            document.querySelectorAll('.question-container').forEach((container, index) => {
-                container.classList.add('hidden');
-                if (index === 0) container.classList.remove('hidden');
-            });
+            document.getElementById('quiz-form-container').classList.remove('hidden');
             
             // Reset form
             document.getElementById('quizForm').reset();
@@ -567,11 +693,6 @@ $conn->close();
             // Reset progress
             answeredQuestionsSet.clear();
             updateProgress();
-            
-            // Reset current question
-            currentQuestion = 1;
-            updateNavButtons();
-            document.getElementById('question-counter').textContent = `Question 1 of ${totalQuestions}`;
             
             // Reset result icons
             document.querySelectorAll('.result-icon').forEach(icon => {
@@ -581,23 +702,45 @@ $conn->close();
             
             // Reset card styling
             document.querySelectorAll('.option-card').forEach(card => {
-                card.classList.remove('border-green-500', 'border-red-500', 'shadow-green-200', 'shadow-red-200');
+                card.classList.remove('border-green-500', 'border-red-500', 'border-primary-500', 'shadow-green-200', 'shadow-red-200');
+                card.classList.add('border-gray-200');
             });
             
             // Reset explanations
             document.querySelectorAll('.explanation-box').forEach(box => {
                 box.classList.add('hidden');
             });
+            
+            // Remove highlighting from unanswered questions
+            document.querySelectorAll('.question-container').forEach(container => {
+                container.classList.remove('border-l-4', 'border-yellow-400', 'pl-3');
+            });
+            
+            // Scroll back to top
+            document.getElementById('quiz-content').scrollTop = 0;
         }
         
         // Function to update selection and progress
         function updateSelection(selectedInput) {
-            // Get the question number
-            const questionNum = selectedInput.getAttribute('data-question-num');
+            // Get the question ID
+            const questionId = selectedInput.getAttribute('data-question-id');
+            
+            // Update card styling
+            const allOptionsForQuestion = document.querySelectorAll(`input[name="answer_${questionId}"]`);
+            allOptionsForQuestion.forEach(input => {
+                const card = input.nextElementSibling;
+                if (input === selectedInput) {
+                    card.classList.add('border-primary-500');
+                    card.classList.remove('border-gray-200');
+                } else {
+                    card.classList.remove('border-primary-500');
+                    card.classList.add('border-gray-200');
+                }
+            });
             
             // Update progress only if this question wasn't answered before
-            if (!answeredQuestionsSet.has(questionNum)) {
-                answeredQuestionsSet.add(questionNum);
+            if (!answeredQuestionsSet.has(questionId)) {
+                answeredQuestionsSet.add(questionId);
                 updateProgress();
             }
         }
@@ -609,121 +752,76 @@ $conn->close();
             document.getElementById('progress-text').textContent = `${progressPercent}%`;
         }
         
-        // Function to go to next question
-        function nextQuestion() {
-            if (currentQuestion < totalQuestions) {
-                document.querySelector(`.question-container[data-question="${currentQuestion}"]`).classList.add('hidden');
-                currentQuestion++;
-                document.querySelector(`.question-container[data-question="${currentQuestion}"]`).classList.remove('hidden');
-                
-                updateNavButtons();
-                document.getElementById('question-counter').textContent = `Question ${currentQuestion} of ${totalQuestions}`;
-            }
-        }
-        
-        // Function to go to previous question
-        function prevQuestion() {
-            if (currentQuestion > 1) {
-                document.querySelector(`.question-container[data-question="${currentQuestion}"]`).classList.add('hidden');
-                currentQuestion--;
-                document.querySelector(`.question-container[data-question="${currentQuestion}"]`).classList.remove('hidden');
-                
-                updateNavButtons();
-                document.getElementById('question-counter').textContent = `Question ${currentQuestion} of ${totalQuestions}`;
-            }
-        }
-        
-        // Function to update navigation buttons
-        function updateNavButtons() {
-            document.getElementById('prev-btn').disabled = currentQuestion === 1;
-            document.getElementById('next-btn').disabled = currentQuestion === totalQuestions;
-        }
-        
         // Function to submit the quiz and display the correct/incorrect answers
         function submitQuiz() {
-            const allQuestions = document.querySelectorAll('[name^="answer_"]');
+            const allQuestions = document.querySelectorAll('.question-container');
             let correctCount = 0;
             let totalAnswered = 0;
-            let questionsMap = new Map();
+            let unansweredQuestions = [];
             
-            allQuestions.forEach(input => {
-                const correctOption = input.getAttribute('data-correct-option');
-                const selectedCard = input.nextElementSibling;
-                const resultIcon = selectedCard.querySelector('.result-icon');
+            allQuestions.forEach(questionContainer => {
+                const questionId = questionContainer.getAttribute('data-question-id');
+                const selectedInput = document.querySelector(`input[name="answer_${questionId}"]:checked`);
                 
-                if (input.checked) {
+                if (selectedInput) {
                     totalAnswered++;
+                    const correctOption = selectedInput.getAttribute('data-correct-option');
+                    const selectedCard = selectedInput.nextElementSibling;
+                    const resultIcon = selectedCard.querySelector('.result-icon');
+                    
                     resultIcon.classList.remove('hidden');
                     
-                    if (input.value === correctOption) {
-                        selectedCard.classList.remove('peer-checked:border-primary-500');
+                    if (selectedInput.value === correctOption) {
+                        selectedCard.classList.remove('border-primary-500', 'border-gray-200');
                         selectedCard.classList.add('border-green-500', 'shadow-green-200');
                         resultIcon.innerHTML = '<i class="fas fa-check-circle text-green-500"></i>';
                         correctCount++;
                     } else {
-                        selectedCard.classList.remove('peer-checked:border-primary-500');
+                        selectedCard.classList.remove('border-primary-500', 'border-gray-200');
                         selectedCard.classList.add('border-red-500', 'shadow-red-200');
                         resultIcon.innerHTML = '<i class="fas fa-times-circle text-red-500"></i>';
                         
                         // Highlight the correct answer
-                        const questionName = input.name;
-                        const correctInput = document.querySelector(`input[name="${questionName}"][value="${correctOption}"]`);
+                        const correctInput = document.querySelector(`input[name="answer_${questionId}"][value="${correctOption}"]`);
                         const correctCard = correctInput.nextElementSibling;
                         const correctIcon = correctCard.querySelector('.result-icon');
                         
                         correctCard.classList.add('border-green-500', 'shadow-green-200');
+                        correctCard.classList.remove('border-gray-200');
                         correctIcon.classList.remove('hidden');
                         correctIcon.innerHTML = '<i class="fas fa-check-circle text-green-500"></i>';
                     }
-                    
-                    // Show explanation
-                    const questionContainer = selectedCard.closest('.question-container');
-                    const explanationBox = questionContainer.querySelector('.explanation-box');
-                    if (explanationBox) {
-                        explanationBox.classList.remove('hidden');
-                    }
-                    
-                    // Add to questions map to track which ones were answered
-                    const questionNum = input.getAttribute('data-question-num');
-                    questionsMap.set(questionNum, true);
+                } else {
+                    unansweredQuestions.push(questionId);
                 }
             });
             
             // Check if all questions are answered
             if (totalAnswered < totalQuestions) {
-                // Find first unanswered question
-                for (let i = 1; i <= totalQuestions; i++) {
-                    if (!questionsMap.has(i.toString())) {
-                        // Show the unanswered question
-                        document.querySelectorAll('.question-container').forEach(container => {
-                            container.classList.add('hidden');
-                        });
-                        document.querySelector(`.question-container[data-question="${i}"]`).classList.remove('hidden');
-                        currentQuestion = i;
-                        updateNavButtons();
-                        document.getElementById('question-counter').textContent = `Question ${i} of ${totalQuestions}`;
-                        
-                        // Highlight it
-                        document.querySelector(`.question-container[data-question="${i}"]`).classList.add('border-l-4', 'border-yellow-400', 'pl-3');
-                        
-                        alert(`Please answer all questions. ${totalQuestions - totalAnswered} question(s) remaining.`);
-                        return;
+                // Highlight unanswered questions
+                unansweredQuestions.forEach(questionId => {
+                    const questionContainer = document.querySelector(`.question-container[data-question-id="${questionId}"]`);
+                    questionContainer.classList.add('border-l-4', 'border-yellow-400', 'pl-3');
+                    
+                    // Scroll to first unanswered question
+                    if (questionId === unansweredQuestions[0]) {
+                        questionContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
-                }
+                });
+                
+                alert(`Please answer all questions. ${totalQuestions - totalAnswered} question(s) remaining.`);
+                return;
             }
             
             // Show results
-            const resultMessage = document.getElementById('resultMessage');
+            document.getElementById('quiz-form-container').classList.add('hidden');
             const quizResult = document.getElementById('quizResult');
-            const scoreBar = document.getElementById('score-bar');
-            const resultIcon = document.getElementById('result-icon');
-            const score = (correctCount / totalQuestions) * 100;
-            
-            // Hide questions, show results
-            document.querySelectorAll('.question-container').forEach(container => {
-                container.classList.add('hidden');
-            });
             quizResult.classList.remove('hidden');
+            
+            const resultIcon = document.getElementById('result-icon');
+            const resultMessage = document.getElementById('resultMessage');
+            const scoreBar = document.getElementById('score-bar');
+            const score = (correctCount / totalQuestions) * 100;
             
             // Set result message and styling based on score
             if (score >= 80) {
@@ -771,6 +869,23 @@ $conn->close();
                 setTimeout(() => {
                     confetti.remove();
                 }, 5000);
+            }
+        }
+        
+        // Function to preview uploaded images
+        function previewImage(input, previewId) {
+            const preview = document.getElementById(previewId);
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Preview" class="w-full h-full object-contain">`;
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.innerHTML = `<i class="fas fa-image text-gray-400 text-4xl"></i>`;
             }
         }
         
@@ -822,12 +937,15 @@ $conn->close();
                 alert(`Delete question ${id} - This would delete the question in a full implementation`);
             }
         }
-        
-        // Initialize navigation buttons on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            updateNavButtons();
-            quizResult.classList.remove('hidden');
-        });
+        // Function to hide messages after 5 seconds (5000ms)
+        setTimeout(() => {
+            const successMsg = document.getElementById("success-message");
+            const errorMsg = document.getElementById("error-message");
+
+            if (successMsg) successMsg.style.display = "none";
+            if (errorMsg) errorMsg.style.display = "none";
+        }, 5000);
     </script>
 </body>
 </html>
+
