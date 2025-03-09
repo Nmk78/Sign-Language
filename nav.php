@@ -11,7 +11,7 @@ function renderHeader($activePage = 'home', $role = "instructor")
         'home' => '/',
         'category' => '/category',
         'About' => '/about',
-        'Content' => '/content',
+        'Contact' => '/contact',
         // 'dashboard' => '/dashboard?tab=statistics',
         // 'profile' => '/profile',
         // 'courseDetails' => '/courseDetails',

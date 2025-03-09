@@ -147,7 +147,7 @@ function formatTimeAgo($datetime)
                         <h3 class="mt-2 text-lg font-medium text-gray-900" id="errorMessage">Error loading lesson</h3>
                         <p class="mt-1 text-sm text-gray-500" id="errorDetails"></p>
                         <div class="mt-6">
-                            <button onclick="window.location.href='index.php'" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#4A90E2] hover:bg-[#357abd] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4A90E2]">
+                            <button onclick="window.location.href='/'" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#4A90E2] hover:bg-[#357abd] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4A90E2]">
                                 Return to Home
                             </button>
                         </div>

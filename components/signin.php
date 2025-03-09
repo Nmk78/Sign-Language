@@ -181,7 +181,7 @@
                     </div>
                     
                     <div class="mt-6 flex justify-center">
-                        <a href="index.php" class="text-sm text-gray-500 hover:text-gray-700 flex items-center">
+                        <a href="/" class="text-sm text-gray-500 hover:text-gray-700 flex items-center">
                             <i class="fas fa-arrow-left mr-2 text-xs"></i>
                             Back to main site
                         </a>

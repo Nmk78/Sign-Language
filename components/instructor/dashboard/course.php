@@ -12,7 +12,8 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['user']['user_id'])) {
 }
 
 // Database connection
-function getDbConnection() {
+function getDbConnection()
+{
     $host = "localhost";
     $user = "root";  // Change if needed
     $pass = "root";  // Change if needed
@@ -28,17 +29,18 @@ function getDbConnection() {
 }
 
 // Get courses for the logged-in user
-function getUserCourses($userId) {
+function getUserCourses($userId)
+{
     $conn = getDbConnection();
-    
+
     // Use prepared statement to prevent SQL injection
     $stmt = $conn->prepare("SELECT * FROM courses WHERE created_by = ?");
     $stmt->bind_param("i", $userId);
     $stmt->execute();
-    
+
     $result = $stmt->get_result();
     $courses = [];
-    
+
     while ($row = $result->fetch_assoc()) {
         // Get lesson count for each course
         $lessonStmt = $conn->prepare("SELECT COUNT(*) as count FROM lesson WHERE course_id = ?");
@@ -46,78 +48,33 @@ function getUserCourses($userId) {
         $lessonStmt->execute();
         $lessonResult = $lessonStmt->get_result();
         $lessonCount = $lessonResult->fetch_assoc()['count'];
-        
+
         // Get enrollment count
         $enrollStmt = $conn->prepare("SELECT COUNT(*) as count FROM course_enrollments WHERE course_id = ?");
         $enrollStmt->bind_param("i", $row['id']);
         $enrollStmt->execute();
         $enrollResult = $enrollStmt->get_result();
         $enrollCount = $enrollResult->fetch_assoc()['count'] ?? 0;
-        
+
         // Add counts to course data
         $row['lesson_count'] = $lessonCount;
         $row['enrollment_count'] = $enrollCount;
-        
+
         $courses[] = $row;
     }
-    
+
     $stmt->close();
     $conn->close();
-    
+
     return $courses;
 }
 
-// Handle POST request for adding a new lesson
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['course_id'])) {
-    $conn = getDbConnection();
-    
-    $course_id = $_POST['course_id'];
-    $title = $_POST['title'];
-    $content = $_POST['content'];
-    
-    // Video upload logic
-    $video_url = NULL;
-    if (isset($_FILES['video_data']) && $_FILES['video_data']['error'] == 0) {
-        // Generate a unique filename
-        $upload_dir = "uploads/videos/";
-        
-        // Create directory if it doesn't exist
-        if (!file_exists($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
-        }
-        
-        $filename = uniqid() . "_" . basename($_FILES['video_data']['name']);
-        $target_file = $upload_dir . $filename;
-        
-        // Move uploaded file
-        if (move_uploaded_file($_FILES['video_data']['tmp_name'], $target_file)) {
-            $video_url = $target_file;
-        }
-    }
-    
-    // Insert lesson into the database
-    $stmt = $conn->prepare("INSERT INTO lesson (course_id, title, description, video_url) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("isss", $course_id, $title, $content, $video_url);
-    
-    if ($stmt->execute()) {
-        // Redirect back to the course manager
-        header("Location: course-manager.php?success=1");
-        exit;
-    } else {
-        // Redirect with error
-        header("Location: course-manager.php?error=1");
-        exit;
-    }
-    
-    $stmt->close();
-    $conn->close();
-}
 
 // Handle lesson deletion
 if (isset($_GET['delete_lesson']) && is_numeric($_GET['delete_lesson'])) {
     $conn = getDbConnection();
     $lesson_id = (int)$_GET['delete_lesson'];
-    
+
     // First check if the lesson belongs to a course owned by the current user
     $stmt = $conn->prepare("
         SELECT l.id FROM lesson l
@@ -127,14 +84,14 @@ if (isset($_GET['delete_lesson']) && is_numeric($_GET['delete_lesson'])) {
     $stmt->bind_param("ii", $lesson_id, $_SESSION['user']['user_id']);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     if ($result->num_rows > 0) {
         // Delete the lesson
         $deleteStmt = $conn->prepare("DELETE FROM lesson WHERE id = ?");
         $deleteStmt->bind_param("i", $lesson_id);
         $deleteStmt->execute();
         $deleteStmt->close();
-        
+
         // Redirect with success message
         header("Location: course-manager.php?deleted=1");
         exit;
@@ -143,7 +100,7 @@ if (isset($_GET['delete_lesson']) && is_numeric($_GET['delete_lesson'])) {
         header("Location: course-manager.php?error=unauthorized");
         exit;
     }
-    
+
     $stmt->close();
     $conn->close();
 }
@@ -172,33 +129,39 @@ $courses = getUserCourses($user_id);
             <h1 class="text-3xl font-bold text-gray-800">Course Manager</h1>
             <button onclick="openCourseModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#4A90E2] hover:bg-[#357abd]">New Course</button>
         </div>
-        
+
         <!-- Status Messages -->
         <?php if (isset($_GET['success'])): ?>
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
                 <strong class="font-bold">Success!</strong>
                 <span class="block sm:inline">Lesson added successfully.</span>
                 <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-                    <svg onclick="this.parentElement.parentElement.remove()" class="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+                    <svg onclick="this.parentElement.parentElement.remove()" class="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <title>Close</title>
+                        <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                    </svg>
                 </span>
             </div>
         <?php endif; ?>
-        
+
         <?php if (isset($_GET['deleted'])): ?>
             <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative mb-4" role="alert">
                 <strong class="font-bold">Success!</strong>
                 <span class="block sm:inline">Lesson deleted successfully.</span>
                 <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-                    <svg onclick="this.parentElement.parentElement.remove()" class="fill-current h-6 w-6 text-blue-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+                    <svg onclick="this.parentElement.parentElement.remove()" class="fill-current h-6 w-6 text-blue-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <title>Close</title>
+                        <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                    </svg>
                 </span>
             </div>
         <?php endif; ?>
-        
+
         <?php if (isset($_GET['error'])): ?>
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
                 <strong class="font-bold">Error!</strong>
                 <span class="block sm:inline">
-                    <?php 
+                    <?php
                     if ($_GET['error'] === 'unauthorized') {
                         echo "You don't have permission to perform this action.";
                     } else {
@@ -207,11 +170,14 @@ $courses = getUserCourses($user_id);
                     ?>
                 </span>
                 <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-                    <svg onclick="this.parentElement.parentElement.remove()" class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+                    <svg onclick="this.parentElement.parentElement.remove()" class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <title>Close</title>
+                        <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                    </svg>
                 </span>
             </div>
         <?php endif; ?>
-        
+
         <!-- Course Cards Grid -->
         <?php if (count($courses) > 0): ?>
             <div class="flex flex-wrap gap-6">
@@ -222,28 +188,28 @@ $courses = getUserCourses($user_id);
                             <!-- Course Thumbnail with Status Badge -->
                             <div class="relative w-full sm:w-1/3">
                                 <img class="w-full max-h-60 sm:h-full object-cover object-center" src="<?php echo !empty($course['thumbnail_url']) ? htmlspecialchars($course['thumbnail_url']) : 'assets/images/default-course.jpg'; ?>" alt="<?php echo htmlspecialchars($course['title']); ?>">
-                                
+
                                 <!-- Status Badge -->
                                 <div class="absolute top-3 left-3">
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full <?php 
-                                        if ($course['status'] === 'published') echo 'bg-green-100 text-green-800';
-                                        elseif ($course['status'] === 'draft') echo 'bg-gray-100 text-gray-800';
-                                        else echo 'bg-red-100 text-red-800';
-                                    ?>">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full <?php
+                                                                                                if ($course['status'] === 'published') echo 'bg-green-100 text-green-800';
+                                                                                                elseif ($course['status'] === 'draft') echo 'bg-gray-100 text-gray-800';
+                                                                                                else echo 'bg-red-100 text-red-800';
+                                                                                                ?>">
                                         <?php echo ucfirst(htmlspecialchars($course['status'])); ?>
                                     </span>
                                 </div>
-                                
+
                                 <!-- Price Badge (if applicable) -->
                                 <?php if (isset($course['price']) && $course['price'] > 0): ?>
-                                <div class="absolute top-3 right-3">
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                                        $<?php echo number_format($course['price'], 2); ?>
-                                    </span>
-                                </div>
+                                    <div class="absolute top-3 right-3">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            $<?php echo number_format($course['price'], 2); ?>
+                                        </span>
+                                    </div>
                                 <?php endif; ?>
                             </div>
-                            
+
                             <!-- Course Info -->
                             <div class="p-5 flex-1 flex flex-col justify-between">
                                 <div>
@@ -251,20 +217,20 @@ $courses = getUserCourses($user_id);
                                     <div class="flex justify-between items-start mb-2">
                                         <h2 class="text-xl font-semibold text-gray-800"><?php echo htmlspecialchars($course['title']); ?></h2>
                                         <?php if (!empty($course['category'])): ?>
-                                        <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-md">
-                                            <?php echo htmlspecialchars($course['category']); ?>
-                                        </span>
+                                            <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-md">
+                                                <?php echo htmlspecialchars($course['category']); ?>
+                                            </span>
                                         <?php endif; ?>
                                     </div>
-                                    
+
                                     <!-- Description -->
                                     <p class="text-gray-600 text-sm mb-4">
-                                        <?php 
+                                        <?php
                                         $desc = strip_tags($course['description']);
-                                        echo strlen($desc) > 120 ? substr($desc, 0, 120) . '...' : $desc; 
+                                        echo strlen($desc) > 120 ? substr($desc, 0, 120) . '...' : $desc;
                                         ?>
                                     </p>
-                                    
+
                                     <!-- Course Stats -->
                                     <div class="grid grid-cols-3 gap-2 mb-4">
                                         <div class="text-center p-2 bg-gray-50 rounded">
@@ -287,7 +253,7 @@ $courses = getUserCourses($user_id);
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Action Buttons -->
                                 <div class="flex flex-col sm:flex-row gap-2">
                                     <button class="manage-course-btn flex-1 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300 flex items-center justify-center" data-course-id="<?php echo $course['id']; ?>" data-course-title="<?php echo htmlspecialchars($course['title']); ?>">
@@ -312,7 +278,7 @@ $courses = getUserCourses($user_id);
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Expanded lessons section (hidden by default) -->
                         <div id="lessonList-<?php echo $course['id']; ?>" class="lessons-list hidden transition-all duration-300 ease-in-out">
                             <div class="p-5 bg-gray-50 border-t border-gray-100">
@@ -325,7 +291,7 @@ $courses = getUserCourses($user_id);
                                         Add Lesson
                                     </button>
                                 </div>
-                                
+
                                 <div class="lesson-container-<?php echo $course['id']; ?>">
                                     <!-- Lessons will be loaded here via AJAX -->
                                     <div class="text-center py-8 lesson-loading-<?php echo $course['id']; ?>">
@@ -402,6 +368,33 @@ $courses = getUserCourses($user_id);
             </div>
         </div>
 
+
+        
+        <!-- quiz modal -->
+        <div id="myModal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 hidden">
+            <div class="bg-white p-6 rounded-lg shadow-lg max-h-[80vh] overflow-y-auto">
+                <div class="flex flex-col overflow-scroll justify-between items-center">
+
+                    <div class="flex">
+                        <h2 class="text-lg font-bold">Form Title</h2>
+                        <button class="text-gray-500 hover:text-red-500" onclick="closeQuizModal()">&times;</button>
+                    </div>
+
+                    <form id="quizForm" method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" enctype="multipart/form-data">
+                        <input type="hidden" id="lessonIdInput" name="lesson_id">
+                        <?php include 'quizForm.php' ?>
+
+                        <!-- Submit Button -->
+                        <div class="flex justify-end">
+                            <button type="submit" name="submit_quiz" class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors shadow-md hover:shadow-lg">
+                                Create Quiz
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
         <!-- Course Manager Modal -->
         <div id="courseManagerModal" class="fixed z-40 inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
             <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
@@ -416,7 +409,8 @@ $courses = getUserCourses($user_id);
                     </div>
                     <div class="mt-2 px-7 py-3">
                         <!-- Add Lesson Form -->
-                        <form id="addLessonForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" enctype="multipart/form-data">
+                        <form id="addLessonForm" action="/upload_lesson.php" method="POST" enctype="multipart/form-data">
+                            <!-- <form id="addLessonForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" enctype="multipart/form-data"> -->
                             <input type="hidden" id="modalCourseId" name="course_id">
                             <div class="mb-4">
                                 <label for="lessonTitle" class="block text-sm font-medium text-gray-700">Lesson Title</label>
@@ -441,6 +435,18 @@ $courses = getUserCourses($user_id);
     </div>
 
     <script>
+        function openQuizModal(lessonId) {
+            document.getElementById('myModal').classList.remove('hidden');
+
+            // let lessonId = event.target.getAttribute('data-lesson-id');
+            console.log("🚀 ~ openQuizModal ~ lessonId:", lessonId)
+            document.getElementById('lessonIdInput').value = lessonId;
+            document.getElementById('myModal').classList.remove('hidden');
+        }
+
+        function closeQuizModal() {
+            document.getElementById('myModal').classList.add('hidden');
+        }
         // Function to open the course creation modal
         function openCourseModal() {
             document.getElementById('courseModal').classList.remove('hidden');
@@ -455,14 +461,14 @@ $courses = getUserCourses($user_id);
         function fetchLessons(courseId) {
             const lessonContainer = document.querySelector(`.lesson-container-${courseId}`);
             const loadingElement = document.querySelector(`.lesson-loading-${courseId}`);
-            
+
             if (!lessonContainer) return;
-            
+
             // Show loading indicator
             if (loadingElement) {
                 loadingElement.classList.remove('hidden');
             }
-            
+
             // Fetch lessons via AJAX
             fetch(`fetch_lessons.php?course_id=${courseId}`)
                 .then(response => response.json())
@@ -471,7 +477,7 @@ $courses = getUserCourses($user_id);
                     if (loadingElement) {
                         loadingElement.classList.add('hidden');
                     }
-                    
+
                     // If no lessons, show empty state
                     if (data.length === 0) {
                         lessonContainer.innerHTML = `
@@ -488,7 +494,7 @@ $courses = getUserCourses($user_id);
                     } else {
                         // Render lessons list
                         let lessonsHTML = '<ul class="divide-y divide-gray-100">';
-                        
+
                         data.forEach((lesson, index) => {
                             lessonsHTML += `
                                 <li class="py-3 flex items-center justify-between hover:bg-gray-100 px-2 rounded transition-colors duration-200">
@@ -516,11 +522,11 @@ $courses = getUserCourses($user_id);
                                             ${lesson.rating}
                                         </span>
                                         ` : ''}
-                                        // TODO - Add Quiz Button is here
                                         <div class="flex space-x-1">
-                                            <button class="text-gray-500 hover:text-blue-500 p-1">
+                                            <button id="quizBtn" class="text-gray-500 hover:text-blue-500 p-1" onclick="openQuizModal(${lesson.id})" data-lesson-id="${lesson.id}">
                                                 <i class="fas fa-q"></i>
                                             </button>
+
                                             <button class="text-gray-500 hover:text-red-500 p-1" onclick="confirmDeleteLesson(${lesson.id})">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -531,7 +537,7 @@ $courses = getUserCourses($user_id);
                                 </li>
                             `;
                         });
-                        
+
                         lessonsHTML += '</ul>';
                         lessonContainer.innerHTML = lessonsHTML;
                     }
@@ -567,14 +573,14 @@ $courses = getUserCourses($user_id);
         document.addEventListener('DOMContentLoaded', function() {
             // Toggle lessons section
             const toggleButtons = document.querySelectorAll('.toggle-lessons-btn');
-            
+
             toggleButtons.forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
                     const courseId = this.getAttribute('data-course-id');
                     const lessonList = document.getElementById(`lessonList-${courseId}`);
                     const icon = this.querySelector('svg');
-                    
+
                     if (lessonList.classList.contains('hidden')) {
                         lessonList.classList.remove('hidden');
                         icon.style.transform = 'rotate(180deg)';
@@ -597,10 +603,10 @@ $courses = getUserCourses($user_id);
                     }
                 });
             });
-            
+
             // Manage course button
             const manageButtons = document.querySelectorAll('.manage-course-btn');
-            
+
             manageButtons.forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -609,10 +615,10 @@ $courses = getUserCourses($user_id);
                     openCourseManager(courseId, courseTitle);
                 });
             });
-            
+
             // Add lesson buttons
             const addLessonButtons = document.querySelectorAll('.add-lesson-btn');
-            
+
             addLessonButtons.forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -621,7 +627,7 @@ $courses = getUserCourses($user_id);
                     openCourseManager(courseId, courseTitle);
                 });
             });
-            
+
             // Close modal button
             const closeModalBtn = document.getElementById('closeModal');
             if (closeModalBtn) {
@@ -629,36 +635,36 @@ $courses = getUserCourses($user_id);
                     document.getElementById('courseManagerModal').classList.add('hidden');
                 });
             }
-            
+
             // Course form submission
             const courseForm = document.getElementById('courseForm');
             if (courseForm) {
                 courseForm.addEventListener('submit', function(e) {
                     e.preventDefault();
                     const formData = new FormData(this);
-                    
+
                     fetch('handlers/createCourse.php', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        const formMessage = document.getElementById('formMessage');
-                        formMessage.textContent = data.message;
-                        formMessage.className = data.success ? 'text-green-500 text-sm mt-2' : 'text-red-500 text-sm mt-2';
-                        
-                        if (data.success) {
-                            setTimeout(() => {
-                                closeCourseModal();
-                                location.reload();
-                            }, 1500);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        document.getElementById('formMessage').textContent = 'An error occurred. Please try again.';
-                        document.getElementById('formMessage').className = 'text-red-500 text-sm mt-2';
-                    });
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            const formMessage = document.getElementById('formMessage');
+                            formMessage.textContent = data.message;
+                            formMessage.className = data.success ? 'text-green-500 text-sm mt-2' : 'text-red-500 text-sm mt-2';
+
+                            if (data.success) {
+                                setTimeout(() => {
+                                    closeCourseModal();
+                                    location.reload();
+                                }, 1500);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            document.getElementById('formMessage').textContent = 'An error occurred. Please try again.';
+                            document.getElementById('formMessage').className = 'text-red-500 text-sm mt-2';
+                        });
                 });
             }
         });
@@ -671,4 +677,5 @@ $courses = getUserCourses($user_id);
         }
     </script>
 </body>
+
 </html>

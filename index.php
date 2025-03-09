@@ -208,6 +208,9 @@ $courses = [
     $uri = trim($urlPath, '/');
 
     switch ($uri) {
+        case 'q':
+            require 'components/instructor/dashboard/quizForm.php';
+            break;
         case 'signingup':
             require 'handlers/signup.php';
             break;
@@ -259,12 +262,37 @@ $courses = [
     $currentPage = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 
     if (!in_array($uri, $hiddenPages)) {
-        echo '<footer class="bg-background py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-primary font-bold text-xl">EDUTOCK</div>
-        </div>
-    </footer>';
+        echo '
+        <!-- Modern footer -->
+        <div class="mt-16 max-w-6xl mx-auto pt-8 border-t border-gray-100">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-gray-500 text-sm">
+                    © ' . date('Y') . ' Sign Language Learning Platform
+                </p>
+    
+                <div class="flex items-center space-x-6">
+                    <a href="#" class="text-gray-500 hover:text-primary transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                        </svg>
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-primary transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
+                        </svg>
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-primary transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>';
     }
+
     ?>
 
     <script>
