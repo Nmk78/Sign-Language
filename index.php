@@ -2,9 +2,9 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
     if (isset($_SESSION['user'])) {
-        $username = $_SESSION['user']['username']; 
-        $role = $_SESSION['user']['role']; 
-        $id = $_SESSION['user']['user_id']; 
+        $username = $_SESSION['user']['username'];
+        $role = $_SESSION['user']['role'];
+        $id = $_SESSION['user']['user_id'];
     } else {
         $username = null; // If not logged in
     }
@@ -30,18 +30,18 @@ if (session_status() === PHP_SESSION_NONE) {
 
 ?>
 <script>
-     // Get username from PHP session and store in localStorage
-     let username = <?php echo json_encode($username); ?>;
-     let role = <?php echo json_encode($role); ?>;
-     let id = <?php echo json_encode($id); ?>;
-        // console.log(username);
-        if (username) {
-            localStorage.setItem("username", username);
-            localStorage.setItem("role", role);
-            localStorage.setItem("id", id);
-        }
+    // Get username from PHP session and store in localStorage
+    let username = <?php echo json_encode($username); ?>;
+    let role = <?php echo json_encode($role); ?>;
+    let id = <?php echo json_encode($id); ?>;
+    // console.log(username);
+    if (username) {
+        localStorage.setItem("username", username);
+        localStorage.setItem("role", role);
+        localStorage.setItem("id", id);
+    }
 
-        // localStorage.removeItem("username"); // Clears username from localStorage
+    // localStorage.removeItem("username"); // Clears username from localStorage
 </script>
 <?php
 $navItems = ["Learning", "Instructor", "Enterprise", "Scholarship"];
@@ -148,13 +148,16 @@ $courses = [
             width: 4px;
             height: 4px;
         }
+
         .scrollbar-thin::-webkit-scrollbar-track {
             background: #f1f1f1;
         }
+
         .scrollbar-thin::-webkit-scrollbar-thumb {
             background: #888;
             border-radius: 2px;
         }
+
         .scrollbar-thin::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
@@ -216,6 +219,9 @@ $courses = [
             break;
         case 'signup':
             require 'components/signup.php';
+            break;
+        case 'instructor-signup':
+            require 'components/instructorSignUp.php';
             break;
         case 'dashboard':
             require 'components/dashboard.php';
@@ -295,4 +301,3 @@ $courses = [
 </body>
 
 </html>
-

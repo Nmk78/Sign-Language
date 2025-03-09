@@ -118,6 +118,7 @@ function formatTimeAgo($datetime)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($course['title'] ?? 'Course View'); ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body class="bg-gray-50">
@@ -125,12 +126,7 @@ function formatTimeAgo($datetime)
     <div class="container mx-auto px-6 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column (2/3 width on large screens) -->
-            <div class="lg:col-span-2 space-y-8">
-                <!-- Course Title -->
-                <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <h1 class="text-2xl font-bold text-gray-900"><?php echo htmlspecialchars($course['title']); ?></h1>
-                    <p class="mt-2 text-gray-600"><?php echo htmlspecialchars($course['description']); ?></p>
-                </div>
+            <div class="lg:col-span-2">
 
                 <!-- Loading State -->
                 <div id="loadingState" class="bg-white p-6 rounded-lg shadow-sm <?php echo $current_lesson ? 'hidden' : ''; ?>">
@@ -201,11 +197,14 @@ function formatTimeAgo($datetime)
                     <?php endif; ?>
                 </div>
 
+                <div class="mt-5">
                 <?php include 'components/comments.php'; ?>
+
+                </div>
             </div>
 
             <!-- Right Column (1/3 width on large screens) -->
-            <div class="lg:col-span-1">
+            <!-- <div class="lg:col-span-1">
                 <div class="bg-white p-6 rounded-lg shadow-sm">
                     <h3 class="text-lg font-semibold mb-4">Course Lessons</h3>
                     <div class="space-y-3">
@@ -222,6 +221,116 @@ function formatTimeAgo($datetime)
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
+                </div>
+            </div> -->
+
+            <div class="lg:col-span-1">
+                <!-- Course Title -->
+                <div class="bg-white p-6 rounded-t-lg shadow-sm border border-gray-100">
+                    <h1 class="text-2xl font-bold text-gray-900"><?php echo htmlspecialchars($course['title']); ?></h1>
+                    <p class="mt-2 text-gray-600"><?php echo htmlspecialchars($course['description']); ?></p>
+                </div>
+                <div class="bg-white p-6 rounded-b-lg shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between mb-5">
+                        <h3 class="text-lg font-semibold">Course Lessons</h3>
+                        <div class="text-sm text-gray-500">
+                            <span class="font-medium text-indigo-600"><?php echo count(array_filter($lessons, function ($l) {
+                                                                            return isset($l['completed']) && $l['completed'];
+                                                                        })); ?></span>
+                            <span>/</span>
+                            <span><?php echo count($lessons); ?></span>
+                            <span class="ml-1">completed</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <?php if (empty($lessons)): ?>
+                            <div class="py-8 flex flex-col items-center justify-center text-center">
+                                <div class="bg-gray-100 p-3 rounded-full mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
+                                </div>
+                                <p class="text-gray-500">No lessons available for this course.</p>
+                                <button class="mt-3 text-sm text-indigo-600 hover:text-indigo-800 font-medium">Refresh List</button>
+                            </div>
+                        <?php else: ?>
+                            <?php foreach ($lessons as $index => $lesson): ?>
+                                <?php
+                                $isActive = ($lesson_id == $lesson['id']);
+                                $isCompleted = isset($lesson['completed']) && $lesson['completed'];
+                                $lessonNumber = $index + 1;
+                                ?>
+                                <a
+                                    href="?course=<?php echo $course_id; ?>&lesson=<?php echo $lesson['id']; ?>"
+                                    class="flex items-start gap-3 border  p-3 rounded-lg transition-all duration-200 relative
+                            <?php echo $isActive
+                                    ? 'bg-indigo-50 border-indigo-100'
+                                    : 'hover:bg-gray-50  border-transparent hover:border-gray-100'; ?>">
+
+                                    <!-- Lesson number or status indicator -->
+                                    <!-- <div class="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium
+                            <?php if ($isCompleted): ?>
+                                bg-green-100 text-green-700
+                            <?php elseif ($isActive): ?>
+                                bg-indigo-100 text-indigo-700
+                            <?php else: ?>
+                                bg-gray-100 text-gray-700
+                            <?php endif; ?>">
+                            <?php if ($isCompleted): ?>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                            <?php else: ?>
+                                <?php echo $lessonNumber; ?>
+                            <?php endif; ?>
+                        </div> -->
+
+                                    <div id="videoContainer" class="relative h-28 aspect-square bg-gray-300 rounded-lg flex items-center justify-center cursor-pointer group overflow-hidden">
+                                        <!-- Play Button -->
+                                        <div class=" size-8 bg-gray-500 rounded-full flex items-center justify-center">
+                                            <i class="fa-solid fa-play text-white"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-start justify-between">
+                                            <h4 class="font-medium text-gray-900 line-clamp-1"><?php echo htmlspecialchars($lesson['title']); ?></h4>
+
+                                            <?php if (isset($lesson['duration'])): ?>
+                                                <span class="text-xs text-gray-500 flex items-center ml-2 flex-shrink-0">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    <?php echo $lesson['duration']; ?>
+                                                </span>
+                                            <?php endif; ?>
+                                        </div>
+
+                                        <p class="text-sm text-gray-500 line-clamp-2 mt-0.5">
+                                            <?php echo htmlspecialchars($lesson['description']); ?>
+                                        </p>
+
+                                        <?php if ($isActive && !$isCompleted): ?>
+                                            <span class="inline-flex items-center mt-2 text-xs font-medium text-indigo-600">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Continue Learning
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <?php if ($isActive): ?>
+                                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 rounded-l-lg"></div>
+                                    <?php endif; ?>
+                                </a>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+
+
                 </div>
             </div>
         </div>

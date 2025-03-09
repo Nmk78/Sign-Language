@@ -30,7 +30,7 @@ if ($conn->connect_error) {
 $username = $_POST['username'];
 $email = $_POST['email'];
 $password = $_POST['password'];
-$role = "admin";
+$role = $_POST['role'];
 
 // Hash the password
 $password_hash = password_hash($password, PASSWORD_BCRYPT);
@@ -43,7 +43,7 @@ $stmt->bind_param("ssss", $username, $email, $password_hash, $role);
 if ($stmt->execute()) {
     echo "New record created successfully";
     echo "<script>
-            window.location.href = '/signup';
+            window.location.href = '/signin';
           </script>";
 } else {
     // echo "Error: " . $stmt->error;
