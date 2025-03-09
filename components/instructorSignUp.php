@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Language LMS - Student Signup</title>
+    <title>Sign Language LMS - Teacher Signup</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -13,16 +13,16 @@
                 extend: {
                     colors: {
                         primary: {
-                            50: '#f0fdfa',
-                            100: '#ccfbf1',
-                            200: '#99f6e4',
-                            300: '#5eead4',
-                            400: '#2dd4bf',
-                            500: '#14b8a6',
-                            600: '#0d9488',
-                            700: '#0f766e',
-                            800: '#115e59',
-                            900: '#134e4a',
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
                         }
                     },
                     animation: {
@@ -30,14 +30,8 @@
                     },
                     keyframes: {
                         fadeIn: {
-                            '0%': {
-                                opacity: '0',
-                                transform: 'translateY(10px)'
-                            },
-                            '100%': {
-                                opacity: '1',
-                                transform: 'translateY(0)'
-                            },
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
                         }
                     }
                 }
@@ -45,56 +39,61 @@
         }
     </script>
     <style>
-        .student-bg {
-            background-color: #0f766e;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%2399f6e4' fill-opacity='0.15'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        .teacher-bg {
+            background-color: #1d4ed8;
+            background-image: url("data:image/svg+xml,%3Csvg width='84' height='48' viewBox='0 0 84 48' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v6H0V0zm28 8h12v6H28V8zm14-8h12v6H42V0zm14 0h12v6H56V0zm0 8h12v6H56V8zM42 8h12v6H42V8zm0 16h12v6H42v-6zm14-8h12v6H56v-6zm14 0h12v6H70v-6zm0-16h12v6H70V0zM28 32h12v6H28v-6zM14 16h12v6H14v-6zM0 24h12v6H0v-6zm0 8h12v6H0v-6zm14 0h12v6H14v-6zm14 8h12v6H28v-6zm-14 0h12v6H14v-6zm28 0h12v6H42v-6zm14-8h12v6H56v-6zm0-8h12v6H56v-6zm14 8h12v6H70v-6zm0 8h12v6H70v-6zM14 24h12v6H14v-6zm14-8h12v6H28v-6zM14 8h12v6H14V8zM0 8h12v6H0V8z' fill='%2393c5fd' fill-opacity='0.15' fill-rule='evenodd'/%3E%3C/svg%3E");
         }
     </style>
 </head>
 
-<body class="w-full h-full flex items-center justify-center min-h-screen bg-gray-50">
+<body class="flex items-center justify-center min-h-screen bg-gray-50">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 overflow-hidden animate-fade-in">
-        <div class="flex absolute bg-gray-50 rounded-xl shadow-xl overflow-hidden top-24 right-1/2 transform translate-x-1/2  flex-col md:flex-row">
+        
+        <div class="flex flex-col md:flex-row  absolute bg-gray-50 rounded-xl shadow-xl overflow-hidden top-24 right-1/2 transform translate-x-1/2 ">
             <!-- Left Side (Image and Info) -->
-            <div class="hidden md:block w-1/2 student-bg text-white p-12 relative">
+            <div class="hidden md:block w-1/2 teacher-bg text-white p-12 relative">
                 <div class="absolute top-8 left-8">
                     <div class="flex items-center">
                         <i class="fas fa-hands text-2xl mr-2"></i>
                         <span class="font-bold text-xl">Silent Voice</span>
                     </div>
                 </div>
+                
                 <div class="h-full flex flex-col justify-center">
                     <div class="mb-8">
-                        <span class="inline-block px-3 py-1 bg-white/20 text-white text-sm rounded-full mb-4">STUDENT PORTAL</span>
-                        <h2 class="text-3xl font-bold mb-4">Join Us, Student!</h2>
-                        <p class="text-primary-100">Start your sign language learning journey and track your progress.</p>
+                        <span class="inline-block px-3 py-1 bg-white/20 text-white text-sm rounded-full mb-4">TEACHER PORTAL</span>
+                        <h2 class="text-3xl font-bold mb-4">Join Us, Teacher!</h2>
+                        <p class="text-primary-100">Sign up to start managing courses and student progress.</p>
                     </div>
+                    
                     <div class="space-y-4 mt-8">
                         <div class="flex items-center">
                             <div class="bg-white/20 rounded-full p-2 mr-3">
-                                <i class="fas fa-book-open text-white"></i>
+                                <i class="fas fa-chalkboard text-white"></i>
                             </div>
                             <div>
-                                <p class="text-white font-medium">Access Your Courses</p>
-                                <p class="text-primary-100 text-sm">Start learning new skills</p>
+                                <p class="text-white font-medium">Manage Your Courses</p>
+                                <p class="text-primary-100 text-sm">Create and update learning materials</p>
                             </div>
                         </div>
+                        
                         <div class="flex items-center">
                             <div class="bg-white/20 rounded-full p-2 mr-3">
-                                <i class="fas fa-chart-line text-white"></i>
+                                <i class="fas fa-user-graduate text-white"></i>
                             </div>
                             <div>
-                                <p class="text-white font-medium">Track Your Progress</p>
-                                <p class="text-primary-100 text-sm">See how far you've come</p>
+                                <p class="text-white font-medium">Track Student Progress</p>
+                                <p class="text-primary-100 text-sm">Monitor performance and engagement</p>
                             </div>
                         </div>
+                        
                         <div class="flex items-center">
                             <div class="bg-white/20 rounded-full p-2 mr-3">
-                                <i class="fas fa-users text-white"></i>
+                                <i class="fas fa-comments text-white"></i>
                             </div>
                             <div>
-                                <p class="text-white font-medium">Join the Community</p>
-                                <p class="text-primary-100 text-sm">Connect with fellow learners</p>
+                                <p class="text-white font-medium">Communicate with Students</p>
+                                <p class="text-primary-100 text-sm">Provide feedback and support</p>
                             </div>
                         </div>
                     </div>
@@ -107,9 +106,11 @@
                     <i class="fas fa-hands text-primary-600 text-2xl mr-2"></i>
                     <span class="font-bold text-xl text-gray-800">SignLang LMS</span>
                 </div>
+                
                 <div class="text-center mb-5">
-                    <h2 class="text-2xl font-bold text-gray-800">Student Signup</h2>
+                    <h2 class="text-2xl font-bold text-gray-800">Teacher Signup</h2>
                 </div>
+                
                 <?php
                 // Display error message if signup failed
                 if (isset($_GET['error']) && $_GET['error'] == 1) {
@@ -127,7 +128,8 @@
                     </div>';
                 }
                 ?>
-                <form action="signingup" id="studentSignupForm" method="POST" class="space-y-3">
+                
+                <form action="signingup" id="teacherSignupForm" method="POST" class="space-y-3">
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                         <div class="relative">
@@ -139,6 +141,7 @@
                                 placeholder="Your Name">
                         </div>
                     </div>
+
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                         <div class="relative">
@@ -150,7 +153,6 @@
                                 placeholder="your@email.com">
                         </div>
                     </div>
-                    <input type="hidden" name="role" value="student">
 
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
@@ -166,6 +168,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div>
                         <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
                         <div class="relative">
@@ -181,33 +184,37 @@
                         </div>
                     </div>
 
+                    <input type="hidden" name="role" value="teacher">
+
                     <div>
                         <button type="submit"
                             class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-                            <i class="fas fa-user-plus mr-2"></i> Sign Up as Student
+                            <i class="fas fa-user-plus mr-2 mt-1"></i> Sign Up as Teacher
                         </button>
                     </div>
                 </form>
+
                 <div class="mt-8 pt-6 border-t border-gray-200">
                     <div class="text-center mb-4">
                         <p class="text-sm text-gray-600">
                             Already have an account?
-                            <a href="student-login.php" class="font-medium text-primary-600 hover:text-primary-500">
-                                Sign in as a student
+                            <a href="teacher-login.php" class="font-medium text-primary-600 hover:text-primary-500">
+                                Sign in here
                             </a>
                         </p>
                     </div>
+                    
                     <div class="flex justify-center">
-                        <a href="teacher-signup.php" class="text-sm text-gray-500 hover:text-gray-700 flex items-center">
-                            <i class="fas fa-chalkboard-teacher mr-2 text-xs"></i>
-                            Teacher? Sign up here
+                        <a href="student-login.php" class="text-sm text-gray-500 hover:text-gray-700 flex items-center">
+                            <i class="fas fa-user-graduate mr-2 text-xs"></i>
+                            Student? Sign in here
                         </a>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Toggle password visibility
@@ -239,5 +246,4 @@
         });
     </script>
 </body>
-
 </html>

@@ -1,7 +1,8 @@
 <?php
 header('Content-Type: application/json');
-session_start();
-
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $conn = new mysqli("localhost", "root", "root", "sign_language");
 
 // Check connection

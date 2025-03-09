@@ -46,7 +46,7 @@ $conn->close();
 </head>
 <body class="bg-gray-100 p-6">
     <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-sm p-6">
-        <h1 class="text-3xl font-bold mb-2">Course Lessons</h1>
+        <h1 class="text-3xl font-bold mb-2">Course Lessons 1</h1>
 
         <div class="space-y-4">
             <?php foreach ($lessons as $lesson): ?>
