@@ -181,6 +181,9 @@ function formatTimeAgo($datetime)
                                 <div class="flex justify-between items-center">
                                     <span class="text-sm text-gray-500">Category: <?php echo htmlspecialchars($current_lesson['category'] ?? 'Uncategorized'); ?></span>
                                     <div class="flex space-x-2">
+                                        <button onclick="OpenQuizz(<?php echo $current_lesson['id']; ?>)" class="bg-green-500 text-white px-3 py-1 rounded-md text-sm hover:bg-gray-300">
+                                            Take Quizz
+                                        </button>
                                         <button onclick="navigateToNextLesson(<?php echo $current_lesson['id']; ?>)" class="bg-gray-200 text-gray-800 px-3 py-1 rounded-md text-sm hover:bg-gray-300">
                                             <svg class="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
@@ -345,6 +348,26 @@ function formatTimeAgo($datetime)
         </button>
     </div>
 
+    <!-- Quiz Modal/Popup -->
+    <div id="quizModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden overflow-y-auto modal-fade-in flex items-start justify-center pt-10 pb-10">
+        <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-4 my-8 modal-slide-up relative">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-primary-600 to-primary-700 text-slate-900 rounded-t-xl px-6 py-4 flex justify-between items-center">
+                <h2 id="modalLessonTitle" class="text-xl font-bold">Lesson Quizzes</h2>
+                <button onclick="closeModal()" class="text-slate-900 hover:text-primary-200 transition-colors focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Modal Content -->
+            <div id="quizContent" class="p-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                <!-- Quiz content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
     <script>
         // DOM elements
         const courseContent = document.getElementById('courseContent');
@@ -484,6 +507,56 @@ function formatTimeAgo($datetime)
             }
         }
 
+        function OpenQuizz(currentLessonId) {
+            // Ensure a valid lesson ID
+            if (!currentLessonId) {
+                alert("No lesson selected!");
+                return;
+            }
+
+            // Fetch quiz data using AJAX
+            fetch(`handlers/get_quizzes.php?lesson_id=${currentLessonId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        document.getElementById('quizContent').innerHTML = "<p class='text-gray-500'>No quizzes available for this lesson.</p>";
+                    } else {
+                        let quizHtml = "";
+                        data.forEach((quiz, index) => {
+                            quizHtml += `
+                                <div class="border p-4 rounded-lg mb-4 bg-gray-50 shadow-md">
+                                    <p class="font-semibold text-lg text-gray-800">${index + 1}. ${quiz.question}</p>
+                                    <div class= " flex mt-3 space-y-2">
+                                        <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
+                                            <input type="radio" name="quiz_${quiz.id}" value="A" class="accent-green-500">
+                                            <img src="${quiz.option_a}" class="h-12 w-auto rounded-md border">
+                                        </label>
+                                        <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
+                                            <input type="radio" name="quiz_${quiz.id}" value="B" class="accent-green-500">
+                                            <img src="${quiz.option_b}" class="h-12 w-auto rounded-md border">
+                                        </label>
+                                        <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
+                                            <input type="radio" name="quiz_${quiz.id}" value="C" class="accent-green-500">
+                                            <img src="${quiz.option_c}" class="h-12 w-auto rounded-md border">
+                                        </label>
+                                    </div>
+                                </div>`;
+
+                        });
+
+                        document.getElementById('quizContent').innerHTML = quizHtml;
+                    }
+
+                    // Show the modal
+                    document.getElementById('quizModal').classList.remove('hidden');
+                })
+                .catch(error => console.error("Error fetching quizzes:", error));
+        }
+        
+        function closeModal() {
+            document.getElementById("quizModal").classList.add("hidden"); 
+        }
+
         // Mark lesson as complete
         function markLessonComplete(lessonId) {
             // In a real application, you would send an AJAX request to mark the lesson as complete
@@ -492,6 +565,7 @@ function formatTimeAgo($datetime)
             // Then navigate to the next lesson
             navigateToNextLesson(lessonId);
         }
+        
     </script>
 </body>
 
