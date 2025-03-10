@@ -181,9 +181,9 @@ function formatTimeAgo($datetime)
                                 <div class="flex justify-between items-center">
                                     <span class="text-sm text-gray-500">Category: <?php echo htmlspecialchars($current_lesson['category'] ?? 'Uncategorized'); ?></span>
                                     <div class="flex space-x-2">
-                                        <button onclick="OpenQuizz(<?php echo $current_lesson['id']; ?>)" class="bg-green-500 text-white px-3 py-1 rounded-md text-sm hover:bg-gray-300">
-                                            Take Quizz
-                                        </button>
+                                    <button onclick="openQuiz(<?php echo $lesson_id; ?>)" class="bg-green-500 text-white px-3 py-1 rounded-md text-sm hover:bg-gray-300">
+                                        Take Quiz
+                                    </button>
                                         <button onclick="navigateToNextLesson(<?php echo $current_lesson['id']; ?>)" class="bg-gray-200 text-gray-800 px-3 py-1 rounded-md text-sm hover:bg-gray-300">
                                             <svg class="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
@@ -507,55 +507,220 @@ function formatTimeAgo($datetime)
             }
         }
 
-        function OpenQuizz(currentLessonId) {
-            // Ensure a valid lesson ID
-            if (!currentLessonId) {
-                alert("No lesson selected!");
-                return;
-            }
+        // function OpenQuizz(currentLessonId) {
+        //     // Ensure a valid lesson ID
+        //     if (!currentLessonId) {
+        //         alert("No lesson selected!");
+        //         return;
+        //     }
 
-            // Fetch quiz data using AJAX
-            fetch(`handlers/get_quizzes.php?lesson_id=${currentLessonId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.length === 0) {
-                        document.getElementById('quizContent').innerHTML = "<p class='text-gray-500'>No quizzes available for this lesson.</p>";
-                    } else {
-                        let quizHtml = "";
-                        data.forEach((quiz, index) => {
-                            quizHtml += `
-                                <div class="border p-4 rounded-lg mb-4 bg-gray-50 shadow-md">
-                                    <p class="font-semibold text-lg text-gray-800">${index + 1}. ${quiz.question}</p>
-                                    <div class= " flex mt-3 space-y-2">
-                                        <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
-                                            <input type="radio" name="quiz_${quiz.id}" value="A" class="accent-green-500">
-                                            <img src="${quiz.option_a}" class="h-12 w-auto rounded-md border">
-                                        </label>
-                                        <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
-                                            <input type="radio" name="quiz_${quiz.id}" value="B" class="accent-green-500">
-                                            <img src="${quiz.option_b}" class="h-12 w-auto rounded-md border">
-                                        </label>
-                                        <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
-                                            <input type="radio" name="quiz_${quiz.id}" value="C" class="accent-green-500">
-                                            <img src="${quiz.option_c}" class="h-12 w-auto rounded-md border">
-                                        </label>
-                                    </div>
-                                </div>`;
+        //     // Fetch quiz data using AJAX
+        //     fetch(`handlers/get_quizzes.php?lesson_id=${currentLessonId}`)
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             if (data.length === 0) {
+        //                 document.getElementById('quizContent').innerHTML = "<p class='text-gray-500'>No quizzes available for this lesson.</p>";
+        //             } else {
+        //                 let quizHtml = "";
+        //                 data.forEach((quiz, index) => {
+        //                     quizHtml += `
+        //                         <div class="border p-4 rounded-lg mb-4 bg-gray-50 shadow-md">
+        //                             <p class="font-semibold text-lg text-gray-800">${index + 1}. ${quiz.question}</p>
+        //                             <div class= " flex mt-3 space-y-2">
+        //                                 <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
+        //                                     <input type="radio" name="quiz_${quiz.id}" value="A" class="accent-green-500">
+        //                                     <img src="${quiz.option_a}" class="h-12 w-auto rounded-md border">
+        //                                 </label>
+        //                                 <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
+        //                                     <input type="radio" name="quiz_${quiz.id}" value="B" class="accent-green-500">
+        //                                     <img src="${quiz.option_b}" class="h-12 w-auto rounded-md border">
+        //                                 </label>
+        //                                 <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
+        //                                     <input type="radio" name="quiz_${quiz.id}" value="C" class="accent-green-500">
+        //                                     <img src="${quiz.option_c}" class="h-12 w-auto rounded-md border">
+        //                                 </label>
+        //                             </div>
+        //                         </div>`;
 
-                        });
+        //                 });
 
-                        document.getElementById('quizContent').innerHTML = quizHtml;
-                    }
+        //                 document.getElementById('quizContent').innerHTML = quizHtml;
+        //             }
 
-                    // Show the modal
-                    document.getElementById('quizModal').classList.remove('hidden');
-                })
-                .catch(error => console.error("Error fetching quizzes:", error));
-        }
+        //             // Show the modal
+        //             document.getElementById('quizModal').classList.remove('hidden');
+        //         })
+        //         .catch(error => console.error("Error fetching quizzes:", error));
+        // }
         
-        function closeModal() {
-            document.getElementById("quizModal").classList.add("hidden"); 
-        }
+        // function closeModal() {
+        //     document.getElementById("quizModal").classList.add("hidden"); 
+        // }
+
+        function openQuiz(currentLessonId) {
+  // Ensure a valid lesson ID
+  if (!currentLessonId) {
+    alert("No lesson selected!")
+    return
+  }
+
+  // Fetch quiz data using AJAX
+  fetch(`handlers/get_quizzes.php?lesson_id=${currentLessonId}`)
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.length === 0) {
+        document.getElementById("quizContent").innerHTML =
+          "<p class='text-gray-500'>No quizzes available for this lesson.</p>"
+      } else {
+        let quizHtml = `<form id="quizForm" data-lesson-id="${currentLessonId}">`
+        data.forEach((quiz, index) => {
+          quizHtml += `
+                        <div class="border p-4 rounded-lg mb-4 bg-gray-50 shadow-md">
+                            <p class="font-semibold text-lg text-gray-800">${index + 1}. ${quiz.question}</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+                                <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
+                                    <input type="radio" name="quiz_${quiz.id}" value="A" class="accent-green-500" required>
+                                    <img src="${quiz.option_a}" class="h-12 w-auto rounded-md border">
+                                </label>
+                                <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
+                                    <input type="radio" name="quiz_${quiz.id}" value="B" class="accent-green-500">
+                                    <img src="${quiz.option_b}" class="h-12 w-auto rounded-md border">
+                                </label>
+                                <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
+                                    <input type="radio" name="quiz_${quiz.id}" value="C" class="accent-green-500">
+                                    <img src="${quiz.option_c}" class="h-12 w-auto rounded-md border">
+                                </label>
+                            </div>
+                        </div>`
+        })
+
+        quizHtml += `
+                    <div class="mt-6 flex justify-end">
+                        <button type="submit" class="bg-gray-600 hover:bg-primary-700 text-white font-bold py-2 px-6 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
+                            Submit Answers
+                        </button>
+                    </div>
+                </form>`
+
+        document.getElementById("quizContent").innerHTML = quizHtml
+
+        // Add event listener for form submission
+        document.getElementById("quizForm").addEventListener("submit", submitQuiz)
+      }
+
+      // Show the modal
+      document.getElementById("quizModal").classList.remove("hidden")
+    })
+    .catch((error) => console.error("Error fetching quizzes:", error))
+}
+
+function submitQuiz(event) {
+  event.preventDefault()
+
+  const form = event.target
+  const lessonId = form.dataset.lessonId
+  const answers = {}
+
+  // Collect all answers
+  const radioButtons = form.querySelectorAll('input[type="radio"]:checked')
+  radioButtons.forEach((radio) => {
+    const quizId = radio.name.replace("quiz_", "")
+    answers[quizId] = radio.value
+  })
+
+  // Check if all questions are answered
+  const totalQuestions = document.querySelectorAll(".border.p-4.rounded-lg").length
+  if (Object.keys(answers).length < totalQuestions) {
+    alert("Please answer all questions before submitting.")
+    return
+  }
+
+  // Submit answers to server
+  const userId = localStorage.getItem('id');
+
+  fetch("handlers/submit_quiz.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      lesson_id: lessonId,
+      userId: userId,
+      answers: answers,
+    }),
+  })
+    .then((response) => response.json())
+    .then((results) => {
+      showResults(results)
+    })
+    .catch((error) => {
+      console.error("Error submitting quiz:", error)
+      alert("There was an error submitting your quiz. Please try again.")
+    })
+}
+
+function showResults(results) {
+  // Create results HTML
+  const resultsHtml = `
+        <div class="bg-white rounded-xl shadow-lg p-6 max-w-2xl mx-auto">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full ${results.percentage >= 70 ? "bg-green-100" : "bg-amber-100"} mb-4">
+                    <span class="text-2xl font-bold ${results.percentage >= 70 ? "text-green-600" : "text-amber-600"}">${results.percentage}%</span>
+                </div>
+                <h3 class="text-xl font-bold">${results.percentage >= 70 ? "Congratulations!" : "Good effort!"}</h3>
+                <p class="text-gray-600">You got ${results.correct} out of ${results.total} questions correct.</p>
+            </div>
+            
+            <div class="space-y-4 mt-6">
+                <h4 class="font-semibold text-lg border-b pb-2">Question Review</h4>
+                ${results.questions
+                  .map(
+                    (q, index) => `
+                    <div class="p-3 rounded-lg ${q.is_correct ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"}">
+                        <p class="font-medium">${index + 1}. ${q.question}</p>
+                        <div class="mt-2 text-sm">
+                            <p>Your answer: <span class="font-semibold">${q.selected}</span></p>
+                            ${!q.is_correct ? `<p>Correct answer: <span class="font-semibold text-green-600">${q.correct}</span></p>` : ""}
+                        </div>
+                    </div>
+                `,
+                  )
+                  .join("")}
+            </div>
+            
+            <div class="mt-6 flex justify-center">
+                <button onclick="closeResultsModal()" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    `
+
+  // Create and show results modal
+  const resultsModal = document.createElement("div")
+  resultsModal.id = "resultsModal"
+  resultsModal.className =
+    "fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 modal-fade-in"
+  resultsModal.innerHTML = resultsHtml
+
+  document.body.appendChild(resultsModal)
+
+  // Hide the quiz modal
+  document.getElementById("quizModal").classList.add("hidden")
+}
+
+function closeResultsModal() {
+  const resultsModal = document.getElementById("resultsModal")
+  if (resultsModal) {
+    resultsModal.remove()
+  }
+}
+
+function closeModal() {
+  document.getElementById("quizModal").classList.add("hidden")
+}
+
+
 
         // Mark lesson as complete
         function markLessonComplete(lessonId) {
