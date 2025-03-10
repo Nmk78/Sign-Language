@@ -1,3 +1,51 @@
+<?php
+// session_start();
+$conn = new mysqli("localhost", "root", "root", "sign_language");
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Get user ID from localStorage using JavaScript
+echo "<script>
+    var userId = localStorage.getItem('id');
+    if (userId) {
+        document.cookie = 'user_id=' + userId + '; path=/; expires=' + new Date(Date.now() + 30*24*60*60*1000).toUTCString(); 
+    }
+</script>";
+
+// Read user ID from cookies in PHP
+if (isset($_COOKIE['user_id'])) {
+    $user_id = intval($_COOKIE['user_id']);
+    $_SESSION['user_id'] = $user_id; // Store in session for extra persistence
+} else {
+    $user_id = 0;
+}
+
+echo "User ID: $user_id"; // Debugging output
+
+// Fetch approved enrolled courses
+$sql = "SELECT c.id, c.title, ce.enrolled_at FROM course_enrollments ce
+        JOIN courses c ON ce.course_id = c.id
+        WHERE ce.user_id = ? AND ce.status = 'approved'";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$currentCourses = [];
+
+while ($row = $result->fetch_assoc()) {
+    $currentCourses[] = [
+        'title' => $row['title'],
+        'enrolled_at' => $row['enrolled_at']
+    ];
+}
+
+// Close connection
+$conn->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -102,59 +150,26 @@
         </div>
 
         <!-- Current Courses -->
-        <div class="grid md:grid-cols-2 gap-8">
-            <div class="bg-surface rounded-xl shadow-lg p-8">
-                <h2 class="text-2xl font-bold text-text mb-6">Current Courses</h2>
-                <div class="space-y-4">
-                    <?php
-                    $currentCourses = [
-                        ['title' => 'Advanced JavaScript', 'progress' => 75],
-                        ['title' => 'React Fundamentals', 'progress' => 45],
-                        ['title' => 'Node.js Basics', 'progress' => 30]
-                    ];
-
-                    foreach ($currentCourses as $course) {
-                        echo "
-                        <div class='p-4 border border-gray-200 rounded-lg'>
-                            <div class='flex justify-between items-center mb-2'>
-                                <h3 class='font-medium text-text'>{$course['title']}</h3>
-                                <span class='text-sm text-text-light'>{$course['progress']}%</span>
-                            </div>
-                            <div class='w-full h-2 bg-gray-200 rounded-full overflow-hidden'>
-                                <div class='h-full bg-primary rounded-full' style='width: {$course['progress']}%'></div>
-                            </div>
-                        </div>";
-                    }
-                    ?>
-                </div>
-            </div>
-
-            <!-- Achievements -->
-            <div class="bg-surface rounded-xl shadow-lg p-8">
-                <h2 class="text-2xl font-bold text-text mb-6">Achievements</h2>
-                <div class="grid grid-cols-3 gap-4">
-                    <?php
-                    $achievements = [
-                        ['icon' => '🏆', 'title' => 'Fast Learner', 'desc' => 'Completed 5 courses in a month'],
-                        ['icon' => '⭐', 'title' => 'Top Student', 'desc' => 'Achieved 95% in Web Dev'],
-                        ['icon' => '🎯', 'title' => 'Goal Setter', 'desc' => 'Completed all goals'],
-                        ['icon' => '🌟', 'title' => 'Expert', 'desc' => 'Mastered JavaScript'],
-                        ['icon' => '📚', 'title' => 'Bookworm', 'desc' => '100 hours of learning'],
-                        ['icon' => '🎓', 'title' => 'Graduate', 'desc' => 'Finished Full Stack']
-                    ];
-
-                    foreach ($achievements as $achievement) {
-                        echo "
-                        <div class='p-4 border border-gray-200 rounded-lg text-center'>
-                            <div class='text-3xl mb-2'>{$achievement['icon']}</div>
-                            <h3 class='font-medium text-text text-sm'>{$achievement['title']}</h3>
-                            <p class='text-xs text-text-light'>{$achievement['desc']}</p>
-                        </div>";
-                    }
-                    ?>
-                </div>
-            </div>
-        </div>
+        <!-- Display Current Courses -->
+<div class="bg-surface rounded-xl shadow-lg p-8">
+    <h2 class="text-2xl font-bold text-text mb-6">Current Courses</h2>
+    <div class="space-y-4">
+        <?php
+        if (empty($currentCourses)) {
+            echo "<p class='text-text-light'>No active courses found.</p>";
+        } else {
+            foreach ($currentCourses as $course) {
+                echo "
+                <div class='p-4 border border-gray-200 rounded-lg'>
+                    <div class='flex justify-between items-center mb-2'>
+                        <h3 class='font-medium text-text'>{$course['title']}</h3>
+                        <span class='text-sm text-text-light'>{$course['enrolled_at']}</span>
+                    </div>
+                </div>";
+            }
+        }
+        ?>
+    </div>
     </div>
 
     <!-- Avatar Selection Modal -->
