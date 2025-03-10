@@ -73,7 +73,7 @@ function getUserCourses($userId)
 // Handle lesson deletion
 if (isset($_GET['delete_lesson']) && is_numeric($_GET['delete_lesson'])) {
     $conn = getDbConnection();
-    $lesson_id = (int)$_GET['delete_lesson'];
+    $lesson_id = (int) $_GET['delete_lesson'];
 
     // First check if the lesson belongs to a course owned by the current user
     $stmt = $conn->prepare("
@@ -109,7 +109,46 @@ if (isset($_GET['delete_lesson']) && is_numeric($_GET['delete_lesson'])) {
 $user_id = $_SESSION['user']['user_id'];
 $courses = getUserCourses($user_id);
 ?>
+<script>
+    tailwind.config = {
+        theme: {
+            fontFamily: {
+                sans: ['Inter', 'sans-serif'],
+            },
+            extend: {
+                colors: {
+                    primary: {
+                        50: '#eef2ff',
+                        100: '#e0e7ff',
+                        200: '#c7d2fe',
+                        300: '#a5b4fc',
+                        400: '#818cf8',
+                        500: '#6366f1',
+                        600: '#4f46e5',
+                        700: '#4338ca',
+                        800: '#3730a3',
+                        900: '#312e81',
+                    },
+                },
+                animation: {
+                    'fade-in': 'fadeIn 0.3s ease-out',
+                    'slide-up': 'slideUp 0.4s ease-out',
+                },
+                keyframes: {
+                    fadeIn: {
+                        '0%': { opacity: '0' },
+                        '100%': { opacity: '1' },
+                    },
+                    slideUp: {
+                        '0%': { transform: 'translateY(20px)', opacity: '0' },
+                        '100%': { transform: 'translateY(0)', opacity: '1' },
+                    },
+                },
+            }
+        }
+    }
 
+</script>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -127,7 +166,9 @@ $courses = getUserCourses($user_id);
     <div class="container mx-auto px-4 py-8">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold text-gray-800">Course Manager</h1>
-            <button onclick="openCourseModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#4A90E2] hover:bg-[#357abd]">New Course</button>
+            <button onclick="openCourseModal()"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#4A90E2] hover:bg-[#357abd]">New
+                Course</button>
         </div>
 
         <!-- Status Messages -->
@@ -136,9 +177,11 @@ $courses = getUserCourses($user_id);
                 <strong class="font-bold">Success!</strong>
                 <span class="block sm:inline">Lesson added successfully.</span>
                 <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-                    <svg onclick="this.parentElement.parentElement.remove()" class="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <svg onclick="this.parentElement.parentElement.remove()" class="fill-current h-6 w-6 text-green-500"
+                        role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                         <title>Close</title>
-                        <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                        <path
+                            d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
                     </svg>
                 </span>
             </div>
@@ -149,9 +192,11 @@ $courses = getUserCourses($user_id);
                 <strong class="font-bold">Success!</strong>
                 <span class="block sm:inline">Lesson deleted successfully.</span>
                 <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-                    <svg onclick="this.parentElement.parentElement.remove()" class="fill-current h-6 w-6 text-blue-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <svg onclick="this.parentElement.parentElement.remove()" class="fill-current h-6 w-6 text-blue-500"
+                        role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                         <title>Close</title>
-                        <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                        <path
+                            d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
                     </svg>
                 </span>
             </div>
@@ -170,9 +215,11 @@ $courses = getUserCourses($user_id);
                     ?>
                 </span>
                 <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-                    <svg onclick="this.parentElement.parentElement.remove()" class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <svg onclick="this.parentElement.parentElement.remove()" class="fill-current h-6 w-6 text-red-500"
+                        role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                         <title>Close</title>
-                        <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                        <path
+                            d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
                     </svg>
                 </span>
             </div>
@@ -182,20 +229,26 @@ $courses = getUserCourses($user_id);
         <?php if (count($courses) > 0): ?>
             <div class="flex flex-wrap gap-6">
                 <?php foreach ($courses as $course): ?>
-                    <div id="courseCard-<?php echo $course['id']; ?>" data-course-id="<?php echo $course['id']; ?>" class="w-full bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg border border-gray-100">
+                    <div id="courseCard-<?php echo $course['id']; ?>" data-course-id="<?php echo $course['id']; ?>"
+                        class="w-full bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg border border-gray-100">
                         <!-- Course Header -->
                         <div class="flex flex-col sm:flex-row">
                             <!-- Course Thumbnail with Status Badge -->
                             <div class="relative w-full sm:w-1/3">
-                                <img class="w-full max-h-60 sm:h-full object-cover object-center" src="<?php echo !empty($course['thumbnail_url']) ? htmlspecialchars($course['thumbnail_url']) : 'assets/images/default-course.jpg'; ?>" alt="<?php echo htmlspecialchars($course['title']); ?>">
+                                <img class="w-full max-h-60 sm:h-full object-cover object-center"
+                                    src="<?php echo !empty($course['thumbnail_url']) ? htmlspecialchars($course['thumbnail_url']) : 'assets/images/default-course.jpg'; ?>"
+                                    alt="<?php echo htmlspecialchars($course['title']); ?>">
 
                                 <!-- Status Badge -->
                                 <div class="absolute top-3 left-3">
                                     <span class="px-2 py-1 text-xs font-semibold rounded-full <?php
-                                                                                                if ($course['status'] === 'published') echo 'bg-green-100 text-green-800';
-                                                                                                elseif ($course['status'] === 'draft') echo 'bg-gray-100 text-gray-800';
-                                                                                                else echo 'bg-red-100 text-red-800';
-                                                                                                ?>">
+                                    if ($course['status'] === 'published')
+                                        echo 'bg-green-100 text-green-800';
+                                    elseif ($course['status'] === 'draft')
+                                        echo 'bg-gray-100 text-gray-800';
+                                    else
+                                        echo 'bg-red-100 text-red-800';
+                                    ?>">
                                         <?php echo ucfirst(htmlspecialchars($course['status'])); ?>
                                     </span>
                                 </div>
@@ -215,7 +268,8 @@ $courses = getUserCourses($user_id);
                                 <div>
                                     <!-- Title and Category -->
                                     <div class="flex justify-between items-start mb-2">
-                                        <h2 class="text-xl font-semibold text-gray-800"><?php echo htmlspecialchars($course['title']); ?></h2>
+                                        <h2 class="text-xl font-semibold text-gray-800">
+                                            <?php echo htmlspecialchars($course['title']); ?></h2>
                                         <?php if (!empty($course['category'])): ?>
                                             <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-md">
                                                 <?php echo htmlspecialchars($course['category']); ?>
@@ -256,22 +310,36 @@ $courses = getUserCourses($user_id);
 
                                 <!-- Action Buttons -->
                                 <div class="flex flex-col sm:flex-row gap-2">
-                                    <button class="manage-course-btn flex-1 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300 flex items-center justify-center" data-course-id="<?php echo $course['id']; ?>" data-course-title="<?php echo htmlspecialchars($course['title']); ?>">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <button
+                                        class="manage-course-btn flex-1 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300 flex items-center justify-center"
+                                        data-course-id="<?php echo $course['id']; ?>"
+                                        data-course-title="<?php echo htmlspecialchars($course['title']); ?>">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
                                         Manage Course
                                     </button>
-                                    <button class="toggle-lessons-btn flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded hover:bg-gray-200 transition duration-300 flex items-center justify-center" data-course-id="<?php echo $course['id']; ?>">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    <button
+                                        class="toggle-lessons-btn flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded hover:bg-gray-200 transition duration-300 flex items-center justify-center"
+                                        data-course-id="<?php echo $course['id']; ?>">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            class="h-4 w-4 mr-1 transition-transform duration-300" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7" />
                                         </svg>
                                         View Lessons
                                     </button>
-                                    <a href="edit-course.php?id=<?php echo $course['id']; ?>" class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded hover:bg-gray-200 transition duration-300 flex items-center justify-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    <a href="edit-course.php?id=<?php echo $course['id']; ?>"
+                                        class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded hover:bg-gray-200 transition duration-300 flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                         Edit
                                     </a>
@@ -280,13 +348,18 @@ $courses = getUserCourses($user_id);
                         </div>
 
                         <!-- Expanded lessons section (hidden by default) -->
-                        <div id="lessonList-<?php echo $course['id']; ?>" class="lessons-list hidden transition-all duration-300 ease-in-out">
+                        <div id="lessonList-<?php echo $course['id']; ?>"
+                            class="lessons-list hidden transition-all duration-300 ease-in-out">
                             <div class="p-5 bg-gray-50 border-t border-gray-100">
                                 <div class="flex justify-between items-center mb-4">
                                     <h3 class="text-lg font-semibold text-gray-800">Course Lessons</h3>
-                                    <button class="add-lesson-btn text-sm text-blue-500 hover:text-blue-700 flex items-center" data-course-id="<?php echo $course['id']; ?>" data-course-title="<?php echo htmlspecialchars($course['title']); ?>">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    <button class="add-lesson-btn text-sm text-blue-500 hover:text-blue-700 flex items-center"
+                                        data-course-id="<?php echo $course['id']; ?>"
+                                        data-course-title="<?php echo htmlspecialchars($course['title']); ?>">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                         </svg>
                                         Add Lesson
                                     </button>
@@ -295,9 +368,13 @@ $courses = getUserCourses($user_id);
                                 <div class="lesson-container-<?php echo $course['id']; ?>">
                                     <!-- Lessons will be loaded here via AJAX -->
                                     <div class="text-center py-8 lesson-loading-<?php echo $course['id']; ?>">
-                                        <svg class="animate-spin h-8 w-8 mx-auto text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        <svg class="animate-spin h-8 w-8 mx-auto text-blue-500"
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                                stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor"
+                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                            </path>
                                         </svg>
                                         <p class="mt-2 text-gray-500">Loading lessons...</p>
                                     </div>
@@ -310,46 +387,59 @@ $courses = getUserCourses($user_id);
         <?php else: ?>
             <div class="p-6 mx-auto mt-40 text-center">
                 <p class="text-gray-500">You haven't created any courses yet.</p>
-                <button onclick="openCourseModal()" class="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#4A90E2] hover:bg-[#357abd]">
+                <button onclick="openCourseModal()"
+                    class="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#4A90E2] hover:bg-[#357abd]">
                     Create Your First Course
                 </button>
             </div>
         <?php endif; ?>
 
         <!-- Create Course Modal -->
-        <div id="courseModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-40 hidden">
-            <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-                <h2 class="text-xl font-semibold mb-4">Create New Course</h2>
+        <div id="courseModal"
+            class="fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center z-50 hidden transition-opacity duration-300">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 transform transition-all duration-300">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-6">Create New Course</h2>
 
-                <form id="courseForm" enctype="multipart/form-data">
-                    <div class="mb-2">
-                        <label class="block text-gray-600">Title</label>
-                        <input type="text" name="title" class="w-full p-2 border rounded" required>
+                <form id="courseForm" enctype="multipart/form-data" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                        <input type="text" name="title"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
+                            required>
                     </div>
 
-                    <div class="mb-2">
-                        <label class="block text-gray-600">Description</label>
-                        <textarea name="description" class="w-full p-2 border rounded" required></textarea>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea name="description"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 resize-y min-h-[100px]"
+                            required></textarea>
                     </div>
 
-                    <div class="mb-2">
-                        <label class="block text-gray-600">Category</label>
-                        <input type="text" name="category" class="w-full p-2 border rounded" required>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <input type="text" name="category"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
+                            required>
                     </div>
 
-                    <div class="mb-2">
-                        <label class="block text-gray-600">Price</label>
-                        <input type="number" name="price" step="0.01" class="w-full p-2 border rounded" required>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                        <input type="number" name="price" step="0.01"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
+                            required>
                     </div>
 
-                    <div class="mb-2">
-                        <label class="block mb-2 text-sm font-medium text-gray-900" for="file_input">Upload Thumbnail</label>
-                        <input type="file" name="thumbnail" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50" id="file_input">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Thumbnail</label>
+                        <input type="file" name="thumbnail"
+                            class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors duration-200"
+                            id="file_input">
                     </div>
 
-                    <div class="mb-2">
-                        <label class="block text-gray-600">Status</label>
-                        <select name="status" class="w-full p-2 border rounded">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <select name="status"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 appearance-none bg-white">
                             <option value="draft">Draft</option>
                             <option value="published">Published</option>
                             <option value="archived">Archived</option>
@@ -358,35 +448,43 @@ $courses = getUserCourses($user_id);
 
                     <input type="hidden" name="created_by" value="<?php echo $_SESSION['user']['user_id']; ?>">
 
-                    <div id="formMessage" class="text-sm mt-2"></div>
+                    <div id="formMessage" class="text-sm text-gray-600 mt-2"></div>
 
-                    <div class="flex justify-end gap-2 mt-4">
-                        <button type="button" class="px-4 py-2 bg-gray-400 text-white rounded" onclick="closeCourseModal()">Cancel</button>
-                        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Save Course</button>
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button type="button"
+                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-medium"
+                            onclick="closeCourseModal()">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium">
+                            Save Course
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
 
 
-        
+
         <!-- quiz modal -->
         <div id="myModal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 hidden">
             <div class="bg-white p-6 rounded-lg shadow-lg max-h-[80vh] overflow-y-auto">
-                <div class="flex flex-col overflow-scroll justify-between items-center">
+                <div class="flex flex-col justify-between items-center">
 
-                    <div class="flex">
+                    <div class="flex float-left">
                         <h2 class="text-lg font-bold">Form Title</h2>
                         <button class="text-gray-500 hover:text-red-500" onclick="closeQuizModal()">&times;</button>
                     </div>
 
-                    <form id="quizForm" method="POST" action="quizFormBackend.php" enctype="multipart/form-data">
+                    <form id="quizForm" method="POST" action="handlers/addQuiz.php" enctype="multipart/form-data">
                         <input type="hidden" id="lessonIdInput" name="lesson_id">
                         <?php include 'quizForm.php' ?>
 
                         <!-- Submit Button -->
                         <div class="flex justify-end">
-                            <button type="submit" name="submit_quiz" class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors shadow-md hover:shadow-lg">
+                            <button type="submit" name="submit_quiz"
+                                class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors shadow-md hover:shadow-lg">
                                 Create Quiz
                             </button>
                         </div>
@@ -396,35 +494,50 @@ $courses = getUserCourses($user_id);
             </div>
         </div>
         <!-- Course Manager Modal -->
-        <div id="courseManagerModal" class="fixed z-40 inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div id="courseManagerModal"
+            class="fixed z-40 inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
             <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
                 <div class="mt-3">
                     <div class="flex justify-between items-center">
                         <h3 class="text-2xl font-bold text-gray-900" id="modalCourseTitle"></h3>
                         <button id="closeModal" class="text-gray-500 hover:text-gray-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
-                    <div class="mt-2 px-7 py-3">
+                    <div class="mt-4 px-6 py-4 bg-white rounded-xl shadow-sm">
                         <!-- Add Lesson Form -->
-                        <form id="addLessonForm" action="/upload_lesson.php" method="POST" enctype="multipart/form-data">
-                            <!-- <form id="addLessonForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" enctype="multipart/form-data"> -->
+                        <form id="addLessonForm" action="/upload_lesson.php" method="POST" enctype="multipart/form-data"
+                            class="space-y-5">
                             <input type="hidden" id="modalCourseId" name="course_id">
-                            <div class="mb-4">
-                                <label for="lessonTitle" class="block text-sm font-medium text-gray-700">Lesson Title</label>
-                                <input type="text" id="lessonTitle" name="title" placeholder="Enter lesson title" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                            <div>
+                                <label for="lessonTitle" class="block text-sm font-medium text-gray-700 mb-1">Lesson
+                                    Title</label>
+                                <input type="text" id="lessonTitle" name="title" placeholder="Enter lesson title"
+                                    required
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 placeholder-gray-400">
                             </div>
-                            <div class="mb-4">
-                                <label for="lessonContent" class="block text-sm font-medium text-gray-700">Lesson Content</label>
-                                <textarea id="lessonContent" name="content" placeholder="Enter lesson content" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+
+                            <div>
+                                <label for="lessonContent" class="block text-sm font-medium text-gray-700 mb-1">Lesson
+                                    Content</label>
+                                <textarea id="lessonContent" name="content" placeholder="Enter lesson content" required
+                                    class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 placeholder-gray-400 min-h-[120px]"></textarea>
                             </div>
-                            <div class="mb-4">
-                                <label for="lessonVideo" class="block text-sm font-medium text-gray-700">Lesson Video (optional)</label>
-                                <input type="file" id="lessonVideo" name="video_data" accept="video/*" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                            <div>
+                                <label for="lessonVideo" class="block text-sm font-medium text-gray-700 mb-1">Lesson
+                                    Video (optional)</label>
+                                <input type="file" id="lessonVideo" name="video_data" accept="video/*"
+                                    class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors duration-200">
                             </div>
-                            <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300">
+
+                            <button type="submit"
+                                class="w-full bg-blue-600 text-white py-2.5 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm hover:shadow-md">
                                 Add Lesson
                             </button>
                         </form>
@@ -570,12 +683,12 @@ $courses = getUserCourses($user_id);
         }
 
         // Document ready event
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Toggle lessons section
             const toggleButtons = document.querySelectorAll('.toggle-lessons-btn');
 
             toggleButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
+                button.addEventListener('click', function (e) {
                     e.preventDefault();
                     const courseId = this.getAttribute('data-course-id');
                     const lessonList = document.getElementById(`lessonList-${courseId}`);
@@ -608,7 +721,7 @@ $courses = getUserCourses($user_id);
             const manageButtons = document.querySelectorAll('.manage-course-btn');
 
             manageButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
+                button.addEventListener('click', function (e) {
                     e.preventDefault();
                     const courseId = this.getAttribute('data-course-id');
                     const courseTitle = this.getAttribute('data-course-title');
@@ -620,7 +733,7 @@ $courses = getUserCourses($user_id);
             const addLessonButtons = document.querySelectorAll('.add-lesson-btn');
 
             addLessonButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
+                button.addEventListener('click', function (e) {
                     e.preventDefault();
                     const courseId = this.getAttribute('data-course-id');
                     const courseTitle = this.getAttribute('data-course-title');
@@ -631,7 +744,7 @@ $courses = getUserCourses($user_id);
             // Close modal button
             const closeModalBtn = document.getElementById('closeModal');
             if (closeModalBtn) {
-                closeModalBtn.addEventListener('click', function() {
+                closeModalBtn.addEventListener('click', function () {
                     document.getElementById('courseManagerModal').classList.add('hidden');
                 });
             }
@@ -639,14 +752,14 @@ $courses = getUserCourses($user_id);
             // Course form submission
             const courseForm = document.getElementById('courseForm');
             if (courseForm) {
-                courseForm.addEventListener('submit', function(e) {
+                courseForm.addEventListener('submit', function (e) {
                     e.preventDefault();
                     const formData = new FormData(this);
 
                     fetch('handlers/createCourse.php', {
-                            method: 'POST',
-                            body: formData
-                        })
+                        method: 'POST',
+                        body: formData
+                    })
                         .then(response => response.json())
                         .then(data => {
                             const formMessage = document.getElementById('formMessage');

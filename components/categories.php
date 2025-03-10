@@ -55,10 +55,10 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
             theme: {
                 extend: {
                     colors: {
-                        'primary': '#1e5dac',
-                        'primary-dark': '#154785',
-                        'secondary': '#b7c5da',
-                        'accent': '#eae2e4',
+                        'primary': '#4A90E2',                        
+                        'primary-dark': '#2A69A4',
+                        'secondary': '#7ED321',
+                        'accent': '#F5A623',
                         'success': '#10B981',
                         'warning': '#F1C40F',
                         'error': '#E74C3C',
