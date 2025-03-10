@@ -192,7 +192,7 @@
                     <div class="text-center mb-4">
                         <p class="text-sm text-gray-600">
                             Already have an account?
-                            <a href="signup" class="font-medium text-[#1e5dac] hover:[#214a7b]">
+                            <a href="signin" class="font-medium text-[#1e5dac] hover:[#214a7b]">
                                 Sign in as a student
                             </a>
                         </p>

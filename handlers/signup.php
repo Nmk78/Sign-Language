@@ -31,7 +31,6 @@ $username = filter_var($_POST['username'], FILTER_SANITIZE_STRING);
 $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
 $password = $_POST['password'];
 $role = filter_var($_POST['role'], FILTER_SANITIZE_STRING);
-
 // Validate email format
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     echo "<script>
@@ -85,4 +84,3 @@ if ($stmt->execute()) {
 // Close the statement and connection
 $stmt->close();
 $conn->close();
-?>

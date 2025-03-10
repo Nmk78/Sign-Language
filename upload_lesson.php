@@ -11,14 +11,15 @@ if ($conn->connect_error) {
 }
 
 // Check if required POST data is set
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['course_id'], $_POST['title'], $_POST['content'])) {
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['course_id'], $_POST['title'], $_POST['content'], $_POST['user_id'])) {
     $course_id = $_POST['course_id'];
     $title = $_POST['title'];
     $content = $_POST['content'];
+    $user_id = $_POST['user_id'];
 
     // Insert lesson into the database without video URL
-    $stmt = $conn->prepare("INSERT INTO lesson (course_id, title, description) VALUES (?, ?, ?)");
-    $stmt->bind_param("iss", $course_id, $title, $content);
+    $stmt = $conn->prepare("INSERT INTO lesson (course_id, title, description, created_by) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("issi", $course_id, $title, $content, $user_id);
     $stmt->execute();
     $lesson_id = $stmt->insert_id; // Get the inserted lesson ID
     $stmt->close();
