@@ -50,7 +50,7 @@ $conn->close();
             theme: {
                 extend: {
                     colors: {
-                        'primary': '#4A90E2',
+                        'primary': '#f5f5fd',
                         'primary-dark': '#2A69A4',
                         'secondary': '#7ED321',
                         'accent': '#F5A623',

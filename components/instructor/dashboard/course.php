@@ -380,7 +380,7 @@ $courses = getUserCourses($user_id);
                         <button class="text-gray-500 hover:text-red-500" onclick="closeQuizModal()">&times;</button>
                     </div>
 
-                    <form id="quizForm" method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" enctype="multipart/form-data">
+                    <form id="quizForm" method="POST" action="quizFormBackend.php" enctype="multipart/form-data">
                         <input type="hidden" id="lessonIdInput" name="lesson_id">
                         <?php include 'quizForm.php' ?>
 
