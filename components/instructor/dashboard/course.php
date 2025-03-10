@@ -109,7 +109,46 @@ if (isset($_GET['delete_lesson']) && is_numeric($_GET['delete_lesson'])) {
 $user_id = $_SESSION['user']['user_id'];
 $courses = getUserCourses($user_id);
 ?>
-
+<script>
+    tailwind.config = {
+            theme: {
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                },
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        },
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                    },
+                }
+            }
+        }
+    
+</script>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -373,14 +412,14 @@ $courses = getUserCourses($user_id);
         <!-- quiz modal -->
         <div id="myModal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 hidden">
             <div class="bg-white p-6 rounded-lg shadow-lg max-h-[80vh] overflow-y-auto">
-                <div class="flex flex-col overflow-scroll justify-between items-center">
+                <div class="flex flex-col justify-between items-center">
 
-                    <div class="flex">
+                    <div class="flex float-left">
                         <h2 class="text-lg font-bold">Form Title</h2>
                         <button class="text-gray-500 hover:text-red-500" onclick="closeQuizModal()">&times;</button>
                     </div>
 
-                    <form id="quizForm" method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" enctype="multipart/form-data">
+                    <form id="quizForm" method="POST" action="handlers/addQuiz.php" enctype="multipart/form-data">
                         <input type="hidden" id="lessonIdInput" name="lesson_id">
                         <?php include 'quizForm.php' ?>
 
