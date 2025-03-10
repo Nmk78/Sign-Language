@@ -21,7 +21,7 @@ $course_id = isset($_GET['course']) ? intval($_GET['course']) : 0;
 $lesson_id = isset($_GET['lesson']) ? intval($_GET['lesson']) : 0;
 
 // Fetch course information
-$course_stmt = $conn->prepare("SELECT title, description FROM courses WHERE id = ?");
+$course_stmt = $conn->prepare("SELECT title, description, thumbnail_url FROM courses WHERE id = ?");
 $course_stmt->bind_param("i", $course_id);
 $course_stmt->execute();
 $course_result = $course_stmt->get_result();
@@ -80,6 +80,30 @@ if ($lesson_id > 0) {
     $comments_stmt->close();
 }
 
+$user_id = $_SESSION['user']['user_id']; // Assuming user is logged in and session is set
+$course_id = $_GET['course']; // Course ID from URL or request
+
+if (!isset($_SESSION['form_token'])) {
+    $_SESSION['form_token'] = bin2hex(random_bytes(16)); // Unique token
+}
+
+$user_id = $_SESSION['user']['user_id'] ?? null;
+$course_id = $_GET['course'] ?? null;
+
+// Check enrollment status
+$query = "SELECT status FROM course_enrollments WHERE user_id = ? AND course_id = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("ii", $user_id, $course_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$enrollment = $result->fetch_assoc();
+$stmt->close();
+
+$enrollment_status = $enrollment ? $enrollment['status'] : null;
+
+// Handle form submission
+
+
 // Close the database connection
 $conn->close();
 
@@ -108,6 +132,8 @@ function formatTimeAgo($datetime)
         return date("M j, Y", $time);
     }
 }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -116,7 +142,7 @@ function formatTimeAgo($datetime)
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($course['title'] ?? 'Course View'); ?></title>
+    <title><?php echo htmlspecialchars(string: $course['title'] ?? 'Course View'); ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -127,73 +153,76 @@ function formatTimeAgo($datetime)
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column (2/3 width on large screens) -->
             <div class="lg:col-span-2">
-
-                <!-- Loading State -->
-                <div id="loadingState" class="bg-white p-6 rounded-lg shadow-sm <?php echo $current_lesson ? 'hidden' : ''; ?>">
-                    <div class="animate-pulse flex flex-col space-y-4">
-                        <div class="rounded-lg bg-gray-200 h-64 w-full"></div>
-                        <div class="h-6 bg-gray-200 rounded w-3/4"></div>
-                        <div class="h-4 bg-gray-200 rounded w-full"></div>
-                        <div class="h-4 bg-gray-200 rounded w-5/6"></div>
-                    </div>
-                </div>
-
-                <!-- Error State -->
-                <div id="errorState" class="bg-white p-6 rounded-lg shadow-sm hidden">
-                    <div class="text-center py-8">
-                        <svg class="mx-auto h-12 w-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                        </svg>
-                        <h3 class="mt-2 text-lg font-medium text-gray-900" id="errorMessage">Error loading lesson</h3>
-                        <p class="mt-1 text-sm text-gray-500" id="errorDetails"></p>
-                        <div class="mt-6">
-                            <button onclick="window.location.href='/'" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#4A90E2] hover:bg-[#357abd] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4A90E2]">
-                                Return to Home
-                            </button>
+                <div class="container mx-auto py-8">
+                    <?php if ($enrollment_status === "approved"): ?>
+                        <!-- Approved Enrollment: Show Course Content -->
+                        <div id="courseContent" class="bg-white rounded-lg shadow-md p-6">
+                            <?php if ($current_lesson): ?>
+                                <div class="aspect-video">
+                                    <?php if (!empty($current_lesson['video_url'])): ?>
+                                        <video controls class="w-full h-full rounded-md" id="lessonVideo" preload="metadata">
+                                            <source src="<?php echo htmlspecialchars($current_lesson['video_url']); ?>"
+                                                type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    <?php else: ?>
+                                        <div class="flex items-center justify-center h-full bg-gray-200 text-gray-600 rounded-md">
+                                            <p>No video available for this lesson</p>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="mt-4">
+                                    <h2 class="text-2xl font-semibold text-gray-900">
+                                        <?php echo htmlspecialchars($current_lesson['title']); ?></h2>
+                                    <p class="text-gray-600 mt-2">
+                                        <?php echo htmlspecialchars($current_lesson['description']); ?></p>
+                                    <div class="mt-4 flex justify-between items-center">
+                                        <span class="text-sm text-gray-500">Category:
+                                            <?php echo htmlspecialchars($current_lesson['category'] ?? 'Uncategorized'); ?></span>
+                                        <div class="space-x-3">
+                                            <button onclick="openQuiz(<?php echo $lesson_id; ?>)"
+                                                class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Take
+                                                Quiz</button>
+                                            <button onclick="navigateToNextLesson(<?php echo $current_lesson['id']; ?>)"
+                                                class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">Next
+                                                Lesson</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php else: ?>
+                                <div class="text-center py-8">
+                                    <p class="text-gray-600">No lesson content available yet.</p>
+                                </div>
+                            <?php endif; ?>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Lesson Content -->
-                <div id="courseContent" class="<?php echo $current_lesson ? '' : 'hidden'; ?>">
-                    <?php if ($current_lesson): ?>
-                        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                            <div class="aspect-video bg-">
-                                <?php if (!empty($current_lesson['video_url'])): ?>
-                                    <video controls class="w-full h-full" id="lessonVideo" preload="metadata">
-                                        <source src="<?php echo htmlspecialchars($current_lesson['video_url']); ?>" type="video/mp4">
-                                        <source src="<?php echo htmlspecialchars($current_lesson['video_url']); ?>" type="video/mov">
-                                        <source src="<?php echo htmlspecialchars($current_lesson['video_url']); ?>" type="video/webm">
-                                        Your browser does not support the video tag.
-                                    </video>
-                                    <div id="videoError" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-2">
-                                        <p>Video playback error. Please try a different browser or contact support.</p>
-                                    </div>
-                                <?php else: ?>
-                                    <div class="flex items-center justify-center h-full bg-gray-800 text-white">
-                                        <p>No video available for this lesson</p>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                            <div class="p-4">
-                                <h2 class="text-xl font-semibold mb-2"><?php echo htmlspecialchars($current_lesson['title']); ?></h2>
-                                <p class="text-sm text-gray-600 mb-4"><?php echo htmlspecialchars($current_lesson['description']); ?></p>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm text-gray-500">Category: <?php echo htmlspecialchars($current_lesson['category'] ?? 'Uncategorized'); ?></span>
-                                    <div class="flex space-x-2">
-                                    <button onclick="openQuiz(<?php echo $lesson_id; ?>)" class="bg-green-500 text-white px-3 py-1 rounded-md text-sm hover:bg-gray-300">
-                                        Take Quiz
-                                    </button>
-                                        <button onclick="navigateToNextLesson(<?php echo $current_lesson['id']; ?>)" class="bg-gray-200 text-gray-800 px-3 py-1 rounded-md text-sm hover:bg-gray-300">
-                                            <svg class="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                                            </svg>
-                                            Next Lesson
+                    <?php elseif ($enrollment_status === 'pending'): ?>
+                        <!-- Pending Enrollment: Show Waiting Message -->
+                        <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6 text-center">
+                            <svg class="mx-auto h-12 w-12 text-yellow-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <h3 class="mt-2 text-lg font-medium text-gray-900">Enrollment Pending</h3>
+                            <p class="mt-1 text-sm text-gray-500">Your enrollment is under review. Please check back later.
+                            </p>
+                        </div>
+
+                    <?php else: ?>
+                        <!-- Not Enrolled: Show Enrollment Option -->
+                        <div class="max-w-md mx-auto rounded-lg shadow-md border border-gray-200 overflow-hidden">
+                            <div class="h-48 bg-cover bg-center"
+                                style="background-image: url('<?php echo $course['thumbnail_url']; ?>');">
+                                <div class="h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
+                                    <form method="POST" id="enrollForm" action="handlers/enroll.php">
+                                        <input type="hidden" name="user_id" value="<?= $user_id ?>">
+                                        <input type="hidden" name="course_id" value="<?= $course_id ?>">
+                                        <button type="submit" id="enrollBtn" class="bg-white text-gray-900 px-6 py-3 rounded-md font-medium
+                                    hover:bg-gray-100 hover:text-blue-800 transition-all duration-200 shadow-md">
+                                            Enroll Now
                                         </button>
-                                        <button onclick="markLessonComplete(<?php echo $current_lesson['id']; ?>)" class="bg-[#4A90E2] text-white px-3 py-1 rounded-md text-sm hover:bg-[#357abd]">
-                                            Complete Lesson
-                                        </button>
-                                    </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -201,7 +230,7 @@ function formatTimeAgo($datetime)
                 </div>
 
                 <div class="mt-5">
-                <?php include 'components/comments.php'; ?>
+                    <?php include 'components/comments.php'; ?>
 
                 </div>
             </div>
@@ -238,8 +267,8 @@ function formatTimeAgo($datetime)
                         <h3 class="text-lg font-semibold">Course Lessons</h3>
                         <div class="text-sm text-gray-500">
                             <span class="font-medium text-indigo-600"><?php echo count(array_filter($lessons, function ($l) {
-                                                                            return isset($l['completed']) && $l['completed'];
-                                                                        })); ?></span>
+                                return isset($l['completed']) && $l['completed'];
+                            })); ?></span>
                             <span>/</span>
                             <span><?php echo count($lessons); ?></span>
                             <span class="ml-1">completed</span>
@@ -250,12 +279,15 @@ function formatTimeAgo($datetime)
                         <?php if (empty($lessons)): ?>
                             <div class="py-8 flex flex-col items-center justify-center text-center">
                                 <div class="bg-gray-100 p-3 rounded-full mb-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                     </svg>
                                 </div>
                                 <p class="text-gray-500">No lessons available for this course.</p>
-                                <button class="mt-3 text-sm text-indigo-600 hover:text-indigo-800 font-medium">Refresh List</button>
+                                <button class="mt-3 text-sm text-indigo-600 hover:text-indigo-800 font-medium">Refresh
+                                    List</button>
                             </div>
                         <?php else: ?>
                             <?php foreach ($lessons as $index => $lesson): ?>
@@ -264,12 +296,10 @@ function formatTimeAgo($datetime)
                                 $isCompleted = isset($lesson['completed']) && $lesson['completed'];
                                 $lessonNumber = $index + 1;
                                 ?>
-                                <a
-                                    href="?course=<?php echo $course_id; ?>&lesson=<?php echo $lesson['id']; ?>"
-                                    class="flex items-start gap-3 border  p-3 rounded-lg transition-all duration-200 relative
+                                <a href="?course=<?php echo $course_id; ?>&lesson=<?php echo $lesson['id']; ?>" class="flex items-start gap-3 border  p-3 rounded-lg transition-all duration-200 relative
                             <?php echo $isActive
-                                    ? 'bg-indigo-50 border-indigo-100'
-                                    : 'hover:bg-gray-50  border-transparent hover:border-gray-100'; ?>">
+                                ? 'bg-indigo-50 border-indigo-100'
+                                : 'hover:bg-gray-50  border-transparent hover:border-gray-100'; ?>">
 
                                     <!-- Lesson number or status indicator -->
                                     <!-- <div class="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium
@@ -289,7 +319,8 @@ function formatTimeAgo($datetime)
                             <?php endif; ?>
                         </div> -->
 
-                                    <div id="videoContainer" class="relative h-28 aspect-square bg-gray-300 rounded-lg flex items-center justify-center cursor-pointer group overflow-hidden">
+                                    <div id="videoContainer"
+                                        class="relative h-28 aspect-square bg-gray-300 rounded-lg flex items-center justify-center cursor-pointer group overflow-hidden">
                                         <!-- Play Button -->
                                         <div class=" size-8 bg-gray-500 rounded-full flex items-center justify-center">
                                             <i class="fa-solid fa-play text-white"></i>
@@ -298,12 +329,16 @@ function formatTimeAgo($datetime)
 
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-start justify-between">
-                                            <h4 class="font-medium text-gray-900 line-clamp-1"><?php echo htmlspecialchars($lesson['title']); ?></h4>
+                                            <h4 class="font-medium text-gray-900 line-clamp-1">
+                                                <?php echo htmlspecialchars($lesson['title']); ?>
+                                            </h4>
 
                                             <?php if (isset($lesson['duration'])): ?>
                                                 <span class="text-xs text-gray-500 flex items-center ml-2 flex-shrink-0">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
                                                     <?php echo $lesson['duration']; ?>
                                                 </span>
@@ -316,9 +351,12 @@ function formatTimeAgo($datetime)
 
                                         <?php if ($isActive && !$isCompleted): ?>
                                             <span class="inline-flex items-center mt-2 text-xs font-medium text-indigo-600">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
                                                 Continue Learning
                                             </span>
@@ -343,24 +381,31 @@ function formatTimeAgo($datetime)
     <div class="fixed bottom-8 right-8">
         <button class="bg-[#4A90E2] text-white p-4 rounded-full shadow-lg hover:bg-[#357abd]">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
+                </path>
             </svg>
         </button>
     </div>
 
     <!-- Quiz Modal/Popup -->
-    <div id="quizModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden overflow-y-auto modal-fade-in flex items-start justify-center pt-10 pb-10">
+    <div id="quizModal"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden overflow-y-auto modal-fade-in flex items-start justify-center pt-10 pb-10">
         <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-4 my-8 modal-slide-up relative">
             <!-- Modal Header -->
-            <div class="bg-gradient-to-r from-primary-600 to-primary-700 text-slate-900 rounded-t-xl px-6 py-4 flex justify-between items-center">
+            <div
+                class="bg-gradient-to-r from-primary-600 to-primary-700 text-slate-900 rounded-t-xl px-6 py-4 flex justify-between items-center">
                 <h2 id="modalLessonTitle" class="text-xl font-bold">Lesson Quizzes</h2>
-                <button onclick="closeModal()" class="text-slate-900 hover:text-primary-200 transition-colors focus:outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                <button onclick="closeModal()"
+                    class="text-slate-900 hover:text-primary-200 transition-colors focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
-            
+
             <!-- Modal Content -->
             <div id="quizContent" class="p-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
                 <!-- Quiz content will be loaded here -->
@@ -394,7 +439,7 @@ function formatTimeAgo($datetime)
 
         // Handle comment form submission
         if (commentForm) {
-            commentForm.addEventListener('submit', function(e) {
+            commentForm.addEventListener('submit', function (e) {
                 e.preventDefault();
 
                 if (!commentText.value.trim()) {
@@ -472,7 +517,7 @@ function formatTimeAgo($datetime)
             });
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const userId = localStorage.getItem('id');
             if (userId) {
                 document.getElementById('userId').value = userId;
@@ -552,29 +597,29 @@ function formatTimeAgo($datetime)
         //         })
         //         .catch(error => console.error("Error fetching quizzes:", error));
         // }
-        
+
         // function closeModal() {
         //     document.getElementById("quizModal").classList.add("hidden"); 
         // }
 
         function openQuiz(currentLessonId) {
-  // Ensure a valid lesson ID
-  if (!currentLessonId) {
-    alert("No lesson selected!")
-    return
-  }
+            // Ensure a valid lesson ID
+            if (!currentLessonId) {
+                alert("No lesson selected!")
+                return
+            }
 
-  // Fetch quiz data using AJAX
-  fetch(`handlers/get_quizzes.php?lesson_id=${currentLessonId}`)
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.length === 0) {
-        document.getElementById("quizContent").innerHTML =
-          "<p class='text-gray-500'>No quizzes available for this lesson.</p>"
-      } else {
-        let quizHtml = `<form id="quizForm" data-lesson-id="${currentLessonId}">`
-        data.forEach((quiz, index) => {
-          quizHtml += `
+            // Fetch quiz data using AJAX
+            fetch(`handlers/get_quizzes.php?lesson_id=${currentLessonId}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.length === 0) {
+                        document.getElementById("quizContent").innerHTML =
+                            "<p class='text-gray-500'>No quizzes available for this lesson.</p>"
+                    } else {
+                        let quizHtml = `<form id="quizForm" data-lesson-id="${currentLessonId}">`
+                        data.forEach((quiz, index) => {
+                            quizHtml += `
                         <div class="border p-4 rounded-lg mb-4 bg-gray-50 shadow-md">
                             <p class="font-semibold text-lg text-gray-800">${index + 1}. ${quiz.question}</p>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
@@ -592,9 +637,9 @@ function formatTimeAgo($datetime)
                                 </label>
                             </div>
                         </div>`
-        })
+                        })
 
-        quizHtml += `
+                        quizHtml += `
                     <div class="mt-6 flex justify-end">
                         <button type="submit" class="bg-gray-600 hover:bg-primary-700 text-white font-bold py-2 px-6 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
                             Submit Answers
@@ -602,66 +647,66 @@ function formatTimeAgo($datetime)
                     </div>
                 </form>`
 
-        document.getElementById("quizContent").innerHTML = quizHtml
+                        document.getElementById("quizContent").innerHTML = quizHtml
 
-        // Add event listener for form submission
-        document.getElementById("quizForm").addEventListener("submit", submitQuiz)
-      }
+                        // Add event listener for form submission
+                        document.getElementById("quizForm").addEventListener("submit", submitQuiz)
+                    }
 
-      // Show the modal
-      document.getElementById("quizModal").classList.remove("hidden")
-    })
-    .catch((error) => console.error("Error fetching quizzes:", error))
-}
+                    // Show the modal
+                    document.getElementById("quizModal").classList.remove("hidden")
+                })
+                .catch((error) => console.error("Error fetching quizzes:", error))
+        }
 
-function submitQuiz(event) {
-  event.preventDefault()
+        function submitQuiz(event) {
+            event.preventDefault()
 
-  const form = event.target
-  const lessonId = form.dataset.lessonId
-  const answers = {}
+            const form = event.target
+            const lessonId = form.dataset.lessonId
+            const answers = {}
 
-  // Collect all answers
-  const radioButtons = form.querySelectorAll('input[type="radio"]:checked')
-  radioButtons.forEach((radio) => {
-    const quizId = radio.name.replace("quiz_", "")
-    answers[quizId] = radio.value
-  })
+            // Collect all answers
+            const radioButtons = form.querySelectorAll('input[type="radio"]:checked')
+            radioButtons.forEach((radio) => {
+                const quizId = radio.name.replace("quiz_", "")
+                answers[quizId] = radio.value
+            })
 
-  // Check if all questions are answered
-  const totalQuestions = document.querySelectorAll(".border.p-4.rounded-lg").length
-  if (Object.keys(answers).length < totalQuestions) {
-    alert("Please answer all questions before submitting.")
-    return
-  }
+            // Check if all questions are answered
+            const totalQuestions = document.querySelectorAll(".border.p-4.rounded-lg").length
+            if (Object.keys(answers).length < totalQuestions) {
+                alert("Please answer all questions before submitting.")
+                return
+            }
 
-  // Submit answers to server
-  const userId = localStorage.getItem('id');
+            // Submit answers to server
+            const userId = localStorage.getItem('id');
 
-  fetch("handlers/submit_quiz.php", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      lesson_id: lessonId,
-      userId: userId,
-      answers: answers,
-    }),
-  })
-    .then((response) => response.json())
-    .then((results) => {
-      showResults(results)
-    })
-    .catch((error) => {
-      console.error("Error submitting quiz:", error)
-      alert("There was an error submitting your quiz. Please try again.")
-    })
-}
+            fetch("handlers/submit_quiz.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    lesson_id: lessonId,
+                    userId: userId,
+                    answers: answers,
+                }),
+            })
+                .then((response) => response.json())
+                .then((results) => {
+                    showResults(results)
+                })
+                .catch((error) => {
+                    console.error("Error submitting quiz:", error)
+                    alert("There was an error submitting your quiz. Please try again.")
+                })
+        }
 
-function showResults(results) {
-  // Create results HTML
-  const resultsHtml = `
+        function showResults(results) {
+            // Create results HTML
+            const resultsHtml = `
         <div class="bg-white rounded-xl shadow-lg p-6 max-w-2xl mx-auto">
             <div class="text-center mb-6">
                 <div class="inline-flex items-center justify-center w-20 h-20 rounded-full ${results.percentage >= 70 ? "bg-green-100" : "bg-amber-100"} mb-4">
@@ -674,8 +719,8 @@ function showResults(results) {
             <div class="space-y-4 mt-6">
                 <h4 class="font-semibold text-lg border-b pb-2">Question Review</h4>
                 ${results.questions
-                  .map(
-                    (q, index) => `
+                    .map(
+                        (q, index) => `
                     <div class="p-3 rounded-lg ${q.is_correct ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"}">
                         <p class="font-medium">${index + 1}. ${q.question}</p>
                         <div class="mt-2 text-sm">
@@ -684,8 +729,8 @@ function showResults(results) {
                         </div>
                     </div>
                 `,
-                  )
-                  .join("")}
+                    )
+                    .join("")}
             </div>
             
             <div class="mt-6 flex justify-center">
@@ -696,29 +741,29 @@ function showResults(results) {
         </div>
     `
 
-  // Create and show results modal
-  const resultsModal = document.createElement("div")
-  resultsModal.id = "resultsModal"
-  resultsModal.className =
-    "fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 modal-fade-in"
-  resultsModal.innerHTML = resultsHtml
+            // Create and show results modal
+            const resultsModal = document.createElement("div")
+            resultsModal.id = "resultsModal"
+            resultsModal.className =
+                "fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 modal-fade-in"
+            resultsModal.innerHTML = resultsHtml
 
-  document.body.appendChild(resultsModal)
+            document.body.appendChild(resultsModal)
 
-  // Hide the quiz modal
-  document.getElementById("quizModal").classList.add("hidden")
-}
+            // Hide the quiz modal
+            document.getElementById("quizModal").classList.add("hidden")
+        }
 
-function closeResultsModal() {
-  const resultsModal = document.getElementById("resultsModal")
-  if (resultsModal) {
-    resultsModal.remove()
-  }
-}
+        function closeResultsModal() {
+            const resultsModal = document.getElementById("resultsModal")
+            if (resultsModal) {
+                resultsModal.remove()
+            }
+        }
 
-function closeModal() {
-  document.getElementById("quizModal").classList.add("hidden")
-}
+        function closeModal() {
+            document.getElementById("quizModal").classList.add("hidden")
+        }
 
 
 
@@ -730,7 +775,7 @@ function closeModal() {
             // Then navigate to the next lesson
             navigateToNextLesson(lessonId);
         }
-        
+
     </script>
 </body>
 
