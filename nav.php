@@ -19,20 +19,26 @@ function renderHeader($activePage = 'home', $role = "instructor")
 
     // TODO
 
-    //ImGay Hello
-    echo '<header class="bg-primary">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <nav class="hidden md:flex space-x-8">';
-    foreach ($navItems as $name => $url) {
-        $activeClass = $activePage === $name ? 'text-white underline' : 'text-white';
-        echo "<a href='{$url}' class='{$activeClass} hover:text-accent transition-colors'>" . ucfirst(strtolower($name)) . "</a>";
-    }
-    echo        '</nav>
-                
-            </div>
+    echo '<header class="bg-primary text-primary-dark shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <nav class="hidden md:flex space-x-8" aria-label="Main navigation">
+                ' . implode('', array_map(function($name, $url) use ($activePage) {
+                    $activeClass = $activePage === $name 
+                        ? 'text-primary-dark underline font-semibold border-b-2 border-primary-dark' 
+                        : 'text-primary-dark hover:text-primary-dark/80 hover:border-b-2 hover:border-primary-dark/50';
+                    return sprintf(
+                        '<a href="%s" class="%s transition-all duration-200 ease-in-out" title="%s">%s</a>',
+                        htmlspecialchars($url),
+                        $activeClass,
+                        ucfirst(strtolower($name)),
+                        ucfirst(strtolower($name))
+                    );
+                }, array_keys($navItems), $navItems)) . '
+            </nav>
         </div>
-    </header>';
+    </div>
+</header>';
 }
 
 function getActiveRoute($url)

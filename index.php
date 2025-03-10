@@ -121,10 +121,10 @@ $courses = [
             theme: {
                 extend: {
                     colors: {
-                        'primary': '#4A90E2',
-                        'primary-dark': '#2A69A4',
-                        'secondary': '#7ED321',
-                        'accent': '#F5A623',
+                        'primary': '#1e5dac',
+                        'primary-dark': '#154785',
+                        'secondary': '#b7c5da',
+                        'accent': '#eae2e4',
                         'success': '#10B981',
                         'warning': '#F1C40F',
                         'error': '#E74C3C',
@@ -132,6 +132,9 @@ $courses = [
                         'surface': '#FFFFFF',
                         'text': '#333333',
                         'text-light': '#7F8C8D',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
                     }
                 }
             }
@@ -167,10 +170,10 @@ $courses = [
 
 <body class="bg-background scrollbar-thin">
     <!-- Header -->
-    <header class="bg-primary sticky top-0 z-50">
+    <!-- <header class="bg-primary sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <div class="text-white font-bold text-xl">EDUTOCK</div>
+                <div class="text-white overflow-hidden font-bold text-xl"><img src="assets/logo1.svg" alt="" width="150" height="64px" class="overflow-hidden h-16 object-cover"></div>
                 <?php include 'nav.php'; ?>
                 <div class="flex items-center space-x-4">
                     <?php if (isset($_SESSION['user']) && $_SESSION['user']['logged_in']): ?>
@@ -179,8 +182,8 @@ $courses = [
                         </a>
                         <img id="profile-avatar" class="size-8 cursor-pointer" src="/assets/userAvatar.svg" alt="" onclick="window.location.href='<?php echo ($_SESSION['user']['role'] === 'teacher') ? '/dashboard?tab=statistics' : '/profile'; ?>';">
                     <?php else: ?>
-                        <a href="/signup" class="bg-white px-6 py-2 rounded-md text-primary font-medium">Join Now</a>
-                        <a href="/signin" class="text-white">Log in</a>
+                        <a href="/signup" class="bg-primary-dark px-6 py-2 rounded-md text-primary font-medium">Join Now</a>
+                        <a href="/signin" class="text-primary-dark">Log in</a>
                     <?php endif; ?>
                 </div>
                 <script>
@@ -201,6 +204,80 @@ $courses = [
                 </script>
             </div>
         </div>
+    </header> -->
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <div class="flex items-center text-[#1e5dac]">
+                <i class="fas fa-hands text-2xl mr-2"></i> <a href="/" class="text-2xl font-bold text-primary ">SILENT<span class="text-primary-dark">VOICE</span></a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <?php
+                $navItems = [
+                    'home' => '/',
+                    'category' => '/category',
+                    'about' => '/about',
+                    'contact' => '/contact',
+                    // 'dashboard' => '/dashboard?tab=statistics',
+                    // 'profile' => '/profile',
+                    // 'courseDetails' => '/courseDetails',
+                ];
+
+                echo '<nav class="hidden md:flex space-x-8" aria-label="Main navigation">';
+                echo implode('', array_map(function ($name, $url) use ($activePage) {
+                    $activeClass = $activePage === $name
+                        ? 'text-primary-dark font-semibold border-b-2 border-primary-dark'
+                        : 'text-primary-dark hover:text-primary-dark/80 hover:border-b-2 hover:border-primary-dark/50';
+                    return sprintf(
+                        '<a href="%s" class="%s transition-all duration-200 ease-in-out" title="%s">%s</a>',
+                        htmlspecialchars($url),
+                        $activeClass,
+                        ucfirst(strtolower($name)),
+                        ucfirst(strtolower($name))
+                    );
+                }, array_keys($navItems), $navItems));
+                echo '</nav>';
+                ?>
+                <div class="flex items-center space-x-4">
+
+                    <div class="flex items-center space-x-4">
+                        <?php if (isset($_SESSION['user']) && $_SESSION['user']['logged_in']): ?>
+                            <a href="<?php echo ($_SESSION['user']['role'] === 'teacher') ? '/dashboard?tab=statistics' : '/profile'; ?>" class="text-primary font-semibold hover:underline">
+                                Hello, <?php echo htmlspecialchars($_SESSION['user']['username']); ?>
+                            </a>
+                            <img id="profile-avatar" class="size-8 cursor-pointer" src="/assets/userAvatar.svg" alt="" onclick="window.location.href='<?php echo ($_SESSION['user']['role'] === 'teacher') ? '/dashboard?tab=statistics' : '/profile'; ?>';">
+                        <?php else: ?>
+                            <a href="signin" class="hidden md:inline-block text-text hover:text-primary transition-colors duration-200">Login</a>
+                            <a href="signup" class="bg-primary hover:bg-primary-dark text-white px-5 py-2 rounded-md transition-colors duration-200">Sign Up</a>
+
+                        <?php endif; ?>
+                    </div>
+                    <!-- Mobile menu button -->
+                    <button id="mobile-menu-button" class="md:hidden text-text">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div id="mobile-menu" class="md:hidden hidden pb-4">
+        <div class="flex flex-col space-y-3">
+            <?php foreach ($navItems as $item): ?>
+                <a href="#" class="text-text hover:text-primary transition-colors duration-200"><?php echo $item; ?></a>
+            <?php endforeach; ?>
+            <a href="#" class="text-text hover:text-primary transition-colors duration-200">Login</a>
+        </div>
+    </div>
+    </div>
     </header>
 
     <?php
@@ -256,7 +333,7 @@ $courses = [
     <?php include 'components/ai.php' ?>
 
     <?php
-    $hiddenPages = ['dashboard', 'profile', 'settings', 'signin', 'signup', 'category']; // Pages where the footer should be hidden
+    $hiddenPages = ['dashboard', 'profile', 'settings', 'signin', 'signup', 'category', 'instructor-signup']; // Pages where the footer should be hidden
 
     // Extract the last segment of the URI (ignoring query parameters)
     $currentPage = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));

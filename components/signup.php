@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Language LMS - Student Signup</title>
+    <title>Sign Language LMS - Student Sign Up</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -46,7 +46,7 @@
     </script>
     <style>
         .student-bg {
-            background-color: #0f766e;
+            background-color: #1e5dac;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%2399f6e4' fill-opacity='0.15'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
     </style>
@@ -59,7 +59,7 @@
             <div class="hidden md:block w-1/2 student-bg text-white p-12 relative">
                 <div class="absolute top-8 left-8">
                     <div class="flex items-center">
-                        <i class="fas fa-hands text-2xl mr-2"></i>
+                        <i class="fas fa-hands text-white text-2xl mr-2"></i>
                         <span class="font-bold text-xl">Silent Voice</span>
                     </div>
                 </div>
@@ -108,7 +108,7 @@
                     <span class="font-bold text-xl text-gray-800">SignLang LMS</span>
                 </div>
                 <div class="text-center mb-5">
-                    <h2 class="text-2xl font-bold text-gray-800">Student Signup</h2>
+                    <h2 class="text-2xl font-bold text-[#1e5dac]">Student Sign Up</h2>
                 </div>
                 <?php
                 // Display error message if signup failed
@@ -135,7 +135,7 @@
                                 <i class="fas fa-user text-gray-400"></i>
                             </div>
                             <input type="text" id="name" name="username" required
-                                class="pl-10 block w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                                class="pl-10 block w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1e5dac] focus:border-primary-500 transition-colors"
                                 placeholder="Your Name">
                         </div>
                     </div>
@@ -146,7 +146,7 @@
                                 <i class="fas fa-envelope text-gray-400"></i>
                             </div>
                             <input type="email" id="email" name="email" required
-                                class="pl-10 block w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                                class="pl-10 block w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1e5dac] focus:border-primary-500 transition-colors"
                                 placeholder="your@email.com">
                         </div>
                     </div>
@@ -159,7 +159,7 @@
                                 <i class="fas fa-lock text-gray-400"></i>
                             </div>
                             <input type="password" id="password" name="password" required
-                                class="pl-10 block w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                                class="pl-10 block w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1e5dac] focus:border-primary-500 transition-colors"
                                 placeholder="••••••••">
                             <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
                                 <i class="fas fa-eye text-gray-400 cursor-pointer hover:text-gray-600 toggle-password"></i>
@@ -173,7 +173,7 @@
                                 <i class="fas fa-lock text-gray-400"></i>
                             </div>
                             <input type="password" id="confirm-password" name="confirm-password" required
-                                class="pl-10 block w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                                class="pl-10 block w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1e5dac] focus:border-primary-500 transition-colors"
                                 placeholder="••••••••">
                             <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
                                 <i class="fas fa-eye text-gray-400 cursor-pointer hover:text-gray-600 toggle-password-confirm"></i>
@@ -183,7 +183,7 @@
 
                     <div>
                         <button type="submit"
-                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#1e5dac] hover:bg-[#214a7b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1e5dac] transition-colors">
                             <i class="fas fa-user-plus mr-2"></i> Sign Up as Student
                         </button>
                     </div>
@@ -192,13 +192,13 @@
                     <div class="text-center mb-4">
                         <p class="text-sm text-gray-600">
                             Already have an account?
-                            <a href="student-login.php" class="font-medium text-primary-600 hover:text-primary-500">
+                            <a href="signup" class="font-medium text-[#1e5dac] hover:[#214a7b]">
                                 Sign in as a student
                             </a>
                         </p>
                     </div>
                     <div class="flex justify-center">
-                        <a href="teacher-signup.php" class="text-sm text-gray-500 hover:text-gray-700 flex items-center">
+                        <a href="instructor-signup" class="text-sm text-[#1e5dac] hover:[#214a7b] flex items-center">
                             <i class="fas fa-chalkboard-teacher mr-2 text-xs"></i>
                             Teacher? Sign up here
                         </a>

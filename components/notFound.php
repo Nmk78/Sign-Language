@@ -17,9 +17,9 @@
                 },
                 extend: {
                     colors: {
-                        primary: '#6366F1', // Indigo
-                        secondary: '#F0F4F8',
-                        dark: '#111827',
+                        main: '#6366F1', // Indigo
+                        main2: '#F0F4F8',
+                        maindark: '#111827',
                     }
                 }
             }
@@ -45,10 +45,10 @@
     </style>
 </head>
 
-<body class="bg-white text-dark min-h-screen flex items-center justify-center p-4 font-sans">
+<body class="bg-white text-maindark min-h-screen flex items-center justify-center p-4 font-sans">
 
     <div class="relative w-full max-w-6xl mx-auto bg-background overflow-hidden">
-        <div class="absolute top-0 right-0 w-1/2 h-1/2 bg-secondary rounded-bl-full -z-10 opacity-70"></div>
+        <div class="absolute top-0 right-0 w-1/2 h-1/2 bg-main2 rounded-bl-full -z-10 opacity-70"></div>
 
         <div class="max-w-5xl w-full mx-auto px-4 py-8 md:py-12">
             <div class="flex flex-col md:flex-row items-center gap-12 md:gap-16">
@@ -67,11 +67,11 @@
                     </p>
 
                     <div class="pt-4 flex flex-col sm:flex-row gap-4">
-                        <a href="<?php echo htmlspecialchars('/'); ?>" class="inline-flex items-center justify-center px-6 py-3 bg-primary hover:bg-opacity-90 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl">
+                        <a href="<?php echo htmlspecialchars('/'); ?>" class="inline-flex items-center justify-center px-6 py-3 bg-main hover:bg-opacity-90 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl">
                             Return Home
                         </a>
 
-                        <a href="#" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 hover:border-primary text-primary font-medium rounded-lg transition-all duration-200">
+                        <a href="#" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 hover:border-main text-main font-medium rounded-lg transition-all duration-200">
                             Contact Support
                         </a>
                     </div>
@@ -88,7 +88,7 @@
                             <!-- Hand sign illustrations -->
                             <div class="relative z-10 flex items-center justify-center h-full">
                                 <div class="hand-animation">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-48 h-48 text-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-48 h-48 text-main">
                                         <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"></path>
                                         <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"></path>
                                         <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"></path>

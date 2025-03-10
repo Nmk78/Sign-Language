@@ -8,7 +8,7 @@ $password = 'root';
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
+} catch (PDOException $e) {
     die("Could not connect to the database $dbname :" . $e->getMessage());
 }
 
@@ -30,7 +30,7 @@ $offset = ($currentPage - 1) * $itemsPerPage;
 // Category filter
 $currentCategory = isset($_GET['category']) ? $_GET['category'] : '';
 if ($currentCategory) {
-    $filteredCourses = array_filter($courses, function($course) use ($currentCategory) {
+    $filteredCourses = array_filter($courses, function ($course) use ($currentCategory) {
         return $course['category'] === $currentCategory;
     });
 } else {
@@ -42,12 +42,14 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Course Catalog</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <script>
         tailwind.config = {
             theme: {
@@ -74,22 +76,32 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
     </script>
     <style>
         @keyframes saveAnimation {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
+
         .save-animation {
             animation: saveAnimation 0.3s ease-in-out;
         }
     </style>
 </head>
+
 <body class="bg-background font-sans">
     <div class="max-w-7xl mx-auto pt-4">
         <!-- <header class="mb-8 text-center">
             <h1 class="text-3xl md:text-4xl font-bold text-text">Course Catalog</h1>
             <p class="text-text-light mt-2">Explore our wide range of courses</p>
         </header> -->
-        
+
         <!-- Category Filter -->
         <div id="categoryFilter" class="mb-6 flex flex-wrap justify-center gap-2">
             <a href="?category=" class="px-4 py-2 border rounded <?php echo $currentCategory === '' ? 'bg-primary text-white' : 'bg-white text-primary'; ?>">
@@ -105,7 +117,7 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
         <!-- Courses Grid -->
         <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             <?php foreach ($pagedCourses as $course): ?>
-                <a href="<?php echo '/courseDetails?course='.htmlspecialchars($course['id']) ;?>" class="bg-white p-4 rounded-lg shadow-md relative ">
+                <a href="<?php echo '/courseDetails?course=' . htmlspecialchars($course['id']); ?>" class="bg-white p-4 rounded-lg shadow-md relative ">
                     <img src="<?php echo $course['thumbnail_url'] ? htmlspecialchars($course['thumbnail_url']) : 'https://via.placeholder.com/300x200.png?text=Course+Thumbnail'; ?>" alt="<?php echo htmlspecialchars($course['title']); ?>" class="w-full h-40 object-cover rounded-lg">
                     <h2 class="text-xl font-semibold mt-1"><?php echo htmlspecialchars($course['title']); ?></h2>
                     <p class="text-gray-600 text-sm"><?php echo htmlspecialchars($course['category'] ?? 'Uncategorized'); ?></p>
@@ -127,8 +139,8 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
         <!-- Pagination -->
         <div id="pagination" class="mt-8 flex justify-center space-x-2">
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                <a href="?page=<?php echo $i; ?><?php echo $currentCategory ? '&category=' . urlencode($currentCategory) : ''; ?>" 
-                   class="px-4 py-2 border rounded <?php echo $i == $currentPage ? 'bg-primary text-white' : 'bg-white text-primary'; ?>">
+                <a href="?page=<?php echo $i; ?><?php echo $currentCategory ? '&category=' . urlencode($currentCategory) : ''; ?>"
+                    class="px-4 py-2 border rounded <?php echo $i == $currentPage ? 'bg-primary text-white' : 'bg-white text-primary'; ?>">
                     <?php echo $i; ?>
                 </a>
             <?php endfor; ?>
@@ -139,7 +151,7 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
         function toggleSave(courseId) {
             const button = document.querySelector(`button[onclick="toggleSave(${courseId})"]`);
             const icon = button.querySelector('svg');
-            
+
             // Toggle visual state
             icon.classList.toggle('text-primary');
             icon.classList.toggle('fill-current');
@@ -150,10 +162,10 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
 
             // Get saved courses from localStorage
             let savedCourses = JSON.parse(localStorage.getItem('savedCourses')) || [];
-            
+
             // Check if course is already saved
             const courseIndex = savedCourses.indexOf(courseId);
-            
+
             // Toggle save state in localStorage
             if (courseIndex === -1) {
                 // Course not saved, add it
@@ -164,7 +176,7 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
                 savedCourses.splice(courseIndex, 1);
                 console.log(`Course ${courseId} removed from saved`);
             }
-            
+
             // Save updated list back to localStorage
             localStorage.setItem('savedCourses', JSON.stringify(savedCourses));
         }
@@ -182,4 +194,5 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
         });
     </script>
 </body>
+
 </html>

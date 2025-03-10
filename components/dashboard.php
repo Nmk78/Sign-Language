@@ -24,10 +24,10 @@ if (!isset($_SESSION['user'])) {
             theme: {
                 extend: {
                     colors: {
-                        'primary': '#4A90E2',
-                        'primary-dark': '#2A69A4',
-                        'secondary': '#7ED321',
-                        'accent': '#F5A623',
+                        'primary': '#1e5dac',
+                        'primary-dark': '#154785',
+                        'secondary': '#b7c5da',
+                        'accent': '#eae2e4',
                         'success': '#10B981',
                         'warning': '#F1C40F',
                         'error': '#E74C3C',
@@ -35,6 +35,9 @@ if (!isset($_SESSION['user'])) {
                         'surface': '#FFFFFF',
                         'text': '#333333',
                         'text-light': '#7F8C8D',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
                     }
                 }
             }
