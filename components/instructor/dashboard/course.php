@@ -513,6 +513,7 @@ $courses = getUserCourses($user_id);
                         <form id="addLessonForm" action="/upload_lesson.php" method="POST" enctype="multipart/form-data"
                             class="space-y-5">
                             <input type="hidden" id="modalCourseId" name="course_id">
+                            <input type="hidden" id="user_id" name="user_id" value="<?php echo $_SESSION['user']['user_id']; ?>">
 
                             <div>
                                 <label for="lessonTitle" class="block text-sm font-medium text-gray-700 mb-1">Lesson

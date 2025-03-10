@@ -21,7 +21,7 @@ $course_id = isset($_GET['course']) ? intval($_GET['course']) : 0;
 $lesson_id = isset($_GET['lesson']) ? intval($_GET['lesson']) : 0;
 
 // Fetch course information
-$course_stmt = $conn->prepare("SELECT title, description, thumbnail_url FROM courses WHERE id = ?");
+$course_stmt = $conn->prepare("SELECT id, title, description, thumbnail_url, category, price FROM courses WHERE id = ?");
 $course_stmt->bind_param("i", $course_id);
 $course_stmt->execute();
 $course_result = $course_stmt->get_result();
@@ -80,7 +80,7 @@ if ($lesson_id > 0) {
     $comments_stmt->close();
 }
 
-$user_id = $_SESSION['user']['user_id']; // Assuming user is logged in and session is set
+$user_id = isset($_SESSION['user']['user_id']) ? $_SESSION['user']['user_id'] : null;
 $course_id = $_GET['course']; // Course ID from URL or request
 
 if (!isset($_SESSION['form_token'])) {
@@ -149,7 +149,7 @@ function formatTimeAgo($datetime)
 
 <body class="bg-gray-50">
     <!-- Main Content -->
-    <div class="container mx-auto px-6 py-8">
+    <div class="container max-w-7xl mx-auto px-6 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Left Column (2/3 width on large screens) -->
             <div class="lg:col-span-2">
@@ -211,22 +211,60 @@ function formatTimeAgo($datetime)
 
                     <?php else: ?>
                         <!-- Not Enrolled: Show Enrollment Option -->
-                        <div class="max-w-md mx-auto rounded-lg shadow-md border border-gray-200 overflow-hidden">
-                            <div class="h-48 bg-cover bg-center"
-                                style="background-image: url('<?php echo $course['thumbnail_url']; ?>');">
-                                <div class="h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
-                                    <form method="POST" id="enrollForm" action="handlers/enroll.php">
-                                        <input type="hidden" name="user_id" value="<?= $user_id ?>">
-                                        <input type="hidden" name="course_id" value="<?= $course_id ?>">
-                                        <button type="submit" id="enrollBtn" class="bg-white text-gray-900 px-6 py-3 rounded-md font-medium
-                                    hover:bg-gray-100 hover:text-blue-800 transition-all duration-200 shadow-md">
-                                            Enroll Now
-                                        </button>
-                                    </form>
+                        <div class="h-96 mx-auto bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                            <!-- Course Image with Overlay -->
+                            <div class="relative h-72">
+                                <!-- Course Thumbnail -->
+                                <img class="h-full w-full aspect-video min-h-72 object-cover" src="<?php echo $course['thumbnail_url']; ?>" alt="<?php echo $course['title']; ?>">
+
+                                <!-- Category Badge -->
+                                <span class="absolute top-3 left-3 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                                    <?php echo $course['category']; ?>
+                                </span>
+                            </div>
+
+                            <!-- Course Content -->
+                            <div class="flex justify-between items-center p-5 space-y-3">
+                                <!-- Course Title -->
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-900 mb-1 truncate"><?php echo $course['title']; ?></h3>
+
+                                    <!-- Course Description -->
+                                    <p class="text-gray-600 text-sm mb-3 line-clamp-2"><?php echo $course['description']; ?></p>
                                 </div>
+                                <!-- Enrollment Form -->
+                                <form method="POST" action="handlers/enroll.php" class="">
+                                    <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
+                                    <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
+
+                                    <!-- Enrollment Button -->
+                                    <button
+                                        type="submit"
+                                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center group disabled:opacity-50"
+                                        <?php if (empty($user_id)) echo 'disabled'; ?>>
+                                        Enroll Now
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2 transform group-hover:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
+
                     <?php endif; ?>
+                    <?php
+                    if (isset($_GET['success'])) {
+
+                        echo "<script>
+                showToast('success', htmlspecialchars($_GET['success']));
+              </script>";
+                    }
+
+                    if (isset($_GET['error'])) {
+                        echo '<div class="error">' . htmlspecialchars($_GET['error']) . '</div>';
+                    }
+                    ?>
+
                 </div>
 
                 <div class="mt-5">
@@ -267,8 +305,8 @@ function formatTimeAgo($datetime)
                         <h3 class="text-lg font-semibold">Course Lessons</h3>
                         <div class="text-sm text-gray-500">
                             <span class="font-medium text-indigo-600"><?php echo count(array_filter($lessons, function ($l) {
-                                return isset($l['completed']) && $l['completed'];
-                            })); ?></span>
+                                                                            return isset($l['completed']) && $l['completed'];
+                                                                        })); ?></span>
                             <span>/</span>
                             <span><?php echo count($lessons); ?></span>
                             <span class="ml-1">completed</span>
@@ -298,8 +336,8 @@ function formatTimeAgo($datetime)
                                 ?>
                                 <a href="?course=<?php echo $course_id; ?>&lesson=<?php echo $lesson['id']; ?>" class="flex items-start gap-3 border  p-3 rounded-lg transition-all duration-200 relative
                             <?php echo $isActive
-                                ? 'bg-indigo-50 border-indigo-100'
-                                : 'hover:bg-gray-50  border-transparent hover:border-gray-100'; ?>">
+                                    ? 'bg-indigo-50 border-indigo-100'
+                                    : 'hover:bg-gray-50  border-transparent hover:border-gray-100'; ?>">
 
                                     <!-- Lesson number or status indicator -->
                                     <!-- <div class="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium
@@ -439,7 +477,7 @@ function formatTimeAgo($datetime)
 
         // Handle comment form submission
         if (commentForm) {
-            commentForm.addEventListener('submit', function (e) {
+            commentForm.addEventListener('submit', function(e) {
                 e.preventDefault();
 
                 if (!commentText.value.trim()) {
@@ -517,7 +555,7 @@ function formatTimeAgo($datetime)
             });
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const userId = localStorage.getItem('id');
             if (userId) {
                 document.getElementById('userId').value = userId;
@@ -684,16 +722,16 @@ function formatTimeAgo($datetime)
             const userId = localStorage.getItem('id');
 
             fetch("handlers/submit_quiz.php", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    lesson_id: lessonId,
-                    userId: userId,
-                    answers: answers,
-                }),
-            })
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        lesson_id: lessonId,
+                        userId: userId,
+                        answers: answers,
+                    }),
+                })
                 .then((response) => response.json())
                 .then((results) => {
                     showResults(results)
@@ -775,7 +813,6 @@ function formatTimeAgo($datetime)
             // Then navigate to the next lesson
             navigateToNextLesson(lessonId);
         }
-
     </script>
 </body>
 
