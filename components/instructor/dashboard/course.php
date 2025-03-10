@@ -373,14 +373,14 @@ $courses = getUserCourses($user_id);
         <!-- quiz modal -->
         <div id="myModal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 hidden">
             <div class="bg-white p-6 rounded-lg shadow-lg max-h-[80vh] overflow-y-auto">
-                <div class="flex flex-col overflow-scroll justify-between items-center">
+                <div class="flex flex-col justify-between items-center">
 
-                    <div class="flex">
+                    <div class="flex float-left">
                         <h2 class="text-lg font-bold">Form Title</h2>
                         <button class="text-gray-500 hover:text-red-500" onclick="closeQuizModal()">&times;</button>
                     </div>
 
-                    <form id="quizForm" method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" enctype="multipart/form-data">
+                    <form id="quizForm" method="POST" action="handlers/addQuiz.php" enctype="multipart/form-data">
                         <input type="hidden" id="lessonIdInput" name="lesson_id">
                         <?php include 'quizForm.php' ?>
 
