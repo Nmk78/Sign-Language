@@ -25,34 +25,33 @@ $features = [
 ];
 
 $services = [
-    "Research Creation",
-    "UX/UI Analysis",
-    "Web Development",
-    "Market Analysis",
-    "Product Design"
+    "Sign Language Basics",
+    "Advanced Signing Skills",
+    "Deaf Culture Education",
+    "Sign Language Interpretation",
+    "Interactive Learning Tools"
 ];
 
 $testimonials = [
     [
-        "name" => "Sarah Johnson",
-        "role" => "UX Designer",
+        "name" => "Sarah Thompson",
+        "role" => "ASL Student",
         "image" => "https://randomuser.me/api/portraits/women/1.jpg",
-        "text" => "EDUTOCK completely transformed my career path. The courses are well-structured and the instructors are industry experts."
+        "text" => "Silent Voice transformed my ability to communicate with the deaf community. The ASL courses are clear, engaging, and taught by skilled signers."
     ],
     [
-        "name" => "Michael Chen",
-        "role" => "Web Developer",
+        "name" => "Michael Davis",
+        "role" => "Sign Language Interpreter",
         "image" => "https://randomuser.me/api/portraits/men/2.jpg",
-        "text" => "The flexibility of learning at my own pace while getting real-world projects to work on made all the difference in my learning journey."
+        "text" => "Learning ASL through Silent Voice gave me the flexibility to practice signs at my own pace, with real-world scenarios that prepared me for interpreting."
     ],
     [
-        "name" => "Emily Rodriguez",
-        "role" => "Product Manager",
+        "name" => "Emily Carter",
+        "role" => "Deaf Education Advocate",
         "image" => "https://randomuser.me/api/portraits/women/3.jpg",
-        "text" => "I've taken courses from several platforms, but Slient Voice stands out with its practical approach and supportive community."
+        "text" => "I've tried many platforms, but Silent Voice stands out with its practical ASL lessons and a community that truly supports deaf culture."
     ]
 ];
-
 $faqs = [
     [
         "question" => "How do I enroll in a course?",
@@ -186,7 +185,7 @@ $faqs = [
                     "Hands That Speak, <span class="text-accent ml-7">Hearts That Connect."</span>
                 </h1>
                 <p class="text-lg text-white/90 max-w-lg">
-                Learn, connect, and communicate effortlessly with our interactive sign language courses. Empower inclusivity with technology.
+                    Learn, connect, and communicate effortlessly with our interactive sign language courses. Empower inclusivity with technology.
                 </p>
                 <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                     <a href="/category" class="bg-[#ffffff] hover:bg-[#154785] text-[#154785] hover:text-white px-8 py-3 rounded-md font-medium transition-all">
@@ -200,10 +199,10 @@ $faqs = [
 
             <!-- Image Section -->
             <div class="relative flex justify-center">
-    <img src="/assets/SCIENT.gif" 
-        alt="Sign Language Learning" 
-        class="w-full max-w-[600px] md:max-w-[500px] lg:max-w-[550px] h-auto object-cover rounded-2xl shadow-xl">
-</div>
+                <img src="/assets/SCIENT.gif"
+                    alt="Sign Language Learning"
+                    class="w-full max-w-[600px] md:max-w-[500px] lg:max-w-[550px] h-auto object-cover rounded-2xl shadow-xl">
+            </div>
 
         </div>
     </section>
@@ -214,11 +213,27 @@ $faqs = [
     <section class="relative py-20 bg-white overflow-hidden" id="features">
         <!-- Top Wave Background -->
         <div class="absolute top-0 left-0 w-screen">
-       <svg id="wave" style="transform:rotate(180deg); transition: 0.3s" viewBox="0 0 1440 170" version="1.1" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sw-gradient-0" x1="0" x2="0" y1="1" y2="0"><stop stop-color="rgba(160, 186, 224, 1)" offset="0%"></stop><stop stop-color="rgba(253.093, 253.093, 253.093, 1)" offset="100%"></stop></linearGradient></defs><path style="transform:translate(0, 0px); opacity:1" fill="url(#sw-gradient-0)" d="M0,68L30,62.3C60,57,120,45,180,45.3C240,45,300,57,360,70.8C420,85,480,102,540,102C600,102,660,85,720,90.7C780,96,840,125,900,116.2C960,108,1020,62,1080,36.8C1140,11,1200,6,1260,22.7C1320,40,1380,79,1440,82.2C1500,85,1560,51,1620,39.7C1680,28,1740,40,1800,56.7C1860,74,1920,96,1980,102C2040,108,2100,96,2160,90.7C2220,85,2280,85,2340,93.5C2400,102,2460,119,2520,107.7C2580,96,2640,57,2700,59.5C2760,62,2820,108,2880,107.7C2940,108,3000,62,3060,39.7C3120,17,3180,17,3240,36.8C3300,57,3360,96,3420,110.5C3480,125,3540,113,3600,99.2C3660,85,3720,68,3780,68C3840,68,3900,85,3960,82.2C4020,79,4080,57,4140,39.7C4200,23,4260,11,4290,5.7L4320,0L4320,170L4290,170C4260,170,4200,170,4140,170C4080,170,4020,170,3960,170C3900,170,3840,170,3780,170C3720,170,3660,170,3600,170C3540,170,3480,170,3420,170C3360,170,3300,170,3240,170C3180,170,3120,170,3060,170C3000,170,2940,170,2880,170C2820,170,2760,170,2700,170C2640,170,2580,170,2520,170C2460,170,2400,170,2340,170C2280,170,2220,170,2160,170C2100,170,2040,170,1980,170C1920,170,1860,170,1800,170C1740,170,1680,170,1620,170C1560,170,1500,170,1440,170C1380,170,1320,170,1260,170C1200,170,1140,170,1080,170C1020,170,960,170,900,170C840,170,780,170,720,170C660,170,600,170,540,170C480,170,420,170,360,170C300,170,240,170,180,170C120,170,60,170,30,170L0,170Z"></path></svg>
+            <svg id="wave" style="transform:rotate(180deg); transition: 0.3s" viewBox="0 0 1440 170" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="sw-gradient-0" x1="0" x2="0" y1="1" y2="0">
+                        <stop stop-color="rgba(160, 186, 224, 1)" offset="0%"></stop>
+                        <stop stop-color="rgba(253.093, 253.093, 253.093, 1)" offset="100%"></stop>
+                    </linearGradient>
+                </defs>
+                <path style="transform:translate(0, 0px); opacity:1" fill="url(#sw-gradient-0)" d="M0,68L30,62.3C60,57,120,45,180,45.3C240,45,300,57,360,70.8C420,85,480,102,540,102C600,102,660,85,720,90.7C780,96,840,125,900,116.2C960,108,1020,62,1080,36.8C1140,11,1200,6,1260,22.7C1320,40,1380,79,1440,82.2C1500,85,1560,51,1620,39.7C1680,28,1740,40,1800,56.7C1860,74,1920,96,1980,102C2040,108,2100,96,2160,90.7C2220,85,2280,85,2340,93.5C2400,102,2460,119,2520,107.7C2580,96,2640,57,2700,59.5C2760,62,2820,108,2880,107.7C2940,108,3000,62,3060,39.7C3120,17,3180,17,3240,36.8C3300,57,3360,96,3420,110.5C3480,125,3540,113,3600,99.2C3660,85,3720,68,3780,68C3840,68,3900,85,3960,82.2C4020,79,4080,57,4140,39.7C4200,23,4260,11,4290,5.7L4320,0L4320,170L4290,170C4260,170,4200,170,4140,170C4080,170,4020,170,3960,170C3900,170,3840,170,3780,170C3720,170,3660,170,3600,170C3540,170,3480,170,3420,170C3360,170,3300,170,3240,170C3180,170,3120,170,3060,170C3000,170,2940,170,2880,170C2820,170,2760,170,2700,170C2640,170,2580,170,2520,170C2460,170,2400,170,2340,170C2280,170,2220,170,2160,170C2100,170,2040,170,1980,170C1920,170,1860,170,1800,170C1740,170,1680,170,1620,170C1560,170,1500,170,1440,170C1380,170,1320,170,1260,170C1200,170,1140,170,1080,170C1020,170,960,170,900,170C840,170,780,170,720,170C660,170,600,170,540,170C480,170,420,170,360,170C300,170,240,170,180,170C120,170,60,170,30,170L0,170Z"></path>
+            </svg>
         </div>
         <!-- Bottom Wave Background -->
         <div class="absolute bottom-0 left-0 w-full">
-        <svg id="wave" style="transform:rotate(0deg); transition: 0.3s" viewBox="0 0 1440 170" version="1.1" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sw-gradient-0" x1="0" x2="0" y1="1" y2="0"><stop stop-color="rgba(187, 241, 255, 1)" offset="0%"></stop><stop stop-color="rgba(253.093, 253.093, 253.093, 1)" offset="100%"></stop></linearGradient></defs><path style="transform:translate(0, 0px); opacity:1" fill="url(#sw-gradient-0)" d="M0,68L30,62.3C60,57,120,45,180,45.3C240,45,300,57,360,70.8C420,85,480,102,540,102C600,102,660,85,720,90.7C780,96,840,125,900,116.2C960,108,1020,62,1080,36.8C1140,11,1200,6,1260,22.7C1320,40,1380,79,1440,82.2C1500,85,1560,51,1620,39.7C1680,28,1740,40,1800,56.7C1860,74,1920,96,1980,102C2040,108,2100,96,2160,90.7C2220,85,2280,85,2340,93.5C2400,102,2460,119,2520,107.7C2580,96,2640,57,2700,59.5C2760,62,2820,108,2880,107.7C2940,108,3000,62,3060,39.7C3120,17,3180,17,3240,36.8C3300,57,3360,96,3420,110.5C3480,125,3540,113,3600,99.2C3660,85,3720,68,3780,68C3840,68,3900,85,3960,82.2C4020,79,4080,57,4140,39.7C4200,23,4260,11,4290,5.7L4320,0L4320,170L4290,170C4260,170,4200,170,4140,170C4080,170,4020,170,3960,170C3900,170,3840,170,3780,170C3720,170,3660,170,3600,170C3540,170,3480,170,3420,170C3360,170,3300,170,3240,170C3180,170,3120,170,3060,170C3000,170,2940,170,2880,170C2820,170,2760,170,2700,170C2640,170,2580,170,2520,170C2460,170,2400,170,2340,170C2280,170,2220,170,2160,170C2100,170,2040,170,1980,170C1920,170,1860,170,1800,170C1740,170,1680,170,1620,170C1560,170,1500,170,1440,170C1380,170,1320,170,1260,170C1200,170,1140,170,1080,170C1020,170,960,170,900,170C840,170,780,170,720,170C660,170,600,170,540,170C480,170,420,170,360,170C300,170,240,170,180,170C120,170,60,170,30,170L0,170Z"></path></svg>
+            <svg id="wave" style="transform:rotate(0deg); transition: 0.3s" viewBox="0 0 1440 170" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="sw-gradient-0" x1="0" x2="0" y1="1" y2="0">
+                        <stop stop-color="rgba(187, 241, 255, 1)" offset="0%"></stop>
+                        <stop stop-color="rgba(253.093, 253.093, 253.093, 1)" offset="100%"></stop>
+                    </linearGradient>
+                </defs>
+                <path style="transform:translate(0, 0px); opacity:1" fill="url(#sw-gradient-0)" d="M0,68L30,62.3C60,57,120,45,180,45.3C240,45,300,57,360,70.8C420,85,480,102,540,102C600,102,660,85,720,90.7C780,96,840,125,900,116.2C960,108,1020,62,1080,36.8C1140,11,1200,6,1260,22.7C1320,40,1380,79,1440,82.2C1500,85,1560,51,1620,39.7C1680,28,1740,40,1800,56.7C1860,74,1920,96,1980,102C2040,108,2100,96,2160,90.7C2220,85,2280,85,2340,93.5C2400,102,2460,119,2520,107.7C2580,96,2640,57,2700,59.5C2760,62,2820,108,2880,107.7C2940,108,3000,62,3060,39.7C3120,17,3180,17,3240,36.8C3300,57,3360,96,3420,110.5C3480,125,3540,113,3600,99.2C3660,85,3720,68,3780,68C3840,68,3900,85,3960,82.2C4020,79,4080,57,4140,39.7C4200,23,4260,11,4290,5.7L4320,0L4320,170L4290,170C4260,170,4200,170,4140,170C4080,170,4020,170,3960,170C3900,170,3840,170,3780,170C3720,170,3660,170,3600,170C3540,170,3480,170,3420,170C3360,170,3300,170,3240,170C3180,170,3120,170,3060,170C3000,170,2940,170,2880,170C2820,170,2760,170,2700,170C2640,170,2580,170,2520,170C2460,170,2400,170,2340,170C2280,170,2220,170,2160,170C2100,170,2040,170,1980,170C1920,170,1860,170,1800,170C1740,170,1680,170,1620,170C1560,170,1500,170,1440,170C1380,170,1320,170,1260,170C1200,170,1140,170,1080,170C1020,170,960,170,900,170C840,170,780,170,720,170C660,170,600,170,540,170C480,170,420,170,360,170C300,170,240,170,180,170C120,170,60,170,30,170L0,170Z"></path>
+            </svg>
         </div>
 
         <!-- Floating Elements -->
@@ -236,10 +251,10 @@ $faqs = [
                 </p>
             </div>
             <?php
-        // Assuming you have a database connection established
-        $pdo = new PDO("mysql:host=localhost;dbname=sign_language", "root", "root");
-        // Query to get courses with enrollment count
-        $query = "
+            // Assuming you have a database connection established
+            $pdo = new PDO("mysql:host=localhost;dbname=sign_language", "root", "root");
+            // Query to get courses with enrollment count
+            $query = "
             SELECT 
                 c.*,
                 COUNT(ce.id) as enrolled_students
@@ -247,14 +262,14 @@ $faqs = [
             LEFT JOIN course_enrollments ce ON c.id = ce.course_id
             GROUP BY c.id
         ";
-        $stmt = $pdo->prepare($query);
-        $stmt->execute();
-        $pagedCourses = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo '<pre>';
-        print_r($pagedCourses);
-        echo '</pre>';
+            $stmt = $pdo->prepare($query);
+            $stmt->execute();
+            $pagedCourses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            // echo '<pre>';
+            // print_r($pagedCourses);
+            // echo '</pre>';
 
-        ?>
+            ?>
             <div class="w-full overflow-x-auto snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
                 <div class="grid grid-flow-col auto-cols-max gap-8 py-4 px-2">
                     <?php foreach ($features as $index => $feature): ?>
@@ -276,13 +291,14 @@ $faqs = [
     </section>
 
     <!-- Services Section -->
+
     <section class="py-16 bg-white" id="services">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="space-y-8">
-                    <h2 class="text-3xl md:text-4xl font-bold text-primary mb-4">EXPERIENCE EXCELLENCE<br>OUR SERVICES</h2>
-                    <p class="text-text-light text-lg">
-                        We provide comprehensive educational services designed to help you succeed in today's competitive landscape.
+            <div class="grid md:grid-cols-9 gap-9 items-center">
+                <div class="space-y-8 col-span-4">
+                    <h2 class="text-3xl md:text-4xl font-bold text-primary mb-4">MASTER SIGN LANGUAGE</h2>
+                    <p class="text-text-light text-md">
+                        We offer specialized educational services to help you learn and excel in sign language, connecting you with the deaf community.
                     </p>
                     <div class="space-y-6">
                         <?php foreach ($services as $index => $service): ?>
@@ -295,12 +311,19 @@ $faqs = [
                         <?php endforeach; ?>
                     </div>
                     <a href="#" class="inline-block bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-md transition-colors duration-200 font-medium">
-                        View All Services
+                        Explore All Courses
                     </a>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-5PTvlftctpgPVeHoeVoKmAvWN0Azyx.png" alt="Interior Design" class="w-full rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300">
-                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-5PTvlftctpgPVeHoeVoKmAvWN0Azyx.png" alt="Product Design" class="w-full rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300 mt-8">
+                <div class="grid grid-cols-3 gap-4 col-span-5">
+                    <img src="/assets/feature1.jpg"
+                        alt="Sign Language Instruction"
+                        class="w-full rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300">
+                    <img src="/assets/feature2.jpg"
+                        alt="Deaf Culture Workshop"
+                        class="w-full rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300 mt-8"> 
+                        <img src="/assets/feature3.jpg"
+                        alt="Deaf Culture Workshop"
+                        class="w-full rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300 mb-5">
                 </div>
             </div>
         </div>
@@ -310,42 +333,42 @@ $faqs = [
     <section class="py-16 bg-background" id="courses">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold text-primary mb-4">
-                    PERFECT ONLINE COURSES<br>FOR YOUR CAREER
+                <h2 class="text-3xl md:text-3xl font-bold text-primary mb-4">
+                    PERFECT SIGN LANGUAGE COURSES<br>FOR YOU
                 </h2>
                 <p class="text-text-light text-lg">
-                    Explore our most popular courses designed to help you advance in your career
+                    Explore our most popular courses to help you advance in your communication
                 </p>
             </div>
             <!-- for 3 popular courses -->
             <div id="coursesGrid" class="flex flex-row flex-nowrap overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
-            <?php foreach ($pagedCourses as $course): ?>
-                <a href="<?php echo '/courseDetails?course=' . htmlspecialchars($course['id']); ?>" class="bg-white rounded-xl overflow-hidden shadow-lg course-card transition-all duration-300 max-w-96 min-w-96 mb-5 flex-shrink-0 mr-8">
-                    <div class="relative">
-                        <img src="<?php echo $course['thumbnail_url'] ? htmlspecialchars($course['thumbnail_url']) : 'https://via.placeholder.com/300x200.png?text=Course+Thumbnail'; ?>" 
-                            alt="<?php echo htmlspecialchars($course['title']); ?>" 
-                            class="w-full aspect-video object-cover">
-                        <!-- Duration could be added here if available in data -->
-                        <div class="absolute top-4 right-4 rounded-full text-sm font-medium text-primary">
-                        <button onclick="toggleSave(<?php echo $course['id']; ?>)" 
-                                        class="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" 
-                                        class="h-6 w-6 transition-colors duration-300 ease-in-out text-blue-400" 
-                                        viewBox="0 0 24 24" 
-                                        stroke="currentColor" 
+                <?php foreach ($pagedCourses as $course): ?>
+                    <a href="<?php echo '/courseDetails?course=' . htmlspecialchars($course['id']); ?>" class="bg-white rounded-xl overflow-hidden shadow-lg course-card transition-all duration-300 max-w-96 min-w-96 mb-5 flex-shrink-0 mr-8">
+                        <div class="relative">
+                            <img src="<?php echo $course['thumbnail_url'] ? htmlspecialchars($course['thumbnail_url']) : 'https://via.placeholder.com/300x200.png?text=Course+Thumbnail'; ?>"
+                                alt="<?php echo htmlspecialchars($course['title']); ?>"
+                                class="w-full aspect-video object-cover">
+                            <!-- Duration could be added here if available in data -->
+                            <div class="absolute top-4 right-4 rounded-full text-sm font-medium text-primary">
+                                <button onclick="toggleSave(<?php echo $course['id']; ?>)"
+                                    class="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="h-6 w-6 transition-colors duration-300 ease-in-out text-blue-400"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
                                         stroke-width="2">
-                                        <path stroke-linecap="round" 
-                                            stroke-linejoin="round" 
+                                        <path stroke-linecap="round"
+                                            stroke-linejoin="round"
                                             d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                                     </svg>
                                 </button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="p-6">
-                        <!-- Rating section - adding placeholder since original doesn't have rating -->
-                        <!-- <div class="flex items-center space-x-2 mb-3">
+                        <div class="p-6">
+                            <!-- Rating section - adding placeholder since original doesn't have rating -->
+                            <!-- <div class="flex items-center space-x-2 mb-3">
                             <div class="flex">
-                                <?php 
+                                <?php
                                 // Using a default rating since it's not in original data
                                 $rating = $course['rating'] ?? 4.5;
                                 for ($i = 0; $i < 5; $i++): ?>
@@ -360,17 +383,17 @@ $faqs = [
                             </div>
                             <span class="text-text-light text-sm">(<?php echo $rating; ?>)</span>
                         </div> -->
-                        
-                        <h3 class="font-semibold text-primary text-xl mb-2">
-                            <?php echo htmlspecialchars($course['title']); ?>
-                        </h3>
-                        
-                        <div class="flex items-center text-text-light text-sm mb-4">
-                            <i class="fas fa-users mr-2"></i>
-                            <span><?php echo number_format($course['enrolled_students']); ?> students</span>
-                        </div>
-                        
-                        <!-- <div class="flex justify-between items-center pt-4 border-t border-gray-100">
+
+                            <h3 class="font-semibold text-primary text-xl mb-2">
+                                <?php echo htmlspecialchars($course['title']); ?>
+                            </h3>
+
+                            <div class="flex items-center text-text-light text-sm mb-4">
+                                <i class="fas fa-users mr-2"></i>
+                                <span><?php echo number_format($course['enrolled_students']); ?> students</span>
+                            </div>
+
+                            <!-- <div class="flex justify-between items-center pt-4 border-t border-gray-100">
                             <span class="text-primary font-bold text-xl">
                                 <?php echo $course['price'] ?? 'N/A'; ?>
                             </span>
@@ -392,10 +415,10 @@ $faqs = [
                                 </button>
                             </div>
                         </div> -->
-                    </div>
-                </a>
-            <?php endforeach; ?>
-        </div>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            </div>
             <div class="text-center mt-12">
                 <a href="category" class="inline-block border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 rounded-md transition-colors duration-200 font-medium">
                     View All Courses

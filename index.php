@@ -395,8 +395,7 @@ $courses = [
         <div class="container max-w-6xl mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                                 <div class="flex items-center space-x-2 mb-4">
-                       <img src="assets/bird.jpg" alt="" width="150" height="" class="overflow-hidden h-24 object-cover">
-                        <span class="font-bold text-lg">SILENT VOICE</span>
+                       <img src="assets/logobgremove.png" alt="" class="overflow-hidden h-full object-cover">
                     </div>
                 <div>
 
@@ -464,7 +463,7 @@ $courses = [
                                 <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
                                 <circle cx="12" cy="10" r="3"/>
                             </svg>
-                            <span class="text-white/70">123 Sign Language St.<br>San Francisco, CA 94103</span>
+                            <span class="text-white/70">123 Sign Language St.<br>Myeik - Tanithary, Myanmar</span>
                         </li>
                     </ul>
                 </div>
