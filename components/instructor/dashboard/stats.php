@@ -10,8 +10,25 @@ if ($conn->connect_error) {
     $db_error = "Database connection failed: " . $conn->connect_error;
 }
 
+// TODO  i call the user_id for localstorage and use for my classes and recent activity
+echo "<script>
+    var userId = localStorage.getItem('id');
+    if (userId) {
+        document.cookie = 'user_id=' + userId + '; path=/; expires=' + new Date(Date.now() + 30*24*60*60*1000).toUTCString(); 
+    }
+</script>";
+
+// Read user ID from cookies in PHP
+if (isset($_COOKIE['user_id'])) {
+    $user_id = intval($_COOKIE['user_id']);
+    $_SESSION['user_id'] = $user_id; // Store in session for extra persistence
+} else {
+    $user_id = 0;
+}
+
 // Get teacher data
-$teacher_id = $_SESSION['user_id'] ?? 1; // Default for demo
+$teacher_id = $_SESSION['user_id'];
+// echo $teacher_id; 
 
 // Fetch classes
 $classes = [];
@@ -408,97 +425,142 @@ function timeAgo($datetime) {
         </div>
 
         <!-- Dashboard Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- My Classes Card -->
-            <div class="bg-white shadow rounded-lg overflow-hidden fade-in" style="animation-delay: 0.2s">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900">My Classes</h3>
-                </div>
-                <div class="p-6">
-                    <?php if (empty($classes)): ?>
-                    <p class="text-gray-500">You haven't created any classes yet.</p>
-                    <a href="#" class="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-500 hover:bg-blue-600">
-                        Create Your First Class
-                    </a>
-                    <?php else: ?>
-                    <ul class="space-y-2">
-                        <?php foreach ($classes as $class): ?>
-                        <li class="bg-gray-50 p-3 rounded-md hover:bg-gray-100 transition-colors">
-                            <div class="flex justify-between items-center">
-                                <span class="font-medium text-gray-800"><?php echo htmlspecialchars($class['title']); ?></span>
-                                <span class="text-xs px-2 py-1 rounded-full <?php echo $class['status'] === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'; ?>">
-                                    <?php echo ucfirst($class['status'] ?? 'Active'); ?>
-                                </span>
-                            </div>
-                            <div class="text-xs text-gray-500 mt-1"><?php echo $class['student_count'] ?? 0; ?> students enrolled</div>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <div class="mt-3 text-center">
-                        <a href="#" class="text-sm text-blue-500 hover:text-blue-600">View all classes</a>
-                    </div>
-                    <?php endif; ?>
-                </div>
-            </div>
+         <!-- TODO CHANGE grid col to 2  -->
+         <?php
+         $teacher_id = $_SESSION['user_id']; // Default for demo
 
-            <!-- Upcoming Assignments Card -->
-            <div class="bg-white shadow rounded-lg overflow-hidden fade-in" style="animation-delay: 0.3s">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900">Upcoming Assignments</h3>
-                </div>
-                <div class="p-6">
-                    <?php if (empty($assignments)): ?>
-                    <p class="text-gray-500">No upcoming assignments.</p>
-                    <a href="#" class="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-500 hover:bg-blue-600">
-                        Create Assignment
-                    </a>
-                    <?php else: ?>
-                    <ul class="space-y-2">
-                        <?php foreach ($assignments as $assignment): ?>
-                        <li class="bg-gray-50 p-3 rounded-md hover:bg-gray-100 transition-colors">
-                            <div class="flex justify-between items-center">
-                                <span class="font-medium text-gray-800"><?php echo htmlspecialchars($assignment['title']); ?></span>
-                            </div>
-                            <div class="flex justify-between text-xs text-gray-500 mt-1">
-                                <span>Course: <?php echo htmlspecialchars($assignment['course_id']); ?></span>
-                                <span>Due: <?php echo formatDate($assignment['due_date']); ?></span>
-                            </div>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <div class="mt-3 text-center">
-                        <a href="#" class="text-sm text-blue-500 hover:text-blue-600">View all assignments</a>
-                    </div>
-                    <?php endif; ?>
-                </div>
-            </div>
+// Database connection
+$conn = mysqli_connect("localhost", "root", "root", "sign_language");
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
 
-            <!-- Recent Activities -->
-            <div class="bg-white shadow rounded-lg overflow-hidden fade-in" style="animation-delay: 0.4s">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900">Recent Activities</h3>
-                </div>
-                <div class="p-6 max-h-80 overflow-y-auto scrollbar-thin">
-                    <?php if (empty($activities)): ?>
-                    <p class="text-gray-500">No recent activities</p>
-                    <?php else: ?>
-                    <ul class="space-y-4">
-                        <?php foreach ($activities as $activity): ?>
-                        <li class="flex items-start justify-between border-b pb-2 last:border-b-0">
-                            <div>
-                                <h3 class="font-medium text-gray-800"><?php echo htmlspecialchars($activity['username']); ?> 
-                                    <span class="text-gray-600 text-sm">(<?php echo htmlspecialchars($activity['action']); ?>)</span>
-                                </h3>
-                                <p class="text-sm text-gray-600"><?php echo htmlspecialchars($activity['details']); ?></p>
-                            </div>
-                            <span class="text-xs text-gray-500"><?php echo timeAgo($activity['timestamp']); ?></span>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <?php endif; ?>
-                </div>
-            </div>
+// Fetch classes (courses created by the user)
+$classes_stmt = $conn->prepare("
+    SELECT 
+        c.id,
+        c.title,
+        c.status,
+        (SELECT COUNT(DISTINCT cl.user_id) 
+         FROM completed_lessons cl 
+         JOIN lesson l ON cl.lesson_id = l.id 
+         WHERE l.course_id = c.id) AS student_count
+    FROM courses c
+    WHERE c.created_by = ?  -- created_by is the user_id of the creator
+    ORDER BY c.created_at DESC
+");
+if ($classes_stmt === false) {
+    die("Prepare failed: " . $conn->error);
+}
+$classes_stmt->bind_param("i", $teacher_id);
+$classes_stmt->execute();
+$classes_result = $classes_stmt->get_result();
+$classes = $classes_result->fetch_all(MYSQLI_ASSOC);
+$classes_stmt->close();
+
+// Fetch recent activities (profile updates and completed lessons)
+$activities_stmt = $conn->prepare("
+   SELECT 
+        'profile' AS activity_type,
+        l.id AS activity_id,
+        NULL AS lesson_id,
+        l.timestamp AS activity_time,
+        'Profile updated' AS details,
+        u.username
+    FROM logs l
+    JOIN users u ON l.user_id = u.id
+    WHERE l.user_id = ? 
+    AND l.entity_type = 'profile' 
+    AND l.action = 'update'
+    
+    UNION ALL
+    
+    SELECT 
+        'lesson_completed' AS activity_type,
+        cl.id AS activity_id,
+        cl.lesson_id,
+        cl.completed_at AS activity_time,
+        CONCAT('Completed lesson \"', les.title, '\" (ID: ', cl.lesson_id, ') in \"', c.title, '\"') AS details,
+        u.username
+    FROM completed_lessons cl
+    JOIN users u ON cl.user_id = u.id
+    LEFT JOIN lesson les ON cl.lesson_id = les.id
+    LEFT JOIN courses c ON les.course_id = c.id
+    WHERE cl.user_id = ?
+    ORDER BY activity_time DESC
+    LIMIT 10
+");
+if ($activities_stmt === false) {
+    die("Prepare failed: " . $conn->error);
+}
+$activities_stmt->bind_param("ii", $teacher_id, $teacher_id);
+$activities_stmt->execute();
+$activities_result = $activities_stmt->get_result();
+$activities = $activities_result->fetch_all(MYSQLI_ASSOC);
+$activities_stmt->close();
+?>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- My Classes Card -->
+    <div class="bg-white shadow rounded-lg overflow-hidden fade-in" style="animation-delay: 0.2s">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">My Classes</h3>
         </div>
+        <div class="p-6 max-h-80 overflow-y-auto scrollbar-thin">
+            <?php if (empty($classes)): ?>
+            <p class="text-gray-500">You haven't created any classes yet.</p>
+            <a href="#" class="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-500 hover:bg-blue-600">
+                Create Your First Class
+            </a>
+            <?php else: ?>
+            <ul class="space-y-2">
+                <?php foreach ($classes as $class): ?>
+                <li class="bg-gray-50 p-3 rounded-md hover:bg-gray-100 transition-colors">
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium text-gray-800"><?php echo htmlspecialchars($class['title']); ?></span>
+                        <span class="text-xs px-2 py-1 rounded-full <?php echo $class['status'] === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'; ?>">
+                            <?php echo ucfirst($class['status'] ?? 'Draft'); ?>
+                        </span>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1"><?php echo $class['student_count'] ?? 0; ?> students enrolled</div>
+                </li>
+                <?php endforeach; ?>
+            </ul>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Recent Activities -->
+    <div class="bg-white shadow rounded-lg overflow-hidden fade-in" style="animation-delay: 0.4s">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Recent Activities</h3>
+        </div>
+        <div class="p-6 max-h-80 overflow-y-auto scrollbar-thin">
+            <?php if (empty($activities)): ?>
+            <p class="text-gray-500">No recent activities</p>
+            <?php else: ?>
+            <ul class="space-y-4">
+                <?php foreach ($activities as $activity): ?>
+                <li class="flex items-start justify-between border-b pb-2 last:border-b-0">
+                    <div>
+                        <h3 class="font-medium text-gray-800"><?php echo htmlspecialchars($activity['username']); ?> 
+                            <span class="text-gray-600 text-sm">(<?php echo htmlspecialchars($activity['activity_type'] === 'profile' ? 'updated profile' : 'completed lesson'); ?>)</span>
+                        </h3>
+                        <p class="text-sm text-gray-600"><?php echo htmlspecialchars($activity['details']); ?></p>
+                    </div>
+                    <span class="text-xs text-gray-500"><?php echo date('F j, Y, g:i A', strtotime($activity['activity_time'])); ?></span>
+                </li>
+                <?php endforeach; ?>
+            </ul>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
+<?php
+$conn->close();
+?>
+
     </main>
 
     <!-- Footer -->

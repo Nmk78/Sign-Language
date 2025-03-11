@@ -757,7 +757,7 @@ function formatTimeAgo($datetime)
                         let quizHtml = `<form id="quizForm" data-lesson-id="${currentLessonId}">`
                         data.forEach((quiz, index) => {
                             quizHtml += `
-                        <div class="border p-4 rounded-lg mb-4 bg-gray-50 shadow-md">
+                        <div id="quiz" class="border p-4 rounded-lg mb-4 bg-gray-50 shadow-md">
                             <p class="font-semibold text-lg text-gray-800">${index + 1}. ${quiz.question}</p>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
                                 <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
@@ -811,7 +811,7 @@ function formatTimeAgo($datetime)
             })
 
             // Check if all questions are answered
-            const totalQuestions = document.querySelectorAll(".border.p-4.rounded-lg").length
+            const totalQuestions = document.querySelectorAll("#quiz").length
             if (Object.keys(answers).length < totalQuestions) {
                 alert("Please answer all questions before submitting.")
                 return

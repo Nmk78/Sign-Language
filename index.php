@@ -206,7 +206,8 @@ $courses = [
         </div>
     </header> -->
 
-    <!-- Header -->
+    <!-- Header --> 
+     <!-- TODO reduce the py-0 done for nav bar is too long  -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto">
             <div class="flex justify-between items-center py-2">

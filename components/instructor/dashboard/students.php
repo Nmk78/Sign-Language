@@ -55,7 +55,8 @@ $result = $conn->query($sql);
     <!-- <div class="flex flex-wrap justify-between gap-3 p-4">
             <p class="text-[#0e161b] tracking-light text-[32px] font-bold leading-tight min-w-72">Student Analytics</p>
         </div> -->
-    <div class="flex gap-3 p-3 flex-wrap pr-4">
+        <!-- TODO remove grade -->
+    <!-- <div class="flex gap-3 p-3 flex-wrap pr-4">
         <div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-xl bg-[#e8eef3] pl-4 pr-4">
             <p class="text-[#0e161b] text-sm font-medium leading-normal">1st Grade</p>
         </div>
@@ -80,7 +81,7 @@ $result = $conn->query($sql);
         <div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-xl bg-[#e8eef3] pl-4 pr-4">
             <p class="text-[#0e161b] text-sm font-medium leading-normal">8th Grade</p>
         </div>
-    </div>
+    </div> -->
 
     <div class="px-1 py-3 @container">
         <div class="relative flex size-full flex-col bg-[#f8fafb] group/design-root overflow-x-hidden" style='font-family: Lexend, "Noto Sans", sans-serif;'>
