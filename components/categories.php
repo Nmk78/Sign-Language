@@ -13,7 +13,12 @@ try {
 }
 
 // Fetch courses
-$stmt = $pdo->query("SELECT * FROM courses");
+$stmt = $pdo->query("SELECT 
+                c.*,
+                COUNT(ce.id) as enrolled_students
+            FROM courses c
+            LEFT JOIN course_enrollments ce ON c.id = ce.course_id
+            GROUP BY c.id");
 $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch distinct categories
@@ -55,7 +60,7 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
             theme: {
                 extend: {
                     colors: {
-                        'primary': '#4A90E2',                        
+                        'primary': '#4A90E2',
                         'primary-dark': '#2A69A4',
                         'secondary': '#7ED321',
                         'accent': '#F5A623',
@@ -114,54 +119,37 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
             <?php endforeach; ?>
         </div>
 
-        <?php
-// Assuming you have a database connection established
-// $pdo = new PDO("mysql:host=localhost;dbname=sign_language", "username", "password");
 
-        // Query to get courses with enrollment count
-        $query = "
-            SELECT 
-                c.*,
-                COUNT(ce.id) as enrolled_students
-            FROM courses c
-            LEFT JOIN course_enrollments ce ON c.id = ce.course_id
-            WHERE c.status = 'published'
-            GROUP BY c.id
-        ";
-        $stmt = $pdo->prepare($query);
-        $stmt->execute();
-        $pagedCourses = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        ?>
 
         <!-- Courses Grid -->
         <div id="coursesGrid" class="grid md:grid-cols-3 gap-8">
             <?php foreach ($pagedCourses as $course): ?>
                 <a href="<?php echo '/courseDetails?course=' . htmlspecialchars($course['id']); ?>" class="bg-white rounded-xl overflow-hidden shadow-lg course-card transition-all duration-300">
                     <div class="relative">
-                        <img src="<?php echo $course['thumbnail_url'] ? htmlspecialchars($course['thumbnail_url']) : 'https://via.placeholder.com/300x200.png?text=Course+Thumbnail'; ?>" 
-                            alt="<?php echo htmlspecialchars($course['title']); ?>" 
+                        <img src="<?php echo $course['thumbnail_url'] ? htmlspecialchars($course['thumbnail_url']) : 'https://via.placeholder.com/300x200.png?text=Course+Thumbnail'; ?>"
+                            alt="<?php echo htmlspecialchars($course['title']); ?>"
                             class="w-full aspect-video object-cover">
                         <!-- Duration could be added here if available in data -->
                         <div class="absolute top-4 right-4 rounded-full text-sm font-medium text-primary">
-                        <button onclick="toggleSave(<?php echo $course['id']; ?>)" 
-                                        class="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" 
-                                        class="h-6 w-6 transition-colors duration-300 ease-in-out text-blue-400" 
-                                        viewBox="0 0 24 24" 
-                                        stroke="currentColor" 
-                                        stroke-width="2">
-                                        <path stroke-linecap="round" 
-                                            stroke-linejoin="round" 
-                                            d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                                    </svg>
-                                </button>
+                            <button onclick="toggleSave(<?php echo $course['id']; ?>)"
+                                class="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="h-6 w-6 transition-colors duration-300 ease-in-out text-blue-400"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="2">
+                                    <path stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                </svg>
+                            </button>
                         </div>
                     </div>
                     <div class="p-6">
                         <!-- Rating section - adding placeholder since original doesn't have rating -->
                         <!-- <div class="flex items-center space-x-2 mb-3">
                             <div class="flex">
-                                <?php 
+                                <?php
                                 // Using a default rating since it's not in original data
                                 $rating = $course['rating'] ?? 4.5;
                                 for ($i = 0; $i < 5; $i++): ?>
@@ -176,16 +164,16 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
                             </div>
                             <span class="text-text-light text-sm">(<?php echo $rating; ?>)</span>
                         </div> -->
-                        
+
                         <h3 class="font-semibold text-primary text-xl mb-2">
                             <?php echo htmlspecialchars($course['title']); ?>
                         </h3>
-                        
+
                         <div class="flex items-center text-text-light text-sm mb-4">
                             <i class="fas fa-users mr-2"></i>
                             <span><?php echo number_format($course['enrolled_students']); ?> students</span>
                         </div>
-                        
+
                         <!-- <div class="flex justify-between items-center pt-4 border-t border-gray-100">
                             <span class="text-primary font-bold text-xl">
                                 <?php echo $course['price'] ?? 'N/A'; ?>

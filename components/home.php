@@ -245,12 +245,15 @@ $faqs = [
                 COUNT(ce.id) as enrolled_students
             FROM courses c
             LEFT JOIN course_enrollments ce ON c.id = ce.course_id
-            WHERE c.status = 'published'
             GROUP BY c.id
         ";
         $stmt = $pdo->prepare($query);
         $stmt->execute();
         $pagedCourses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo '<pre>';
+        print_r($pagedCourses);
+        echo '</pre>';
+
         ?>
             <div class="w-full overflow-x-auto snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
                 <div class="grid grid-flow-col auto-cols-max gap-8 py-4 px-2">
@@ -315,9 +318,9 @@ $faqs = [
                 </p>
             </div>
             <!-- for 3 popular courses -->
-            <div id="coursesGrid" class="grid md:grid-cols-3 gap-8">
+            <div id="coursesGrid" class="flex flex-row flex-nowrap overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
             <?php foreach ($pagedCourses as $course): ?>
-                <a href="<?php echo '/courseDetails?course=' . htmlspecialchars($course['id']); ?>" class="bg-white rounded-xl overflow-hidden shadow-lg course-card transition-all duration-300">
+                <a href="<?php echo '/courseDetails?course=' . htmlspecialchars($course['id']); ?>" class="bg-white rounded-xl overflow-hidden shadow-lg course-card transition-all duration-300 max-w-96 min-w-96 mb-5 flex-shrink-0 mr-8">
                     <div class="relative">
                         <img src="<?php echo $course['thumbnail_url'] ? htmlspecialchars($course['thumbnail_url']) : 'https://via.placeholder.com/300x200.png?text=Course+Thumbnail'; ?>" 
                             alt="<?php echo htmlspecialchars($course['title']); ?>" 
