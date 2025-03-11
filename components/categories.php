@@ -137,7 +137,7 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
         </div>
 
         <!-- Pagination -->
-        <div id="pagination" class="mt-8 flex justify-center space-x-2">
+        <div id="pagination" class="mt-8 flex justify-center space-x-2 mb-8">
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                 <a href="?page=<?php echo $i; ?><?php echo $currentCategory ? '&category=' . urlencode($currentCategory) : ''; ?>"
                     class="px-4 py-2 border rounded <?php echo $i == $currentPage ? 'bg-primary text-white' : 'bg-white text-primary'; ?>">
