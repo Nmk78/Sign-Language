@@ -11,6 +11,8 @@ if (!isset($_SESSION['user']) || !isset($_SESSION['user']['user_id'])) {
     exit;
 }
 
+
+
 // Database connection
 function getDbConnection()
 {
@@ -105,9 +107,42 @@ if (isset($_GET['delete_lesson']) && is_numeric($_GET['delete_lesson'])) {
     $conn->close();
 }
 
+function getCourse($course_id)
+{
+    $conn = getDbConnection();
+
+    // Use prepared statement to prevent SQL injection
+    $teacher_id = $_SESSION['user']['user_id'];
+
+    // Fetch course data
+    $conn = getDbConnection();
+
+    $stmt = $conn->prepare("
+    SELECT title, description, category, price, thumbnail_url
+    FROM courses
+    WHERE id = ? AND created_by = ?");
+    $stmt->bind_param("ii", $course_id, $teacher_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 0) {
+        // Course not found or user doesn't have permission
+        exit();
+    }
+
+    $course = $result->fetch_assoc();
+    $stmt->close();
+    $conn->close();
+    return $course;
+}
+
+
+
 // Get courses for the current user
 $user_id = $_SESSION['user']['user_id'];
 $courses = getUserCourses($user_id);
+
+$_SESSION['courses'] = $courses
 ?>
 <script>
     tailwind.config = {
@@ -345,7 +380,8 @@ $courses = getUserCourses($user_id);
                                         </svg>
                                         View Lessons
                                     </button>
-                                    <a href="edit-course.php?id=<?php echo $course['id']; ?>"
+                                    <!-- <a href="edit-course.php?id=<?php echo $course['id']; ?>" -->
+                                    <button onclick="openCourseEditModal(<?php echo $course['id']; ?>)"
                                         class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded hover:bg-gray-200 transition duration-300 flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor">
@@ -353,7 +389,7 @@ $courses = getUserCourses($user_id);
                                                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                         Edit
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -475,38 +511,105 @@ $courses = getUserCourses($user_id);
                 </form>
             </div>
         </div>
+        <!-- Edit Course Modal -->
+        <div id="courseEditModal"
+            class="fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center z-50 hidden transition-opacity duration-300">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 transform transition-all duration-300">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-6">Edit Course</h2>
 
+                <form id="editCourseForm" enctype="multipart/form-data" method="POST" class="space-y-4">
+                    <input type="hidden" name="course_id" id="editCourseId">
 
-
-        <!-- quiz modal -->
-        <div id="myModal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 hidden">
-            <div class="bg-white p-6 rounded-lg shadow-lg max-h-[80vh] overflow-y-auto">
-                <div class="flex flex-col justify-between items-center">
-
-                    <div class="flex float-left">
-                        <h2 class="text-lg font-bold">Form Title</h2>
-                        <button class="text-gray-500 hover:text-red-500" onclick="closeQuizModal()">&times;</button>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                        <input id="editTitle" type="text" name="title"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
+                            required>
                     </div>
 
-                    <form id="quizForm" method="POST" action="handlers/addQuiz.php" enctype="multipart/form-data">
-                        <input type="hidden" id="lessonIdInput" name="lesson_id">
-                        <?php include 'quizForm.php' ?>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea id="editDesc" name="description"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 resize-y min-h-[100px]"
+                            required></textarea>
+                    </div>
 
-                        <!-- Submit Button -->
-                        <div class="flex justify-end">
-                            <button type="submit" name="submit_quiz"
-                                class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors shadow-md hover:shadow-lg">
-                                Create Quiz
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <input id="editCategory" type="text" name="category"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
+                            required>
+                    </div>
 
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                        <input id="editPrice" type="number" name="price" step="0.01"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200"
+                            required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Thumbnail</label>
+                        <input type="file" name="thumbnail"
+                            class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors duration-200"
+                            id="edit_file_input">
+                        <p id="currentThumbnail" class="text-xs text-gray-500 mt-1"></p>
+                    </div>
+
+                    <input type="hidden" name="created_by" value="<?php echo $_SESSION['user']['user_id']; ?>">
+
+                    <div id="formMessage" class="text-sm text-gray-600 mt-2"></div>
+
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button type="button"
+                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-medium"
+                            onclick="closeCourseEditQuizModal()">
+                            Cancel
+                        </button>
+
+                        <button type="submit"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium">
+                            Save Course
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
+
+        <!-- quiz modal -->
+        <div id="myModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+            <div class="bg-white p-6 rounded-lg shadow-lg max-h-[85vh] flex flex-col overflow-hidden justify-between items-center overflow-y-scroll">
+
+                <!-- Modal Header -->
+                <div class="w-full flex justify-between items-center mb-4">
+                    <h2 id="modalTitle" class="text-lg font-bold text-gray-800">Form Title</h2>
+                    <button
+                        class="text-gray-500 hover:text-red-500 focus:outline-none"
+                        onclick="closeQuizModal()"
+                        aria-label="Close Modal">
+                        <i class="fa-solid fa-x"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Content -->
+                <form id="quizForm" method="POST" action="handlers/addQuiz.php" enctype="multipart/form-data">
+                    <input type="hidden" id="lessonIdInput" name="lesson_id">
+                    <?php include 'quizForm.php' ?>
+
+                    <!-- Submit Button -->
+                    <div class="flex justify-end mt-4">
+                        <button type="submit" name="submit_quiz"
+                            class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-colors shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                            Create Quiz
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Course Manager Modal -->
         <div id="courseManagerModal"
-            class="fixed z-40 inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+            class="fixed z-50 inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
             <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
                 <div class="mt-3">
                     <div class="flex justify-between items-center">
@@ -571,6 +674,49 @@ $courses = getUserCourses($user_id);
 
         function closeQuizModal() {
             document.getElementById('myModal').classList.add('hidden');
+        }
+
+        const courses = <?php echo json_encode($_SESSION['courses']); ?>;
+
+        function openCourseEditModal(courseId) {
+            // Find the course in the array
+            const course = courses.find(c => c.id === parseInt(courseId));
+            if (!course) {
+                console.error('Course not found:', courseId);
+                return;
+            }
+
+            // Set the course ID
+            document.getElementById('editCourseId').value = courseId;
+
+            // Populate form fields
+            document.getElementById('editTitle').value = course.title || '';
+            document.getElementById('editDesc').value = course.description || '';
+            document.getElementById('editCategory').value = course.category || '';
+            document.getElementById('editPrice').value = course.price || 0;
+            document.getElementById('currentThumbnail').textContent = course.thumbnail_url ?
+                `Current: ${course.thumbnail_url.split('/').pop()}` :
+                'No thumbnail set';
+
+            // Show the modal with animation
+            const modal = document.getElementById('courseEditModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.add('opacity-100');
+                modal.querySelector('div').classList.add('scale-100');
+            }, 10);
+
+            console.log("Opened modal for course ID:", courseId);
+        }
+
+        function closeCourseEditQuizModal() {
+            const modal = document.getElementById('courseEditModal');
+            modal.classList.remove('opacity-100');
+            modal.querySelector('div').classList.remove('scale-100');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300); // Match this with transition duration
         }
         // Function to open the course creation modal
         function openCourseModal() {
@@ -792,6 +938,22 @@ $courses = getUserCourses($user_id);
                         });
                 });
             }
+        });
+
+        document.getElementById('editCourseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetch('handlers/editCourse.php', {
+                    method: 'POST',
+                    body: new FormData(this)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('formMessage').textContent = data.message;
+                    if (data.success) {
+                        setTimeout(closeCourseEditQuizModal, 1000);
+                        window.reload()
+                    }
+                });
         });
 
         // Function to open course manager modal
