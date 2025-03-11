@@ -43,13 +43,36 @@ if ($lesson_id > 0) {
     $lesson_stmt->close();
 }
 
-// Fetch all lessons for this course
-$lessons_stmt = $conn->prepare("SELECT id, title, description, created_at FROM lesson WHERE course_id = ? ORDER BY id ASC");
-$lessons_stmt->bind_param("i", $course_id);
+$user_id = $_SESSION['user']['user_id'] ?? null; // Get user_id from session
+
+// echo $user_id;
+
+$lessons_stmt = $conn->prepare("
+    SELECT 
+        l.id,
+        l.title,
+        l.description,
+        l.created_at,
+        l.course_id,
+        c.title AS course_title,
+        l.rating,
+        l.video_url,
+        cl.completed_at IS NOT NULL AS is_completed,
+        cl.completed_at
+    FROM lesson l
+    LEFT JOIN courses c ON l.course_id = c.id
+    LEFT JOIN completed_lessons cl ON l.id = cl.lesson_id AND cl.user_id = ?
+    WHERE l.course_id = ?
+    ORDER BY l.id ASC
+");
+$lessons_stmt->bind_param("ii", $user_id, $course_id);
 $lessons_stmt->execute();
 $lessons_result = $lessons_stmt->get_result();
 $lessons = $lessons_result->fetch_all(MYSQLI_ASSOC);
-$lessons_stmt->close();
+
+// echo '<pre>';
+// print_r($lessons);
+// echo '</pre>';
 
 // Fetch comments for the current lesson
 $comments = [];
@@ -173,18 +196,32 @@ function formatTimeAgo($datetime)
                                 </div>
                                 <div class="mt-4">
                                     <h2 class="text-2xl font-semibold text-gray-900">
-                                        <?php echo htmlspecialchars($current_lesson['title']); ?></h2>
+                                        <?php echo htmlspecialchars($current_lesson['title']); ?>
+                                    </h2>
                                     <p class="text-gray-600 mt-2">
-                                        <?php echo htmlspecialchars($current_lesson['description']); ?></p>
+                                        <?php echo htmlspecialchars($current_lesson['description']); ?>
+                                    </p>
                                     <div class="mt-4 flex justify-between items-center">
                                         <span class="text-sm text-gray-500">Category:
                                             <?php echo htmlspecialchars($current_lesson['category'] ?? 'Uncategorized'); ?></span>
-                                        <div class="space-x-3">
+                                        <div class="flex space-x-3 justify-around items-center">
                                             <button onclick="openQuiz(<?php echo $lesson_id; ?>)"
                                                 class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Take
                                                 Quiz</button>
+
+                                            <form action="handlers/completeLesson.php" method="POST" class="flex justify-center items-center">
+                                                <input type="hidden" name="lesson_id" value="<?php echo $lesson_id; ?>">
+                                                <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
+                                                <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
+                                                <button type="submit"
+                                                    class="bg-blue-500 mt-4 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                                                    Complete
+                                                </button>
+                                            </form>
+
+
                                             <button onclick="navigateToNextLesson(<?php echo $current_lesson['id']; ?>)"
-                                                class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">Next
+                                                class="b-200 px-4 py-2 rounded-md bg-blue-700 text-white hover:bg-gray-300">Next
                                                 Lesson</button>
                                         </div>
                                     </div>
@@ -211,14 +248,17 @@ function formatTimeAgo($datetime)
 
                     <?php else: ?>
                         <!-- Not Enrolled: Show Enrollment Option -->
-                        <div class="h-96 mx-auto bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                        <div
+                            class="h-96 mx-auto bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
                             <!-- Course Image with Overlay -->
                             <div class="relative h-72">
                                 <!-- Course Thumbnail -->
-                                <img class="h-full w-full aspect-video min-h-72 object-cover" src="<?php echo $course['thumbnail_url']; ?>" alt="<?php echo $course['title']; ?>">
+                                <img class="h-full w-full aspect-video min-h-72 object-cover"
+                                    src="<?php echo $course['thumbnail_url']; ?>" alt="<?php echo $course['title']; ?>">
 
                                 <!-- Category Badge -->
-                                <span class="absolute top-3 left-3 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                                <span
+                                    class="absolute top-3 left-3 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
                                     <?php echo $course['category']; ?>
                                 </span>
                             </div>
@@ -227,10 +267,13 @@ function formatTimeAgo($datetime)
                             <div class="flex justify-between items-center p-5 space-y-3">
                                 <!-- Course Title -->
                                 <div>
-                                    <h3 class="text-xl font-bold text-gray-900 mb-1 truncate"><?php echo $course['title']; ?></h3>
+                                    <h3 class="text-xl font-bold text-gray-900 mb-1 truncate">
+                                        <?php echo $course['title']; ?>
+                                    </h3>
 
                                     <!-- Course Description -->
-                                    <p class="text-gray-600 text-sm mb-3 line-clamp-2"><?php echo $course['description']; ?></p>
+                                    <p class="text-gray-600 text-sm mb-3 line-clamp-2"><?php echo $course['description']; ?>
+                                    </p>
                                 </div>
                                 <!-- Enrollment Form -->
                                 <form method="POST" action="handlers/enroll.php" class="">
@@ -238,13 +281,16 @@ function formatTimeAgo($datetime)
                                     <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
 
                                     <!-- Enrollment Button -->
-                                    <button
-                                        type="submit"
+                                    <button type="submit"
                                         class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center group disabled:opacity-50"
-                                        <?php if (empty($user_id)) echo 'disabled'; ?>>
+                                        <?php if (empty($user_id))
+                                            echo 'disabled'; ?>>
                                         Enroll Now
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2 transform group-hover:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            class="h-4 w-4 ml-2 transform group-hover:translate-x-1 transition-transform duration-200"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 5l7 7-7 7" />
                                         </svg>
                                     </button>
                                 </form>
@@ -306,8 +352,8 @@ function formatTimeAgo($datetime)
                         <h3 class="text-lg font-semibold">Course Lessons</h3>
                         <div class="text-sm text-gray-500">
                             <span class="font-medium text-indigo-600"><?php echo count(array_filter($lessons, function ($l) {
-                                                                            return isset($l['completed']) && $l['completed'];
-                                                                        })); ?></span>
+                                return isset($l['completed']) && $l['completed'];
+                            })); ?></span>
                             <span>/</span>
                             <span><?php echo count($lessons); ?></span>
                             <span class="ml-1">completed</span>
@@ -329,84 +375,136 @@ function formatTimeAgo($datetime)
                                     List</button>
                             </div>
                         <?php else: ?>
-                            <?php foreach ($lessons as $index => $lesson): ?>
-                                <?php
-                                $isActive = ($lesson_id == $lesson['id']);
-                                $isCompleted = isset($lesson['completed']) && $lesson['completed'];
+                            <?php foreach ($lessons as $index => $lesson):
+                                // Extract lesson data and state
                                 $lessonNumber = $index + 1;
+                                $isActive = ($lesson_id == $lesson['id']);
+                                $isCompleted = isset($lesson['is_completed']) && $lesson['is_completed'];
+                                $title = htmlspecialchars($lesson['title']);
+                                $description = htmlspecialchars($lesson['description']);
+                                $duration = isset($lesson['duration']) ? $lesson['duration'] : null;
+
+                                // Define CSS classes based on lesson state
+                                $cardClasses = "flex items-start gap-4 border p-4 rounded-lg transition-all duration-300 relative " .
+                                    ($isActive
+                                        ? 'bg-indigo-50 border-indigo-200 shadow-sm'
+                                        : 'hover:bg-gray-50 border-transparent hover:border-gray-200');
+
+                                $statusClasses = "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium " .
+                                    ($isCompleted
+                                        ? 'bg-green-100 text-green-700'
+                                        : ($isActive
+                                            ? 'bg-indigo-100 text-indigo-700'
+                                            : 'bg-gray-100 text-gray-700'));
                                 ?>
-                                <a href="?course=<?php echo $course_id; ?>&lesson=<?php echo $lesson['id']; ?>" class="flex items-start gap-3 border  p-3 rounded-lg transition-all duration-200 relative
-                            <?php echo $isActive
-                                    ? 'bg-indigo-50 border-indigo-100'
-                                    : 'hover:bg-gray-50  border-transparent hover:border-gray-100'; ?>">
+                                <a href="?course=<?php echo $course_id; ?>&lesson=<?php echo $lesson['id']; ?>"
+                                    class="<?php echo $cardClasses; ?> group">
 
-                                    <!-- Lesson number or status indicator -->
-                                    <!-- <div class="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium
-                            <?php if ($isCompleted): ?>
-                                bg-green-100 text-green-700
-                            <?php elseif ($isActive): ?>
-                                bg-indigo-100 text-indigo-700
-                            <?php else: ?>
-                                bg-gray-100 text-gray-700
-                            <?php endif; ?>">
-                            <?php if ($isCompleted): ?>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                            <?php else: ?>
-                                <?php echo $lessonNumber; ?>
-                            <?php endif; ?>
-                        </div> -->
+                                    <?php if ($isActive): ?>
+                                        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-indigo-500 rounded-l-lg"></div>
+                                    <?php endif; ?>
 
-                                    <div id="videoContainer"
-                                        class="relative h-28 aspect-square bg-gray-300 rounded-lg flex items-center justify-center cursor-pointer group overflow-hidden">
-                                        <!-- Play Button -->
-                                        <div class=" size-8 bg-gray-500 rounded-full flex items-center justify-center">
-                                            <i class="fa-solid fa-play text-white"></i>
+                                    <!-- Status indicator
+                                    <div class="<?php echo $statusClasses; ?>">
+                                        <?php if ($isCompleted): ?>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        <?php else: ?>
+                                            <?php echo $lessonNumber; ?>
+                                        <?php endif; ?>
+                                    </div> -->
+
+                                    <!-- Video thumbnail -->
+                                    <div class="relative h-24 w-36 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                                        <?php if (isset($lesson['thumbnail'])): ?>
+                                            <img src="<?php echo htmlspecialchars($lesson['thumbnail']); ?>" alt="Lesson thumbnail"
+                                                class="w-full h-full object-cover" />
+                                        <?php endif; ?>
+
+                                        <!-- Play button overlay -->
+                                        <div
+                                            class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-all duration-300">
+                                            <div
+                                                class="size-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center shadow-md transform group-hover:scale-110 transition-transform duration-300">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600"
+                                                    viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd"
+                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                                                        clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
                                         </div>
                                     </div>
 
+                                    <!-- Lesson content -->
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-start justify-between">
-                                            <h4 class="font-medium text-gray-900 line-clamp-1">
-                                                <?php echo htmlspecialchars($lesson['title']); ?>
+                                            <h4
+                                                class="font-medium text-gray-900 line-clamp-1 group-hover:text-indigo-700 transition-colors">
+                                                <?php echo $title; ?>
                                             </h4>
 
-                                            <?php if (isset($lesson['duration'])): ?>
-                                                <span class="text-xs text-gray-500 flex items-center ml-2 flex-shrink-0">
+                                            <?php if ($duration): ?>
+                                                <span
+                                                    class="text-xs text-gray-500 flex items-center ml-2 flex-shrink-0 bg-gray-100 px-2 py-0.5 rounded">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none"
                                                         viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
-                                                    <?php echo $lesson['duration']; ?>
+                                                    <?php echo $duration; ?>
                                                 </span>
                                             <?php endif; ?>
                                         </div>
 
-                                        <p class="text-sm text-gray-500 line-clamp-2 mt-0.5">
-                                            <?php echo htmlspecialchars($lesson['description']); ?>
+                                        <p
+                                            class="text-sm text-gray-500 line-clamp-2 mt-1.5 group-hover:text-gray-700 transition-colors">
+                                            <?php echo $description; ?>
                                         </p>
 
-                                        <?php if ($isActive && !$isCompleted): ?>
-                                            <span class="inline-flex items-center mt-2 text-xs font-medium text-indigo-600">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                Continue Learning
-                                            </span>
-                                        <?php endif; ?>
+                                        <!-- Status indicators -->
+                                        <div class="mt-2 flex items-center">
+                                            <?php if ($isCompleted): ?>
+                                                <span
+                                                    class="inline-flex items-center text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    Completed
+                                                </span>
+                                            <?php elseif ($isActive): ?>
+                                                <span
+                                                    class="inline-flex items-center text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    Continue Learning
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="inline-flex items-center text-xs font-medium text-gray-500">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                    </svg>
+                                                    Start Lesson
+                                                </span>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
-
-                                    <?php if ($isActive): ?>
-                                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 rounded-l-lg"></div>
-                                    <?php endif; ?>
                                 </a>
                             <?php endforeach; ?>
+
+
                         <?php endif; ?>
                     </div>
 
@@ -478,7 +576,7 @@ function formatTimeAgo($datetime)
 
         // Handle comment form submission
         if (commentForm) {
-            commentForm.addEventListener('submit', function(e) {
+            commentForm.addEventListener('submit', function (e) {
                 e.preventDefault();
 
                 if (!commentText.value.trim()) {
@@ -556,7 +654,7 @@ function formatTimeAgo($datetime)
             });
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const userId = localStorage.getItem('id');
             if (userId) {
                 document.getElementById('userId').value = userId;
@@ -723,16 +821,16 @@ function formatTimeAgo($datetime)
             const userId = localStorage.getItem('id');
 
             fetch("handlers/submit_quiz.php", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        lesson_id: lessonId,
-                        userId: userId,
-                        answers: answers,
-                    }),
-                })
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    lesson_id: lessonId,
+                    userId: userId,
+                    answers: answers,
+                }),
+            })
                 .then((response) => response.json())
                 .then((results) => {
                     showResults(results)
