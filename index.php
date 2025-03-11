@@ -40,7 +40,6 @@ if (session_status() === PHP_SESSION_NONE) {
         localStorage.setItem("role", role);
         localStorage.setItem("id", id);
     }
-
     // localStorage.removeItem("username"); // Clears username from localStorage
 </script>
 <?php
@@ -243,8 +242,47 @@ $courses = [
                 }, array_keys($navItems), $navItems));
                 echo '</nav>';
                 ?>
+                
                 <div class="flex items-center space-x-4">
+                    <div class="relative flex items-center">
+                        <!-- Search Form -->
+                        <form action="search" method="GET" class="flex items-center border border-gray-300 rounded-full overflow-hidden transition-all duration-300 ease-in-out" id="searchContainer">
+                            <input type="text" name="query" id="searchInput" placeholder="Search..."
+                                class="w-0 px-0 py-2 text-gray-700 outline-none transition-all duration-300 ease-in-out opacity-0 bg-transparent" />
+                            <button type="button" id="searchBtn" class="p-3 bg-blue-500 text-white rounded-full focus:outline-none">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </div>
 
+                    <script>
+                        const searchBtn = document.getElementById("searchBtn");
+                        const searchInput = document.getElementById("searchInput");
+                        const searchContainer = document.getElementById("searchContainer");
+
+                        let isExpanded = false;
+
+                        searchBtn.addEventListener("click", () => {
+                            if (!isExpanded) {
+                                // Expand search bar
+                                searchContainer.classList.add("pl-2");
+                                searchInput.classList.remove("w-0", "opacity-0");
+                                searchInput.classList.add("w-40", "opacity-100");
+                                isExpanded = true;
+                                searchInput.focus();
+                            } else {
+                                // If there's text, submit the form; otherwise, collapse
+                                if (searchInput.value.trim() !== "") {
+                                    searchContainer.parentElement.submit(); // Submit form
+                                } else {
+                                    searchInput.classList.remove("w-40", "opacity-100");
+                                    searchInput.classList.add("w-0", "opacity-0");
+                                    searchContainer.classList.remove("pl-2");
+                                    isExpanded = false;
+                                }
+                            }
+                        });
+                    </script>
                     <div class="flex items-center space-x-4">
                         <?php if (isset($_SESSION['user']) && $_SESSION['user']['logged_in']): ?>
                             <a href="<?php echo ($_SESSION['user']['role'] === 'teacher') ? '/dashboard?tab=statistics' : '/profile'; ?>" class="text-primary font-semibold hover:underline">
@@ -324,6 +362,9 @@ $courses = [
             break;
         case '':
             require 'components/home.php';
+            break;
+        case 'search':
+            require 'components/search_result.php';
             break;
         default:
             require 'components/notfound.php';
