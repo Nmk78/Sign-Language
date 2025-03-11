@@ -114,23 +114,100 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
             <?php endforeach; ?>
         </div>
 
+        <?php
+// Assuming you have a database connection established
+// $pdo = new PDO("mysql:host=localhost;dbname=sign_language", "username", "password");
+
+        // Query to get courses with enrollment count
+        $query = "
+            SELECT 
+                c.*,
+                COUNT(ce.id) as enrolled_students
+            FROM courses c
+            LEFT JOIN course_enrollments ce ON c.id = ce.course_id
+            WHERE c.status = 'published'
+            GROUP BY c.id
+        ";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute();
+        $pagedCourses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        ?>
+
         <!-- Courses Grid -->
-        <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div id="coursesGrid" class="grid md:grid-cols-3 gap-8">
             <?php foreach ($pagedCourses as $course): ?>
-                <a href="<?php echo '/courseDetails?course=' . htmlspecialchars($course['id']); ?>" class="bg-white p-4 rounded-lg shadow-md relative ">
-                    <img src="<?php echo $course['thumbnail_url'] ? htmlspecialchars($course['thumbnail_url']) : 'https://via.placeholder.com/300x200.png?text=Course+Thumbnail'; ?>" alt="<?php echo htmlspecialchars($course['title']); ?>" class="w-full h-40 object-cover rounded-lg">
-                    <h2 class="text-xl font-semibold mt-1"><?php echo htmlspecialchars($course['title']); ?></h2>
-                    <p class="text-gray-600 text-sm"><?php echo htmlspecialchars($course['category'] ?? 'Uncategorized'); ?></p>
-                    <p class="mt-1 text-gray-800"><?php echo htmlspecialchars(substr($course['description'], 0, 80)) . '...'; ?></p>
-                    <div class="flex justify-between items-center mt-2 absolute right-3 top-2">
-                        <!-- <button class="px-3 py-1 bg-primary text-white rounded hover:bg-primary-dark transition-colors">
-                            Enroll Now
-                        </button> -->
-                        <button onclick="toggleSave(<?php echo $course['id']; ?>)" class=" p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-colors duration-300 ease-in-out text-blue-400" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                            </svg>
-                        </button>
+                <a href="<?php echo '/courseDetails?course=' . htmlspecialchars($course['id']); ?>" class="bg-white rounded-xl overflow-hidden shadow-lg course-card transition-all duration-300">
+                    <div class="relative">
+                        <img src="<?php echo $course['thumbnail_url'] ? htmlspecialchars($course['thumbnail_url']) : 'https://via.placeholder.com/300x200.png?text=Course+Thumbnail'; ?>" 
+                            alt="<?php echo htmlspecialchars($course['title']); ?>" 
+                            class="w-full aspect-video object-cover">
+                        <!-- Duration could be added here if available in data -->
+                        <div class="absolute top-4 right-4 rounded-full text-sm font-medium text-primary">
+                        <button onclick="toggleSave(<?php echo $course['id']; ?>)" 
+                                        class="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" 
+                                        class="h-6 w-6 transition-colors duration-300 ease-in-out text-blue-400" 
+                                        viewBox="0 0 24 24" 
+                                        stroke="currentColor" 
+                                        stroke-width="2">
+                                        <path stroke-linecap="round" 
+                                            stroke-linejoin="round" 
+                                            d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                    </svg>
+                                </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <!-- Rating section - adding placeholder since original doesn't have rating -->
+                        <!-- <div class="flex items-center space-x-2 mb-3">
+                            <div class="flex">
+                                <?php 
+                                // Using a default rating since it's not in original data
+                                $rating = $course['rating'] ?? 4.5;
+                                for ($i = 0; $i < 5; $i++): ?>
+                                    <?php if ($i < floor($rating)): ?>
+                                        <i class="fas fa-star text-warning text-sm"></i>
+                                    <?php elseif ($i < $rating): ?>
+                                        <i class="fas fa-star-half-alt text-warning text-sm"></i>
+                                    <?php else: ?>
+                                        <i class="far fa-star text-warning text-sm"></i>
+                                    <?php endif; ?>
+                                <?php endfor; ?>
+                            </div>
+                            <span class="text-text-light text-sm">(<?php echo $rating; ?>)</span>
+                        </div> -->
+                        
+                        <h3 class="font-semibold text-primary text-xl mb-2">
+                            <?php echo htmlspecialchars($course['title']); ?>
+                        </h3>
+                        
+                        <div class="flex items-center text-text-light text-sm mb-4">
+                            <i class="fas fa-users mr-2"></i>
+                            <span><?php echo number_format($course['enrolled_students']); ?> students</span>
+                        </div>
+                        
+                        <!-- <div class="flex justify-between items-center pt-4 border-t border-gray-100">
+                            <span class="text-primary font-bold text-xl">
+                                <?php echo $course['price'] ?? 'N/A'; ?>
+                            </span>
+                            <div class="flex items-center space-x-2">
+                                <button class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md text-sm transition-colors duration-200">
+                                    Enroll Now
+                                </button>
+                                <button onclick="toggleSave(<?php echo $course['id']; ?>)" 
+                                        class="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" 
+                                        class="h-6 w-6 transition-colors duration-300 ease-in-out text-blue-400" 
+                                        viewBox="0 0 24 24" 
+                                        stroke="currentColor" 
+                                        stroke-width="2">
+                                        <path stroke-linecap="round" 
+                                            stroke-linejoin="round" 
+                                            d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div> -->
                     </div>
                 </a>
             <?php endforeach; ?>

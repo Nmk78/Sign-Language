@@ -279,7 +279,8 @@
             <h2 class="text-3xl font-bold text-[#154785] mb-4">Ready to Start Your Sign Language Journey?</h2>
             <p class="text-text-light mb-8 max-w-2xl mx-auto">Join thousands of students learning to communicate in new ways. Our structured courses make learning sign language accessible to everyone.</p>
             <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <a href="signup.php" class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-md transition-colors font-medium">Get Started</a>
+                <!-- TODO adding page direction -->
+                <a href="signup" class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-md transition-colors font-medium">Get Started</a>
             </div>
         </div>
     </section>

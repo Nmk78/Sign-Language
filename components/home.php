@@ -32,33 +32,6 @@ $services = [
     "Product Design"
 ];
 
-$courses = [
-    [
-        "title" => "The Web Design Course",
-        "price" => "$80.00",
-        "duration" => "2h 40m",
-        "rating" => 4.8,
-        "students" => 1240,
-        "image" => "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-5PTvlftctpgPVeHoeVoKmAvWN0Azyx.png"
-    ],
-    [
-        "title" => "UI/UX Design Course",
-        "price" => "$120.00",
-        "duration" => "1h 30m",
-        "rating" => 4.9,
-        "students" => 980,
-        "image" => "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-5PTvlftctpgPVeHoeVoKmAvWN0Azyx.png"
-    ],
-    [
-        "title" => "Product Design",
-        "price" => "$90.00",
-        "duration" => "2h 15m",
-        "rating" => 4.7,
-        "students" => 1560,
-        "image" => "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-5PTvlftctpgPVeHoeVoKmAvWN0Azyx.png"
-    ]
-];
-
 $testimonials = [
     [
         "name" => "Sarah Johnson",
@@ -262,20 +235,39 @@ $faqs = [
                     Discover how our platform adapts to your learning style and schedule
                 </p>
             </div>
-            <div class="grid md:grid-cols-3 gap-8">
-                <?php foreach ($features as $index => $feature): ?>
-                    <div class="<?php echo $feature['bg']; ?> p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 group">
-                        <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
-                            <i class="fas fa-<?php echo $feature['icon']; ?> text-primary text-xl group-hover:text-white"></i>
+            <?php
+        // Assuming you have a database connection established
+        $pdo = new PDO("mysql:host=localhost;dbname=sign_language", "root", "root");
+        // Query to get courses with enrollment count
+        $query = "
+            SELECT 
+                c.*,
+                COUNT(ce.id) as enrolled_students
+            FROM courses c
+            LEFT JOIN course_enrollments ce ON c.id = ce.course_id
+            WHERE c.status = 'published'
+            GROUP BY c.id
+        ";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute();
+        $pagedCourses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        ?>
+            <div class="w-full overflow-x-auto snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+                <div class="grid grid-flow-col auto-cols-max gap-8 py-4 px-2">
+                    <?php foreach ($features as $index => $feature): ?>
+                        <div class="<?php echo $feature['bg']; ?> p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 group">
+                            <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+                                <i class="fas fa-<?php echo $feature['icon']; ?> text-primary text-xl group-hover:text-white"></i>
+                            </div>
+                            <h3 class="<?php echo $feature['text']; ?> text-xl font-bold mb-4"><?php echo $feature['title']; ?></h3>
+                            <p class="text-text-light"><?php echo $feature['description']; ?></p>
+                            <a href="#" class="inline-flex items-center mt-6 text-primary font-medium hover:text-primary-dark transition-colors duration-200">
+                                Learn more
+                                <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                            </a>
                         </div>
-                        <h3 class="<?php echo $feature['text']; ?> text-xl font-bold mb-4"><?php echo $feature['title']; ?></h3>
-                        <p class="text-text-light"><?php echo $feature['description']; ?></p>
-                        <a href="#" class="inline-flex items-center mt-6 text-primary font-medium hover:text-primary-dark transition-colors duration-200">
-                            Learn more
-                            <i class="fas fa-arrow-right ml-2 text-sm"></i>
-                        </a>
-                    </div>
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
     </section>
@@ -322,47 +314,87 @@ $faqs = [
                     Explore our most popular courses designed to help you advance in your career
                 </p>
             </div>
-            <div class="grid md:grid-cols-3 gap-8">
-                <?php foreach ($courses as $index => $course): ?>
-                    <div class="bg-white rounded-xl overflow-hidden shadow-lg course-card transition-all duration-300">
-                        <div class="relative">
-                            <img src="<?php echo $course['image']; ?>" alt="<?php echo $course['title']; ?>" class="w-full aspect-video object-cover">
-                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-primary">
-                                <?php echo $course['duration']; ?>
-                            </div>
+            <!-- for 3 popular courses -->
+            <div id="coursesGrid" class="grid md:grid-cols-3 gap-8">
+            <?php foreach ($pagedCourses as $course): ?>
+                <a href="<?php echo '/courseDetails?course=' . htmlspecialchars($course['id']); ?>" class="bg-white rounded-xl overflow-hidden shadow-lg course-card transition-all duration-300">
+                    <div class="relative">
+                        <img src="<?php echo $course['thumbnail_url'] ? htmlspecialchars($course['thumbnail_url']) : 'https://via.placeholder.com/300x200.png?text=Course+Thumbnail'; ?>" 
+                            alt="<?php echo htmlspecialchars($course['title']); ?>" 
+                            class="w-full aspect-video object-cover">
+                        <!-- Duration could be added here if available in data -->
+                        <div class="absolute top-4 right-4 rounded-full text-sm font-medium text-primary">
+                        <button onclick="toggleSave(<?php echo $course['id']; ?>)" 
+                                        class="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" 
+                                        class="h-6 w-6 transition-colors duration-300 ease-in-out text-blue-400" 
+                                        viewBox="0 0 24 24" 
+                                        stroke="currentColor" 
+                                        stroke-width="2">
+                                        <path stroke-linecap="round" 
+                                            stroke-linejoin="round" 
+                                            d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                    </svg>
+                                </button>
                         </div>
-                        <div class="p-6">
-                            <div class="flex items-center space-x-2 mb-3">
-                                <div class="flex">
-                                    <?php for ($i = 0; $i < 5; $i++): ?>
-                                        <?php if ($i < floor($course['rating'])): ?>
-                                            <i class="fas fa-star text-warning text-sm"></i>
-                                        <?php elseif ($i < $course['rating']): ?>
-                                            <i class="fas fa-star-half-alt text-warning text-sm"></i>
-                                        <?php else: ?>
-                                            <i class="far fa-star text-warning text-sm"></i>
-                                        <?php endif; ?>
-                                    <?php endfor; ?>
-                                </div>
-                                <span class="text-text-light text-sm">(<?php echo $course['rating']; ?>)</span>
+                    </div>
+                    <div class="p-6">
+                        <!-- Rating section - adding placeholder since original doesn't have rating -->
+                        <!-- <div class="flex items-center space-x-2 mb-3">
+                            <div class="flex">
+                                <?php 
+                                // Using a default rating since it's not in original data
+                                $rating = $course['rating'] ?? 4.5;
+                                for ($i = 0; $i < 5; $i++): ?>
+                                    <?php if ($i < floor($rating)): ?>
+                                        <i class="fas fa-star text-warning text-sm"></i>
+                                    <?php elseif ($i < $rating): ?>
+                                        <i class="fas fa-star-half-alt text-warning text-sm"></i>
+                                    <?php else: ?>
+                                        <i class="far fa-star text-warning text-sm"></i>
+                                    <?php endif; ?>
+                                <?php endfor; ?>
                             </div>
-                            <h3 class="font-semibold text-primary text-xl mb-2"><?php echo $course['title']; ?></h3>
-                            <div class="flex items-center text-text-light text-sm mb-4">
-                                <i class="fas fa-users mr-2"></i>
-                                <span><?php echo number_format($course['students']); ?> students</span>
-                            </div>
-                            <div class="flex justify-between items-center pt-4 border-t border-gray-100">
-                                <span class="text-primary font-bold text-xl"><?php echo $course['price']; ?></span>
+                            <span class="text-text-light text-sm">(<?php echo $rating; ?>)</span>
+                        </div> -->
+                        
+                        <h3 class="font-semibold text-primary text-xl mb-2">
+                            <?php echo htmlspecialchars($course['title']); ?>
+                        </h3>
+                        
+                        <div class="flex items-center text-text-light text-sm mb-4">
+                            <i class="fas fa-users mr-2"></i>
+                            <span><?php echo number_format($course['enrolled_students']); ?> students</span>
+                        </div>
+                        
+                        <!-- <div class="flex justify-between items-center pt-4 border-t border-gray-100">
+                            <span class="text-primary font-bold text-xl">
+                                <?php echo $course['price'] ?? 'N/A'; ?>
+                            </span>
+                            <div class="flex items-center space-x-2">
                                 <button class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md text-sm transition-colors duration-200">
                                     Enroll Now
                                 </button>
+                                <button onclick="toggleSave(<?php echo $course['id']; ?>)" 
+                                        class="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" 
+                                        class="h-6 w-6 transition-colors duration-300 ease-in-out text-blue-400" 
+                                        viewBox="0 0 24 24" 
+                                        stroke="currentColor" 
+                                        stroke-width="2">
+                                        <path stroke-linecap="round" 
+                                            stroke-linejoin="round" 
+                                            d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                    </svg>
+                                </button>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
-                <?php endforeach; ?>
-            </div>
+                </a>
+            <?php endforeach; ?>
+        </div>
             <div class="text-center mt-12">
-                <a href="#" class="inline-block border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 rounded-md transition-colors duration-200 font-medium">
+                <a href="category" class="inline-block border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 rounded-md transition-colors duration-200 font-medium">
                     View All Courses
                 </a>
             </div>
