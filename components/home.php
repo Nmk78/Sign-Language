@@ -106,7 +106,6 @@ $faqs = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EDUTOCK - Online Learning Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -214,13 +213,13 @@ $faqs = [
                     "Hands That Speak, <span class="text-accent ml-7">Hearts That Connect."</span>
                 </h1>
                 <p class="text-lg text-white/90 max-w-lg">
-                    Learn, connect, and communicate effortlessly with our interactive sign language courses. Empower inclusivity with technology.
+                Learn, connect, and communicate effortlessly with our interactive sign language courses. Empower inclusivity with technology.
                 </p>
                 <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                    <a href="#learn" class="bg-[#ffffff] hover:bg-[#154785] text-[#154785] hover:text-white px-8 py-3 rounded-md font-medium transition-all">
+                    <a href="/category" class="bg-[#ffffff] hover:bg-[#154785] text-[#154785] hover:text-white px-8 py-3 rounded-md font-medium transition-all">
                         Start Learning
                     </a>
-                    <a href="#about" class="border border-white/50 hover:bg-white hover:text-primary px-8 py-3 rounded-md font-medium transition-all">
+                    <a href="/about" class="border border-white/50 hover:bg-white hover:text-primary px-8 py-3 rounded-md font-medium transition-all">
                         Discover More
                     </a>
                 </div>

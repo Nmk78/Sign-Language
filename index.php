@@ -95,7 +95,7 @@ $courses = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EDUTOCK - Online Learning Platform</title>
+    <title>Silent Voice</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -208,8 +208,8 @@ $courses = [
 
     <!-- Header -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center py-2">
                 <!-- Logo -->
                 <div class="flex items-center text-[#1e5dac]">
                     <i class="fas fa-hands text-2xl mr-2"></i> <a href="/" class="text-2xl font-bold text-primary ">SILENT<span class="text-primary-dark">VOICE</span></a>
@@ -369,6 +369,9 @@ $courses = [
         case 'about':
             require 'components/about.php';
             break;
+        case 'contact':
+            require 'components/contact.php';
+            break;
         default:
             require 'components/notfound.php';
             break;
@@ -385,34 +388,97 @@ $courses = [
 
     if (!in_array($uri, $hiddenPages)) {
         echo '
-        <!-- Modern footer -->
-        <div class="mt-16 max-w-6xl mx-auto pt-8 border-t border-gray-100">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-gray-500 text-sm">
-                    © ' . date('Y') . ' Sign Language Learning Platform
-                </p>
-    
-                <div class="flex items-center space-x-6">
-                    <a href="#" class="text-gray-500 hover:text-primary transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-                        </svg>
-                    </a>
-                    <a href="#" class="text-gray-500 hover:text-primary transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
-                        </svg>
-                    </a>
-                    <a href="#" class="text-gray-500 hover:text-primary transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                        </svg>
-                    </a>
+            <footer class="bg-primary-dark  text-white py-12">
+        <div class="container max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                                <div class="flex items-center space-x-2 mb-4">
+                       <img src="assets/bird.jpg" alt="" width="150" height="" class="overflow-hidden h-24 object-cover">
+                        <span class="font-bold text-lg">SILENT VOICE</span>
+                    </div>
+                <div>
+
+                    <p class="text-white/70 mb-4">Breaking barriers through sign language education, creating a more inclusive world for everyone.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-white/70 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-white/70 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-white/70 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-white/70 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                                <rect width="4" height="12" x="2" y="9"/>
+                                <circle cx="4" cy="4" r="2"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/" class="text-white/70 hover:text-white transition-colors">Home</a></li>
+                        <li><a href="/category" class="text-white/70 hover:text-white transition-colors">Category</a></li>
+                        <li><a href="/about" class="text-white/70 hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="/contact" class="text-white/70 hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+
+                
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Contact Us</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-start space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-1 text-white/70">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                            </svg>
+                            <span class="text-white/70">(123) 456-7890</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-1 text-white/70">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <path d="m22 6-10 7L2 6"/>
+                            </svg>
+                            <span class="text-white/70">info@silentvoice.com</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-1 text-white/70">
+                                <path  stroke-linejoin="round" class="mt-1 text-white/70">
+                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                                <circle cx="12" cy="10" r="3"/>
+                            </svg>
+                            <span class="text-white/70">123 Sign Language St.<br>San Francisco, CA 94103</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
-        </div>';
+            
+            <div class="border-t border-white/20 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-white/70 mb-4 md:mb-0">
+                    <?php echo "© " . date("Y") . " Silent Voice. All rights reserved."; ?>
+                </p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-white/70 hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="#" class="text-white/70 hover:text-white transition-colors">Terms of Service</a>
+                    <a href="#" class="text-white/70 hover:text-white transition-colors">Accessibility</a>
+                </div>
+            </div>
+        </div>
+    </footer>';
     }
 
     ?>

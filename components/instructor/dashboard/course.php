@@ -136,18 +136,27 @@ $courses = getUserCourses($user_id);
                 },
                 keyframes: {
                     fadeIn: {
-                        '0%': { opacity: '0' },
-                        '100%': { opacity: '1' },
+                        '0%': {
+                            opacity: '0'
+                        },
+                        '100%': {
+                            opacity: '1'
+                        },
                     },
                     slideUp: {
-                        '0%': { transform: 'translateY(20px)', opacity: '0' },
-                        '100%': { transform: 'translateY(0)', opacity: '1' },
+                        '0%': {
+                            transform: 'translateY(20px)',
+                            opacity: '0'
+                        },
+                        '100%': {
+                            transform: 'translateY(0)',
+                            opacity: '1'
+                        },
                     },
                 },
             }
         }
     }
-
 </script>
 <!DOCTYPE html>
 <html lang="en">
@@ -160,6 +169,8 @@ $courses = getUserCourses($user_id);
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="icon" type="image/png" href="assets/image.png">
+
 </head>
 
 <body class="bg-gray-100 relative">
@@ -242,13 +253,13 @@ $courses = getUserCourses($user_id);
                                 <!-- Status Badge -->
                                 <div class="absolute top-3 left-3">
                                     <span class="px-2 py-1 text-xs font-semibold rounded-full <?php
-                                    if ($course['status'] === 'published')
-                                        echo 'bg-green-100 text-green-800';
-                                    elseif ($course['status'] === 'draft')
-                                        echo 'bg-gray-100 text-gray-800';
-                                    else
-                                        echo 'bg-red-100 text-red-800';
-                                    ?>">
+                                                                                                if ($course['status'] === 'published')
+                                                                                                    echo 'bg-green-100 text-green-800';
+                                                                                                elseif ($course['status'] === 'draft')
+                                                                                                    echo 'bg-gray-100 text-gray-800';
+                                                                                                else
+                                                                                                    echo 'bg-red-100 text-red-800';
+                                                                                                ?>">
                                         <?php echo ucfirst(htmlspecialchars($course['status'])); ?>
                                     </span>
                                 </div>
@@ -684,12 +695,12 @@ $courses = getUserCourses($user_id);
         }
 
         // Document ready event
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // Toggle lessons section
             const toggleButtons = document.querySelectorAll('.toggle-lessons-btn');
 
             toggleButtons.forEach(button => {
-                button.addEventListener('click', function (e) {
+                button.addEventListener('click', function(e) {
                     e.preventDefault();
                     const courseId = this.getAttribute('data-course-id');
                     const lessonList = document.getElementById(`lessonList-${courseId}`);
@@ -722,7 +733,7 @@ $courses = getUserCourses($user_id);
             const manageButtons = document.querySelectorAll('.manage-course-btn');
 
             manageButtons.forEach(button => {
-                button.addEventListener('click', function (e) {
+                button.addEventListener('click', function(e) {
                     e.preventDefault();
                     const courseId = this.getAttribute('data-course-id');
                     const courseTitle = this.getAttribute('data-course-title');
@@ -734,7 +745,7 @@ $courses = getUserCourses($user_id);
             const addLessonButtons = document.querySelectorAll('.add-lesson-btn');
 
             addLessonButtons.forEach(button => {
-                button.addEventListener('click', function (e) {
+                button.addEventListener('click', function(e) {
                     e.preventDefault();
                     const courseId = this.getAttribute('data-course-id');
                     const courseTitle = this.getAttribute('data-course-title');
@@ -745,7 +756,7 @@ $courses = getUserCourses($user_id);
             // Close modal button
             const closeModalBtn = document.getElementById('closeModal');
             if (closeModalBtn) {
-                closeModalBtn.addEventListener('click', function () {
+                closeModalBtn.addEventListener('click', function() {
                     document.getElementById('courseManagerModal').classList.add('hidden');
                 });
             }
@@ -753,14 +764,14 @@ $courses = getUserCourses($user_id);
             // Course form submission
             const courseForm = document.getElementById('courseForm');
             if (courseForm) {
-                courseForm.addEventListener('submit', function (e) {
+                courseForm.addEventListener('submit', function(e) {
                     e.preventDefault();
                     const formData = new FormData(this);
 
                     fetch('handlers/createCourse.php', {
-                        method: 'POST',
-                        body: formData
-                    })
+                            method: 'POST',
+                            body: formData
+                        })
                         .then(response => response.json())
                         .then(data => {
                             const formMessage = document.getElementById('formMessage');
