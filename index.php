@@ -206,10 +206,11 @@ $courses = [
         </div>
     </header> -->
 
-    <!-- Header -->
+    <!-- Header --> 
+     <!-- TODO reduce the py-0 done for nav bar is too long  -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
+            <div class="flex justify-between items-center py-0">
                 <!-- Logo -->
                 <div class="flex items-center text-[#1e5dac]">
                 <i class="fas fa-hands text-2xl mr-2"></i> <a href="/" class="text-2xl font-bold text-primary ">SILENT<span class="text-primary-dark">VOICE</span></a>

@@ -284,7 +284,7 @@ $total_enrollments = $total_pending + $total_approved + $total_rejected;
 
 <body class="bg-gray-50 min-h-screen">
     <!-- Header with Navigation -->
-    <header class="bg-white shadow-sm">
+    <!-- <header class="bg-white shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center">
@@ -299,7 +299,7 @@ $total_enrollments = $total_pending + $total_approved + $total_rejected;
                 </nav>
             </div>
         </div>
-    </header>
+    </header> -->
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -426,7 +426,8 @@ $total_enrollments = $total_pending + $total_approved + $total_rejected;
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pending</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Approved</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rejected</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                <!-- TODO remove the action column -->
+                                <!-- <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th> -->
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -462,11 +463,12 @@ $total_enrollments = $total_pending + $total_approved + $total_rejected;
                                                 <?php echo $stat['rejected_count']; ?>
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                         <!-- TODO remove the action column -->
+                                        <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             <a href="course-details.php?id=<?php echo $stat['course_id']; ?>" class="text-blue-600 hover:text-blue-900 mr-3">
                                                 <i class="fas fa-eye"></i> View
                                             </a>
-                                        </td>
+                                        </td> -->
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -776,12 +778,8 @@ $total_enrollments = $total_pending + $total_approved + $total_rejected;
                                     <p class="text-gray-900">${data.enrolled_courses} courses</p>
                                 </div>
                             </div>
-                            <div class="mt-6 flex justify-end">
-                                <a href="student-details.php?id=${data.id}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                                    View Full Profile
-                                </a>
-                            </div>
                         `);
+                        // TODO i remove the view profile
                     },
                     error: function() {
                         // If AJAX call fails, display a fallback
