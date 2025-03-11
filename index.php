@@ -246,10 +246,10 @@ $courses = [
                 <div class="flex items-center space-x-4">
                     <div class="relative flex items-center">
                         <!-- Search Form -->
-                        <form action="search" method="GET" class="flex items-center border border-gray-300 rounded-full overflow-hidden transition-all duration-300 ease-in-out" id="searchContainer">
+                        <form action="search" method="GET" class="flex items-center border mt-4 border-primary rounded-full overflow-hidden transition-all duration-300 ease-in-out" id="searchContainer">
                             <input type="text" name="query" id="searchInput" placeholder="Search..."
-                                class="w-0 px-0 py-2 text-gray-700 outline-none transition-all duration-300 ease-in-out opacity-0 bg-transparent" />
-                            <button type="button" id="searchBtn" class="p-3 bg-blue-500 text-white rounded-full focus:outline-none">
+                                class="w-0 px-0 py-1 text-gray-700 outline-none transition-all duration-300 ease-in-out opacity-0 bg-transparent" />
+                            <button type="button" id="searchBtn" class="p-2 text-slate-900 rounded-full focus:outline-none">
                                 <i class="fas fa-search"></i>
                             </button>
                         </form>
