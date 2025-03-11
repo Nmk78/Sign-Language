@@ -206,8 +206,8 @@ $courses = [
         </div>
     </header> -->
 
-    <!-- Header --> 
-     <!-- TODO reduce the py-0 done for nav bar is too long  -->
+    <!-- Header -->
+    <!-- TODO reduce the py-0 done for nav bar is too long  -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto">
             <div class="flex justify-between items-center py-2">
@@ -227,12 +227,14 @@ $courses = [
                     // 'profile' => '/profile',
                     // 'courseDetails' => '/courseDetails',
                 ];
+                $activePage = basename($_SERVER['REQUEST_URI']) ?: 'home';
 
                 echo '<nav class="hidden md:flex space-x-8" aria-label="Main navigation">';
                 echo implode('', array_map(function ($name, $url) use ($activePage) {
-                    $activeClass = $activePage === $name
-                        ? 'text-primary-dark font-semibold border-b-2 border-primary-dark'
-                        : 'text-primary-dark hover:text-primary-dark/80 hover:border-b-2 hover:border-primary-dark/50';
+                    $activeClass = strtolower($activePage) === strtolower($name)
+                        ? 'text-primary-dark font-semibold border-b-2 border-primary-dark inline-block'
+                        : 'text-primary-dark hover:text-primary-dark/80 hover:border-b-2 hover:border-primary-dark/50 inline-block';
+
                     return sprintf(
                         '<a href="%s" class="%s transition-all duration-200 ease-in-out" title="%s">%s</a>',
                         htmlspecialchars($url),
