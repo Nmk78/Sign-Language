@@ -245,7 +245,6 @@ $faqs = [
                 COUNT(ce.id) as enrolled_students
             FROM courses c
             LEFT JOIN course_enrollments ce ON c.id = ce.course_id
-            WHERE c.status = 'published'
             GROUP BY c.id
         ";
         $stmt = $pdo->prepare($query);
