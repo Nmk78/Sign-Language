@@ -254,14 +254,15 @@ function formatTimeAgo($datetime)
                     <?php endif; ?>
                     <?php
                     if (isset($_GET['success'])) {
-
-                        echo "<script>
-                showToast('success', htmlspecialchars($_GET['success']));
-              </script>";
+                        $success_message = htmlspecialchars($_GET['success']);
+                        echo "<script>showToast('success', 'Enrolled', '$success_message');</script>";
                     }
+                    ?>
 
+                    <?php
                     if (isset($_GET['error'])) {
-                        echo '<div class="error">' . htmlspecialchars($_GET['error']) . '</div>';
+                        $error_message = htmlspecialchars($_GET['error']);
+                        echo "<script>showToast('error', 'Try again', '$error_message');</script>";
                     }
                     ?>
 
