@@ -1,6 +1,11 @@
 videos/*
 !videos/.gitkeep
+
 images/*
-uploads/*
 !images/.gitkeep
+
+uploads/*
 !uploads/.gitkeep
+
+quizzes/*
+!quizzes/.gitkeep

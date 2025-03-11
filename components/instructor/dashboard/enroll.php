@@ -2,6 +2,11 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Check if user is logged in and is a teacher
 if (!isset($_SESSION['user']['user_id']) || !isset($_SESSION['user']['role']) || $_SESSION['user']['role'] !== 'teacher') {
     // Redirect to login page
@@ -29,10 +34,10 @@ $teacher_id = $_SESSION['user']['user_id'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && isset($_POST['enrollment_id'])) {
     $enrollment_id = intval($_POST['enrollment_id']);
     $action = $_POST['action'];
-    
+
     if ($action === 'approve' || $action === 'reject') {
         $status = ($action === 'approve') ? 'approved' : 'rejected';
-        
+
         // Verify this enrollment belongs to a course created by this teacher
         $verify_stmt = $conn->prepare("
             SELECT ce.id 
@@ -43,12 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && isset($_
         $verify_stmt->bind_param("ii", $enrollment_id, $teacher_id);
         $verify_stmt->execute();
         $verify_result = $verify_stmt->get_result();
-        
+
         if ($verify_result->num_rows > 0) {
             // Update the enrollment status
             $update_stmt = $conn->prepare("UPDATE course_enrollments SET status = ? WHERE id = ?");
             $update_stmt->bind_param("si", $status, $enrollment_id);
-            
+
             if ($update_stmt->execute()) {
                 $success_message = "Enrollment successfully " . $action . "d.";
             } else {
@@ -118,9 +123,14 @@ $enrollments_stmt = $conn->prepare("
 $enrollments_stmt->bind_param("i", $teacher_id);
 $enrollments_stmt->execute();
 $enrollments_result = $enrollments_stmt->get_result();
+
 $pending_enrollments = $enrollments_result->fetch_all(MYSQLI_ASSOC);
 $enrollments_stmt->close();
 
+
+// echo '<pre>';
+// print_r($enrollment_stats);
+// echo '</pre>';
 // Get recent enrollment activity (approved/rejected) for all courses created by this teacher
 $activity_stmt = $conn->prepare("
     SELECT 
@@ -150,11 +160,12 @@ $activity_stmt->close();
 $conn->close();
 
 // Helper function to format dates
-function formatTimeAgo($datetime) {
+function formatTimeAgo($datetime)
+{
     $time = strtotime($datetime);
     $now = time();
     $diff = $now - $time;
-    
+
     if ($diff < 60) {
         return "just now";
     } elseif ($diff < 3600) {
@@ -191,431 +202,677 @@ $total_enrollments = $total_pending + $total_approved + $total_rejected;
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher Enrollment Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
         .fade-in {
             animation: fadeIn 0.3s ease-out forwards;
         }
+
         .scrollbar-thin::-webkit-scrollbar {
             width: 4px;
             height: 4px;
         }
+
         .scrollbar-thin::-webkit-scrollbar-track {
             background: #f1f1f1;
         }
+
         .scrollbar-thin::-webkit-scrollbar-thumb {
             background: #888;
             border-radius: 2px;
         }
+
         .scrollbar-thin::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-badge {
+            transition: all 0.2s ease;
+        }
+
+        .status-badge:hover {
+            transform: scale(1.05);
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+        }
     </style>
 </head>
+
 <body class="bg-gray-50 min-h-screen">
+    <!-- Header with Navigation -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <i class="fas fa-chalkboard-teacher text-blue-600 text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold text-gray-900">Teacher Dashboard</h1>
+                </div>
+                <nav class="flex space-x-4">
+                    <a href="dashboard.php" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                    <a href="courses.php" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">My Courses</a>
+                    <a href="teacher-enrollments.php" class="text-blue-600 border-b-2 border-blue-600 px-3 py-2 rounded-md text-sm font-medium">Enrollments</a>
+                    <a href="profile.php" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Profile</a>
+                </nav>
+            </div>
+        </div>
+    </header>
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Page Title and Summary Cards -->
-        <div class="mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Enrollment Management</h2>
-            
-            <!-- Summary Cards -->
-
-        </div>
-
         <!-- Success/Error Messages -->
         <?php if (isset($success_message)): ?>
-        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded fade-in" role="alert">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-check-circle text-green-500"></i>
+            <div id="successAlert" class="mb-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded fade-in" role="alert">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <p><?php echo $success_message; ?></p>
                 </div>
-                <div class="ml-3">
-                    <p class="font-medium"><?php echo $success_message; ?></p>
-                </div>
-                <button class="ml-auto" onclick="this.parentElement.parentElement.remove()">
-                    <i class="fas fa-times text-green-500"></i>
+                <button onclick="document.getElementById('successAlert').style.display='none'" class="absolute top-0 right-0 mt-4 mr-4 text-green-700">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
-        </div>
         <?php endif; ?>
 
         <?php if (isset($error_message)): ?>
-        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded fade-in" role="alert">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-exclamation-circle text-red-500"></i>
+            <div id="errorAlert" class="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded fade-in" role="alert">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <p><?php echo $error_message; ?></p>
                 </div>
-                <div class="ml-3">
-                    <p class="font-medium"><?php echo $error_message; ?></p>
-                </div>
-                <button class="ml-auto" onclick="this.parentElement.parentElement.remove()">
-                    <i class="fas fa-times text-red-500"></i>
+                <button onclick="document.getElementById('errorAlert').style.display='none'" class="absolute top-0 right-0 mt-4 mr-4 text-red-700">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
-        </div>
         <?php endif; ?>
 
-        <!-- Dashboard Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Left Column: Enrollment Stats and Activity -->
-            <div class="lg:col-span-1 space-y-6">
-                <!-- Enrollment Statistics -->
-                <div class="bg-white shadow rounded-lg overflow-hidden fade-in" style="animation-delay: 0.5s">
-                    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                        <h3 class="text-lg font-semibold text-gray-900">Enrollment Statistics</h3>
-                        <span class="text-xs text-gray-500">By Course</span>
-                    </div>
-                    
-                    <div class="p-6 max-h-96 overflow-y-auto scrollbar-thin">
-                        <?php if (empty($enrollment_stats)): ?>
-                        <div class="text-center py-8">
-                            <i class="fas fa-chart-bar text-gray-300 text-4xl mb-3"></i>
-                            <p class="text-gray-500">No enrollment data available.</p>
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Enrollment Management</h2>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="bg-white shadow rounded-lg p-5 card-hover fade-in">
+                    <div class="flex items-center">
+                        <div class="bg-blue-100 p-3 rounded-full">
+                            <i class="fas fa-book text-blue-600 text-xl"></i>
                         </div>
-                        <?php else: ?>
-                            <?php foreach ($enrollment_stats as $stat): ?>
-                            <div class="mb-5 pb-5 border-b border-gray-100 last:border-0 last:pb-0 last:mb-0">
-                                <div class="flex justify-between items-center mb-2">
-                                    <h4 class="font-medium text-gray-800 truncate max-w-[200px]" title="<?php echo htmlspecialchars($stat['course_title']); ?>">
-                                        <?php echo htmlspecialchars($stat['course_title']); ?>
-                                    </h4>
-                                    <span class="text-xs text-gray-500"><?php echo $stat['total_enrollments']; ?> total</span>
-                                </div>
-                                
-                                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-3">
-                                    <?php 
-                                    $total = max(1, $stat['total_enrollments']); // Avoid division by zero
-                                    $pending_width = ($stat['pending_count'] / $total) * 100;
-                                    $approved_width = ($stat['approved_count'] / $total) * 100;
-                                    $rejected_width = ($stat['rejected_count'] / $total) * 100;
-                                    ?>
-                                    <div class="flex h-2.5 rounded-full overflow-hidden">
-                                        <div class="bg-yellow-400" style="width: <?php echo $pending_width; ?>%"></div>
-                                        <div class="bg-green-500" style="width: <?php echo $approved_width; ?>%"></div>
-                                        <div class="bg-red-500" style="width: <?php echo $rejected_width; ?>%"></div>
-                                    </div>
-                                </div>
-                                
-                                <div class="grid grid-cols-3 gap-2 text-center">
-                                    <div class="bg-yellow-50 p-2 rounded">
-                                        <span class="block text-yellow-700 font-semibold"><?php echo $stat['pending_count']; ?></span>
-                                        <span class="text-xs text-yellow-600">Pending</span>
-                                    </div>
-                                    <div class="bg-green-50 p-2 rounded">
-                                        <span class="block text-green-700 font-semibold"><?php echo $stat['approved_count']; ?></span>
-                                        <span class="text-xs text-green-600">Approved</span>
-                                    </div>
-                                    <div class="bg-red-50 p-2 rounded">
-                                        <span class="block text-red-700 font-semibold"><?php echo $stat['rejected_count']; ?></span>
-                                        <span class="text-xs text-red-600">Rejected</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Total Courses</p>
+                            <p class="text-2xl font-semibold text-gray-900"><?php echo $total_courses; ?></p>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-sm text-gray-500">
+                        <span class="text-green-600 font-medium">
+                            <i class="fas fa-arrow-up mr-1"></i>
+                            <?php echo round(($total_courses > 0 ? $total_enrollments / $total_courses : 0), 1); ?>
+                        </span>
+                        enrollments per course
                     </div>
                 </div>
 
-                <!-- Recent Activity -->
-                <div class="bg-white shadow rounded-lg overflow-hidden fade-in" style="animation-delay: 0.6s">
-                    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                        <h3 class="text-lg font-semibold text-gray-900">Recent Activity</h3>
-                        <span class="text-xs text-gray-500">Last 10 actions</span>
-                    </div>
-                    
-                    <div class="p-6 max-h-[400px] overflow-y-auto scrollbar-thin">
-                        <?php if (empty($recent_activity)): ?>
-                        <div class="text-center py-8">
-                            <i class="fas fa-history text-gray-300 text-4xl mb-3"></i>
-                            <p class="text-gray-500">No recent activity.</p>
+                <div class="bg-white shadow rounded-lg p-5 card-hover fade-in" style="animation-delay: 0.1s">
+                    <div class="flex items-center">
+                        <div class="bg-yellow-100 p-3 rounded-full">
+                            <i class="fas fa-clock text-yellow-600 text-xl"></i>
                         </div>
-                        <?php else: ?>
-                            <div class="space-y-4">
-                                <?php foreach ($recent_activity as $activity): ?>
-                                <div class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
-                                    <div class="flex-shrink-0">
-                                        <?php if ($activity['status'] === 'approved'): ?>
-                                        <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-green-100">
-                                            <i class="fas fa-check text-green-600"></i>
-                                        </span>
-                                        <?php else: ?>
-                                        <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-red-100">
-                                            <i class="fas fa-times text-red-600"></i>
-                                        </span>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-900">
-                                            <?php echo htmlspecialchars($activity['username']); ?>
-                                        </p>
-                                        <p class="text-sm text-gray-600">
-                                            <?php echo ucfirst($activity['status']); ?> for 
-                                            <span class="font-medium"><?php echo htmlspecialchars($activity['course_title']); ?></span>
-                                        </p>
-                                        <p class="text-xs text-gray-400 mt-1">
-                                            <?php echo formatTimeAgo($activity['enrolled_at']); ?>
-                                        </p>
-                                    </div>
-                                </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Pending</p>
+                            <p class="text-2xl font-semibold text-gray-900"><?php echo $total_pending; ?></p>
+                        </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Right Column: Pending Enrollments and Courses -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- Pending Enrollment Requests -->
-                <div class="bg-white shadow rounded-lg overflow-hidden fade-in" style="animation-delay: 0.7s">
-                    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                        <h3 class="text-lg font-semibold text-gray-900">Pending Enrollment Requests</h3>
-                        <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">
-                            <?php echo count($pending_enrollments); ?> pending
+                    <div class="mt-3 text-sm text-gray-500">
+                        <span class="<?php echo $total_pending > 0 ? 'text-yellow-600' : 'text-gray-500'; ?> font-medium">
+                            <?php echo $total_pending > 0 ? '<i class="fas fa-exclamation-circle mr-1"></i> Needs attention' : 'No pending requests'; ?>
                         </span>
                     </div>
-                    
-                    <?php if (empty($pending_enrollments)): ?>
-                    <div class="p-6 text-center">
-                        <div class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-                            <i class="fas fa-check text-green-600 text-2xl"></i>
-                        </div>
-                        <h3 class="text-lg font-medium text-gray-900">All caught up!</h3>
-                        <p class="mt-2 text-sm text-gray-500 max-w-md mx-auto">
-                            You've processed all enrollment requests. New requests will appear here when students enroll in your courses.
-                        </p>
-                    </div>
-                    <?php else: ?>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Student
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Course
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Requested
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <?php foreach ($pending_enrollments as $index => $enrollment): ?>
-                                <tr class="hover:bg-gray-50 transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10">
-                                                <?php if (!empty($enrollment['profile']) && $enrollment['profile'] !== 'assets/avatar13.svg'): ?>
-                                                <img class="h-10 w-10 rounded-full object-cover" src="<?php echo htmlspecialchars($enrollment['profile']); ?>" alt="Profile">
-                                                <?php else: ?>
-                                                <div class="h-10 w-10 rounded-full bg-[#4A90E2] flex items-center justify-center text-white font-semibold">
-                                                    <?php echo strtoupper(substr($enrollment['username'], 0, 1)); ?>
-                                                </div>
-                                                <?php endif; ?>
-                                            </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">
-                                                    <?php echo htmlspecialchars($enrollment['username']); ?>
-                                                </div>
-                                                <div class="text-sm text-gray-500">
-                                                    <?php echo htmlspecialchars($enrollment['email']); ?>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900 font-medium"><?php echo htmlspecialchars($enrollment['course_title']); ?></div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-500"><?php echo formatTimeAgo($enrollment['enrolled_at']); ?></div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <div class="flex justify-end space-x-2">
-                                            <form method="post" action="" class="inline-block">
-                                                <input type="hidden" name="enrollment_id" value="<?php echo $enrollment['enrollment_id']; ?>">
-                                                <input type="hidden" name="action" value="approve">
-                                                <button type="submit" class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
-                                                    <i class="fas fa-check mr-1"></i> Approve
-                                                </button>
-                                            </form>
-                                            <form method="post" action="" class="inline-block">
-                                                <input type="hidden" name="enrollment_id" value="<?php echo $enrollment['enrollment_id']; ?>">
-                                                <input type="hidden" name="action" value="reject">
-                                                <button type="submit" class="bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
-                                                    <i class="fas fa-times mr-1"></i> Reject
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                    <?php endif; ?>
                 </div>
 
-                <!-- Course List -->
-                <div class="bg-white shadow rounded-lg overflow-hidden fade-in" style="animation-delay: 0.8s">
-                    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                        <h3 class="text-lg font-semibold text-gray-900">Your Courses</h3>
-                        <a href="create-course.php" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-[#4A90E2] hover:bg-[#357abd] transition-colors">
-                            <i class="fas fa-plus mr-1"></i> New Course
-                        </a>
-                    </div>
-                    
-                    <?php if (empty($courses)): ?>
-                    <div class="p-6 text-center">
-                        <div class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
-                            <i class="fas fa-book text-blue-600 text-2xl"></i>
+                <div class="bg-white shadow rounded-lg p-5 card-hover fade-in" style="animation-delay: 0.2s">
+                    <div class="flex items-center">
+                        <div class="bg-green-100 p-3 rounded-full">
+                            <i class="fas fa-check-circle text-green-600 text-xl"></i>
                         </div>
-                        <h3 class="text-lg font-medium text-gray-900">No courses yet</h3>
-                        <p class="mt-2 text-sm text-gray-500 max-w-md mx-auto">
-                            You haven't created any courses yet. Click the "New Course" button above to get started.
-                        </p>
-                        <div class="mt-6">
-                            <a href="create-course.php" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#4A90E2] hover:bg-[#357abd] transition-colors">
-                                Create Your First Course
-                            </a>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Approved</p>
+                            <p class="text-2xl font-semibold text-gray-900"><?php echo $total_approved; ?></p>
                         </div>
                     </div>
-                    <?php else: ?>
+                    <div class="mt-3 text-sm text-gray-500">
+                        <span class="text-green-600 font-medium">
+                            <?php
+                            $approval_rate = $total_enrollments > 0 ? round(($total_approved / $total_enrollments) * 100) : 0;
+                            echo $approval_rate . '%';
+                            ?>
+                        </span>
+                        approval rate
+                    </div>
+                </div>
+
+                <div class="bg-white shadow rounded-lg p-5 card-hover fade-in" style="animation-delay: 0.3s">
+                    <div class="flex items-center">
+                        <div class="bg-red-100 p-3 rounded-full">
+                            <i class="fas fa-times-circle text-red-600 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Rejected</p>
+                            <p class="text-2xl font-semibold text-gray-900"><?php echo $total_rejected; ?></p>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-sm text-gray-500">
+                        <span class="text-red-600 font-medium">
+                            <?php
+                            $rejection_rate = $total_enrollments > 0 ? round(($total_rejected / $total_enrollments) * 100) : 0;
+                            echo $rejection_rate . '%';
+                            ?>
+                        </span>
+                        rejection rate
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course Enrollment Stats -->
+        <div class="mb-8 fade-in" style="animation-delay: 0.4s">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Course Enrollment Statistics</h3>
+            <div class="bg-white shadow rounded-lg overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pending</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Approved</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rejected</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <?php if (empty($enrollment_stats)): ?>
+                                <tr>
+                                    <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">No enrollment statistics available.</td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($enrollment_stats as $stat): ?>
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($stat['course_title']); ?></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900"><?php echo $stat['total_enrollments']; ?></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <?php if ($stat['pending_count'] > 0): ?>
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                    <?php echo $stat['pending_count']; ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="text-sm text-gray-500">0</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                <?php echo $stat['approved_count']; ?>
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                <?php echo $stat['rejected_count']; ?>
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <a href="course-details.php?id=<?php echo $stat['course_id']; ?>" class="text-blue-600 hover:text-blue-900 mr-3">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Enrollments Section -->
+        <div class="mb-8 fade-in" style="animation-delay: 0.5s">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Pending Enrollment Requests</h3>
+
+                <?php if (!empty($pending_enrollments)): ?>
+                    <div class="flex items-center">
+                        <span class="relative flex h-3 w-3 mr-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
+                        </span>
+                        <span class="text-sm text-gray-600"><?php echo count($pending_enrollments); ?> pending requests</span>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <?php if (!empty($pending_enrollments)): ?>
+                <div class="bg-white shadow rounded-lg mb-6 p-4">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <div class="flex-1">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-search text-gray-400"></i>
+                                </div>
+                                <input type="text" id="enrollmentSearch" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Search by student name or email...">
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <select id="courseFilter" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">All Courses</option>
+                                <?php foreach ($courses as $course): ?>
+                                    <option value="<?php echo $course['id']; ?>"><?php echo htmlspecialchars($course['title']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <button id="refreshBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="pendingEnrollmentsContainer" class="bg-white shadow rounded-lg overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Course
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Category
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Enrollments
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Actions
-                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Requested</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <?php foreach ($courses as $course): ?>
-                                <tr class="hover:bg-gray-50 transition-colors">
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($course['title']); ?></div>
-                                        <div class="text-xs text-gray-500"><?php echo formatTimeAgo($course['created_at']); ?></div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-medium rounded-full bg-gray-100 text-gray-800">
-                                            <?php echo htmlspecialchars($course['category'] ?? 'Uncategorized'); ?>
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <?php if ($course['status'] === 'published'): ?>
-                                        <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-medium rounded-full bg-green-100 text-green-800">
-                                            Published
-                                        </span>
-                                        <?php elseif ($course['status'] === 'draft'): ?>
-                                        <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-medium rounded-full bg-gray-100 text-gray-800">
-                                            Draft
-                                        </span>
-                                        <?php else: ?>
-                                        <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-medium rounded-full bg-red-100 text-red-800">
-                                            Archived
-                                        </span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <span class="text-sm font-medium text-gray-900 mr-2"><?php echo $course['enrollment_count']; ?></span>
-                                            <div class="flex -space-x-1">
-                                                <?php for ($i = 0; $i < min(3, $course['enrollment_count']); $i++): ?>
-                                                <div class="h-6 w-6 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs text-gray-600">
-                                                    <i class="fas fa-user"></i>
+                            <tbody class="bg-white divide-y divide-gray-200" id="pendingEnrollmentsList">
+                                <?php foreach ($pending_enrollments as $enrollment): ?>
+                                    <tr class="enrollment-row hover:bg-gray-50 transition-colors" data-course-id="<?php echo $enrollment['course_id']; ?>" data-student-name="<?php echo strtolower(htmlspecialchars($enrollment['username'])); ?>" data-student-email="<?php echo strtolower(htmlspecialchars($enrollment['email'])); ?>">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10">
+                                                    <?php if (!empty($enrollment['profile'])): ?>
+                                                        <img class="h-10 w-10 rounded-full object-cover" src="<?php echo htmlspecialchars($enrollment['profile']); ?>" alt="Profile">
+                                                    <?php else: ?>
+                                                        <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                                            <span class="text-blue-600 font-semibold"><?php echo strtoupper(substr($enrollment['username'], 0, 1)); ?></span>
+                                                        </div>
+                                                    <?php endif; ?>
                                                 </div>
-                                                <?php endfor; ?>
-                                                <?php if ($course['enrollment_count'] > 3): ?>
-                                                <div class="h-6 w-6 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center text-xs text-gray-600">
-                                                    +<?php echo $course['enrollment_count'] - 3; ?>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($enrollment['username']); ?></div>
+                                                    <div class="text-sm text-gray-500"><?php echo htmlspecialchars($enrollment['email']); ?></div>
                                                 </div>
-                                                <?php endif; ?>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <div class="flex justify-end space-x-2">
-                                            <a href="course-enrollments.php?course_id=<?php echo $course['id']; ?>" class="text-[#4A90E2] hover:text-[#357abd] bg-blue-50 px-3 py-1.5 rounded-md transition-colors">
-                                                <i class="fas fa-users mr-1"></i> Enrollments
-                                            </a>
-                                            <a href="edit-course.php?id=<?php echo $course['id']; ?>" class="text-gray-700 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-md transition-colors">
-                                                <i class="fas fa-edit mr-1"></i> Edit
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900"><?php echo htmlspecialchars($enrollment['course_title']); ?></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-500"><?php echo formatTimeAgo($enrollment['enrolled_at']); ?></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div class="flex justify-center items-center space-x-2">
+                                                <form method="POST" class="inline-block">
+                                                    <input type="hidden" name="enrollment_id" value="<?php echo $enrollment['enrollment_id']; ?>">
+                                                    <input type="hidden" name="action" value="approve">
+                                                    <button type="submit" class="bg-green-100 mt-3 hover:bg-green-200 text-green-800 px-3 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500">
+                                                        <i class="fas fa-check mr-1"></i> Approve
+                                                    </button>
+                                                </form>
+                                                <form method="POST" class="inline-block">
+                                                    <input type="hidden" name="enrollment_id" value="<?php echo $enrollment['enrollment_id']; ?>">
+                                                    <input type="hidden" name="action" value="reject">
+                                                    <button type="submit" class="bg-red-100 mt-3 hover:bg-red-200 text-red-800 px-3 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-500">
+                                                        <i class="fas fa-times mr-1"></i> Reject
+                                                    </button>
+                                                </form>
+                                                <button class="view-profile-btn bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500" data-user-id="<?php echo $enrollment['user_id']; ?>">
+                                                    <i class="fas fa-user mr-1 "></i> Profile
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
-                    <?php endif; ?>
                 </div>
-            </div>
+            <?php else: ?>
+                <div class="bg-white shadow rounded-lg p-6 text-center">
+                    <div class="flex flex-col items-center">
+                        <div class="bg-blue-100 p-4 rounded-full mb-4">
+                            <i class="fas fa-check-circle text-blue-600 text-3xl"></i>
+                        </div>
+                        <h4 class="text-lg font-medium text-gray-900 mb-2">All Caught Up!</h4>
+                        <p class="text-gray-600 mb-4">You have no pending enrollment requests at this time.</p>
+                        <a href="courses.php" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-plus mr-2"></i> Create New Course
+                        </a>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Recent Activity Section -->
+        <div class="fade-in" style="animation-delay: 0.6s">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Enrollment Activity</h3>
+
+            <?php if (!empty($recent_activity)): ?>
+                <div class="bg-white shadow rounded-lg overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <?php foreach ($recent_activity as $activity): ?>
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-8 w-8">
+                                                    <?php if (!empty($activity['profile'])): ?>
+                                                        <img class="h-8 w-8 rounded-full object-cover" src="<?php echo htmlspecialchars($activity['profile']); ?>" alt="Profile">
+                                                    <?php else: ?>
+                                                        <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                                            <span class="text-blue-600 font-semibold text-xs"><?php echo strtoupper(substr($activity['username'], 0, 1)); ?></span>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($activity['username']); ?></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900"><?php echo htmlspecialchars($activity['course_title']); ?></div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <?php if ($activity['status'] === 'approved'): ?>
+                                                <span class="status-badge px-2 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    <i class="fas fa-check-circle mr-1"></i> Approved
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="status-badge px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                    <i class="fas fa-times-circle mr-1"></i> Rejected
+                                                </span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <?php echo formatTimeAgo($activity['enrolled_at']); ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            <?php else: ?>
+                <div class="bg-white shadow rounded-lg p-6 text-center">
+                    <p class="text-gray-500">No recent activity to display.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 mt-8">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <p class="text-center text-sm text-gray-500">
-                &copy; <?php echo date('Y'); ?> Sign Language Learning Platform. All rights reserved.
-            </p>
+    <!-- Student Profile Modal -->
+    <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg max-w-md w-full mx-4 overflow-hidden">
+            <div class="flex justify-between items-center border-b px-6 py-4">
+                <h3 class="text-lg font-medium text-gray-900">Student Profile</h3>
+                <button id="closeProfileModal" class="text-gray-400 hover:text-gray-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="profileContent" class="p-6">
+                <div class="flex justify-center mb-4">
+                    <div class="animate-pulse flex space-x-4">
+                        <div class="rounded-full bg-gray-200 h-12 w-12"></div>
+                        <div class="flex-1 space-y-4 py-1">
+                            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                            <div class="space-y-2">
+                                <div class="h-4 bg-gray-200 rounded"></div>
+                                <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-center text-gray-500">Loading student information...</p>
+            </div>
         </div>
-    </footer>
+    </div>
 
     <script>
-    // Toggle notifications panel
-    document.getElementById('notifications-button')?.addEventListener('click', function() {
-        // In a real application, you would toggle a notifications dropdown here
-        alert('Notifications clicked - would show pending enrollments in a real app');
-    });
-
-    // Toggle user menu
-    document.getElementById('user-menu-button')?.addEventListener('click', function() {
-        // In a real application, you would toggle a dropdown menu here
-        alert('User menu clicked - would show profile options in a real app');
-    });
-
-    // Add fade-in animation to table rows
-    document.addEventListener('DOMContentLoaded', function() {
-        const tables = document.querySelectorAll('table');
-        tables.forEach(table => {
-            const rows = table.querySelectorAll('tbody tr');
-            rows.forEach((row, index) => {
-                row.classList.add('fade-in');
-                row.style.animationDelay = (0.1 * index) + 's';
+        $(document).ready(function() {
+            // Search functionality
+            $("#enrollmentSearch").on("keyup", function() {
+                const value = $(this).val().toLowerCase();
+                $(".enrollment-row").filter(function() {
+                    const studentName = $(this).data("student-name");
+                    const studentEmail = $(this).data("student-email");
+                    const matchesSearch = studentName.includes(value) || studentEmail.includes(value);
+                    const courseId = $("#courseFilter").val();
+                    const matchesCourse = courseId === "" || $(this).data("course-id") == courseId;
+                    $(this).toggle(matchesSearch && matchesCourse);
+                });
+                updateEmptyState();
             });
+
+            // Course filter
+            $("#courseFilter").on("change", function() {
+                const courseId = $(this).val();
+                const searchValue = $("#enrollmentSearch").val().toLowerCase();
+
+                $(".enrollment-row").filter(function() {
+                    const studentName = $(this).data("student-name");
+                    const studentEmail = $(this).data("student-email");
+                    const matchesSearch = studentName.includes(searchValue) || studentEmail.includes(searchValue);
+                    const matchesCourse = courseId === "" || $(this).data("course-id") == courseId;
+                    $(this).toggle(matchesSearch && matchesCourse);
+                });
+                updateEmptyState();
+            });
+
+            // Refresh button
+            $("#refreshBtn").on("click", function() {
+                $(this).addClass("animate-spin");
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
+            });
+
+            // View profile button
+            $(".view-profile-btn").on("click", function() {
+                const userId = $(this).data("user-id");
+                $("#profileModal").removeClass("hidden");
+
+                // Fetch user data from database
+                $.ajax({
+                    url: 'handlers/getUserProfile.php',
+                    type: 'GET',
+                    data: {
+                        user_id: userId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        // If AJAX call is successful, display the user data
+                        let profileImage = '';
+
+                        if (data.profile && data.profile !== '') {
+                            profileImage = `<img src="${data.profile}" alt="${data.username}" class="h-24 w-24 rounded-full object-cover">`;
+                        } else {
+                            profileImage = `
+                                <div class="h-24 w-24 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <span class="text-blue-600 font-bold text-2xl">${data.username.charAt(0).toUpperCase()}</span>
+                                </div>
+                            `;
+                        }
+
+                        $("#profileContent").html(`
+                            <div class="flex flex-col items-center mb-6">
+                                ${profileImage}
+                                <h4 class="text-xl font-medium text-gray-900 mt-4">${data.username}</h4>
+                                <p class="text-gray-500">${data.email}</p>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <h5 class="text-sm font-medium text-gray-500 mb-1">Role</h5>
+                                    <p class="text-gray-900">${data.role}</p>
+                                </div>
+                                <div>
+                                    <h5 class="text-sm font-medium text-gray-500 mb-1">Joined</h5>
+                                    <p class="text-gray-900">${new Date(data.created_at).toLocaleDateString()}</p>
+                                </div>
+                                <div>
+                                    <h5 class="text-sm font-medium text-gray-500 mb-1">Enrolled Courses</h5>
+                                    <p class="text-gray-900">${data.enrolled_courses} courses</p>
+                                </div>
+                            </div>
+                            <div class="mt-6 flex justify-end">
+                                <a href="student-details.php?id=${data.id}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                    View Full Profile
+                                </a>
+                            </div>
+                        `);
+                    },
+                    error: function() {
+                        // If AJAX call fails, display a fallback
+                        $("#profileContent").html(`
+                            <div class="flex flex-col items-center mb-6">
+                                <div class="h-24 w-24 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                                    <span class="text-blue-600 font-bold text-2xl">U</span>
+                                </div>
+                                <h4 class="text-xl font-medium text-gray-900">User #${userId}</h4>
+                                <p class="text-gray-500">student${userId}@example.com</p>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <h5 class="text-sm font-medium text-gray-500 mb-1">Enrolled Courses</h5>
+                                    <p class="text-gray-900">3 courses</p>
+                                </div>
+                                <div>
+                                    <h5 class="text-sm font-medium text-gray-500 mb-1">Joined</h5>
+                                    <p class="text-gray-900">January 15, 2023</p>
+                                </div>
+                                <div>
+                                    <h5 class="text-sm font-medium text-gray-500 mb-1">Last Active</h5>
+                                    <p class="text-gray-900">2 days ago</p>
+                                </div>
+                            </div>
+                            <div class="mt-6 flex justify-end">
+                                <a href="student-details.php?id=${userId}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                    View Full Profile
+                                </a>
+                            </div>
+                        `);
+                    }
+                });
+            });
+
+            // Close profile modal
+            $("#closeProfileModal").on("click", function() {
+                $("#profileModal").addClass("hidden");
+                // Reset content to loading state for next time
+                $("#profileContent").html(`
+                    <div class="flex justify-center mb-4">
+                        <div class="animate-pulse flex space-x-4">
+                            <div class="rounded-full bg-gray-200 h-12 w-12"></div>
+                            <div class="flex-1 space-y-4 py-1">
+                                <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                                <div class="space-y-2">
+                                    <div class="h-4 bg-gray-200 rounded"></div>
+                                    <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-center text-gray-500">Loading student information...</p>
+                `);
+            });
+
+            // Close modal when clicking outside
+            $("#profileModal").on("click", function(e) {
+                if (e.target === this) {
+                    $(this).addClass("hidden");
+                }
+            });
+
+            // Function to update empty state when filtering
+            function updateEmptyState() {
+                const visibleRows = $(".enrollment-row:visible").length;
+                if (visibleRows === 0) {
+                    if ($("#pendingEnrollmentsList").find(".no-results").length === 0) {
+                        $("#pendingEnrollmentsList").append(`
+                            <tr class="no-results">
+                                <td colspan="4" class="px-6 py-8 text-center">
+                                    <div class="flex flex-col items-center">
+                                        <i class="fas fa-search text-gray-400 text-2xl mb-2"></i>
+                                        <p class="text-gray-500 mb-1">No matching enrollment requests found</p>
+                                        <p class="text-sm text-gray-400">Try adjusting your search or filter</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        `);
+                    }
+                } else {
+                    $("#pendingEnrollmentsList").find(".no-results").remove();
+                }
+            }
+
+            // Auto-hide alerts after 5 seconds
+            setTimeout(function() {
+                $("#successAlert, #errorAlert").fadeOut(500);
+            }, 5000);
         });
-    });
     </script>
 </body>
-</html>
 
+</html>
