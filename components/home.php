@@ -4,7 +4,7 @@ $features = [
     [
         "title" => "CLASS PROGRAM OPTIONS",
         "description" => "Some theorists focus on a single to overarching purpose of education and see.",
-        "bg" => "bg-primary/10",
+        "bg" => "bg-[#FBF7F4]",
         "text" => "text-primary",
         "icon" => "book-open"
     ],
@@ -76,7 +76,7 @@ $testimonials = [
         "name" => "Emily Rodriguez",
         "role" => "Product Manager",
         "image" => "https://randomuser.me/api/portraits/women/3.jpg",
-        "text" => "I've taken courses from several platforms, but EDUTOCK stands out with its practical approach and supportive community."
+        "text" => "I've taken courses from several platforms, but Slient Voice stands out with its practical approach and supportive community."
     ]
 ];
 
@@ -176,52 +176,75 @@ $faqs = [
 <body class="bg-background text-text">
 
 
-    <!-- Hero Section -->
-    <section class="hero-gradient py-16 md:py-24">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="space-y-8">
-                    <div class="inline-flex items-center space-x-2 bg-white rounded-full px-4 py-2 shadow-sm">
-                        <div class="bg-primary text-white text-sm px-2 py-1 rounded-full">86%</div>
-                        <span class="text-primary font-medium">Success Rate for Our Students</span>
-                    </div>
-                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-primary leading-tight">
-                        GATEWAY TO YOUR<br>KNOWLEDGE<br>UNIVERSE
-                    </h1>
-                    <p class="text-text-light text-lg max-w-lg">
-                        Unlock your potential with our expert-led courses designed to help you master new skills and advance your career.
-                    </p>
-                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                        <a href="#courses" class="bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-md text-center transition-colors duration-200 font-medium">
-                            Explore Courses
-                        </a>
-                        <a href="#" class="border border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 rounded-md text-center transition-colors duration-200 font-medium">
-                            Learn More
-                        </a>
-                    </div>
-                </div>
-                <div class="relative max-h-[550px] overflow-hidden rounded-2xl shadow-xl">
-                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-jNLOT8D3ifET6hAc7vRlsBqodzVLf8.png" alt="Student" class="w-full object-cover">
-                    <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg">
-                        <div class="flex items-center space-x-2">
-                            <div class="flex -space-x-2">
-                                <?php for ($i = 1; $i <= 3; $i++): ?>
-                                    <img src="https://randomuser.me/api/portraits/men/<?php echo $i; ?>.jpg" alt="User" class="w-8 h-8 rounded-full border-2 border-white">
-                                <?php endfor; ?>
-                            </div>
-                            <div class="text-sm">
-                                <p class="font-medium text-primary">Join 10,000+ students</p>
-                                <p class="text-text-light">Learning together</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<!-- Hero Section for Sign Language Website -->
+<section class="relative bg-gradient-to-br from-[#154785] to-[#cfe1ff] text-[#ffffff] py-20 md:py-32 overflow-hidden">
+    <!-- Background Elements -->
+    <div class="absolute inset-0 pointer-events-none">
+        <!-- Soft Circles -->
+        <div class="absolute top-10 left-10 w-20 h-20 bg-white/50 rounded-full blur-lg"></div> 
+        <div class="absolute bottom-20 right-20 w-32 h-32 bg-white/40 rounded-full blur-xl"></div>
+        <div class="absolute top-1/3 left-1/2 w-16 h-16 bg-white/30 rounded-full blur-lg"></div>
+
+        <!-- Abstract Lines -->
+        <div class="absolute bottom-10 left-1/4 w-32 h-1 bg-[#b7c5da]"></div>
+        <div class="absolute top-16 right-1/3 w-1 h-40 bg-white/40"></div>
+
+        <!-- Arrows -->
+        <svg class="absolute bottom-16 left-12 w-16 h-16 text-[#ffffff] opacity-30" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L10.59 3.41 18.17 11H2v2h16.17l-7.59 7.59L12 22l10-10L12 2z"/>
+        </svg>
+        <svg class="absolute top-12 right-20 w-12 h-12 text-white/50 opacity-20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L14.41 4.41 6.83 12H22v2H6.83l7.58 7.59L12 22 2 12 12 2z"/>
+        </svg>
+
+        <!-- Dotted Pattern -->
+        <div class="absolute top-1/4 left-1/3 grid grid-cols-3 gap-2">
+            <div class="w-2 h-2 bg-[#b7c5da] rounded-full"></div>
+            <div class="w-2 h-2 bg-[#b7c5da] rounded-full"></div>
+            <div class="w-2 h-2 bg-[#b7c5da] rounded-full"></div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="relative max-w-7xl mx-auto px-6 lg:px-8 grid md:grid-cols-2 gap-12 items-center">
+        <!-- Text Content -->
+        <div class="space-y-6">
+            <span class="inline-block bg-white/20 text-sm px-4 py-1 rounded-full">Breaking Barriers Through Communication</span>
+            <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">
+            "Hands That Speak, <span class="text-accent">Hearts That Connect."</span>
+            </h1>
+            <p class="text-lg text-white/90 max-w-lg">
+                Learn, connect, and communicate effortlessly with our interactive sign language courses. Empower inclusivity with technology.
+            </p>
+            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                <a href="#learn" class="bg-[#ffffff] hover:bg-[#154785] text-black hover:text-white px-8 py-3 rounded-md font-medium transition-all">
+                    Start Learning
+                </a>
+                <a href="#about" class="border border-white/50 hover:bg-white hover:text-primary px-8 py-3 rounded-md font-medium transition-all">
+                    Discover More
+                </a>
             </div>
         </div>
-    </section>
+        
+        <!-- Image Section -->
+        <div class="relative">
+            <img src="/assets/home.jpg" alt="Sign Language Learning" class="w-full max-h-[400px] object-cover rounded-2xl shadow-lg">
+            <div class="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-lg p-4 rounded-lg shadow-md flex items-center space-x-3">
+                <div class="flex -space-x-2">
+                    <img src="https://randomuser.me/api/portraits/men/1.jpg" class="w-10 h-10 rounded-full border-2 border-white" alt="User">
+                    <img src="https://randomuser.me/api/portraits/women/2.jpg" class="w-10 h-10 rounded-full border-2 border-white" alt="User">
+                    <img src="https://randomuser.me/api/portraits/men/3.jpg" class="w-10 h-10 rounded-full border-2 border-white" alt="User">
+                </div>
+                <p class="text-sm font-medium text-text">Join 15,000+ learners mastering sign language</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
 
     <!-- Partners Section -->
-    <section class="py-16 bg-white">
+   <!-- <section class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-center text-xl font-semibold text-primary mb-12">TRUSTED BY LEADING COMPANIES</h2>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center justify-items-center opacity-60">
@@ -233,11 +256,30 @@ $faqs = [
                 <img src="https://placehold.co/200x80?text=Sponsor+6" alt="Sponsor 6" class="h-12 grayscale hover:grayscale-0 transition-all duration-300">
             </div>
         </div>
-    </section>
+    </section>-->
 
     <!-- Features Section -->
-    <section class="py-16 bg-background" id="features">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section class="relative py-20 bg-white overflow-hidden" id="features">
+    <!-- Top Wave Background -->
+    <div class="absolute top-0 left-0 w-full">
+        <svg class="w-full h-32 md:h-40 text-blue-50" fill="currentColor" viewBox="0 0 1440 320">
+            <path fill-opacity="1" d="M0,128L48,144C96,160,192,192,288,186.7C384,181,480,139,576,122.7C672,107,768,117,864,144C960,171,1056,213,1152,229.3C1248,245,1344,235,1392,229.3L1440,224L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+        </svg>
+    </div>
+
+    <!-- Bottom Wave Background -->
+    <div class="absolute bottom-0 left-0 w-full">
+        <svg class="w-full h-32 md:h-40 text-blue-50" fill="currentColor" viewBox="0 0 1440 320">
+            <path fill-opacity="1" d="M0,64L48,96C96,128,192,192,288,186.7C384,181,480,139,576,122.7C672,107,768,117,864,144C960,171,1056,213,1152,229.3C1248,245,1344,235,1392,229.3L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+        </svg>
+    </div>
+
+    <!-- Floating Elements -->
+    <div class="absolute -top-10 left-10 w-24 h-24 bg-blue-100/30 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-10 right-20 w-20 h-20 bg-blue-100/30 rounded-full blur-2xl"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <!--<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">-->
             <div class="text-center max-w-3xl mx-auto mb-16">
                 <h2 class="text-3xl md:text-4xl font-bold text-primary mb-4">
                     ONLINE LEARNING FOR REAL LIFE
@@ -361,7 +403,7 @@ $faqs = [
                     WHAT OUR STUDENTS SAY
                 </h2>
                 <p class="text-text-light text-lg">
-                    Hear from our community of learners about their experience with EDUTOCK
+                    Hear from our community of learners about their experience with Silent Voice
                 </p>
             </div>
             <div class="grid md:grid-cols-3 gap-8">
@@ -535,7 +577,7 @@ $faqs = [
             <div class="border-t border-gray-200 pt-8">
                 <div class="flex flex-col md:flex-row justify-between items-center">
                     <p class="text-text-light text-sm">
-                        &copy; <?php echo date('Y'); ?> EDUTOCK. All rights reserved.
+                        &copy; <?php echo date('Y'); ?> Silent Voice. All rights reserved.
                     </p>
                     <div class="flex space-x-4 mt-4 md:mt-0">
                         <a href="#" class="text-text-light hover:text-primary transition-colors duration-200 text-sm">Privacy Policy</a>
