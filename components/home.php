@@ -135,38 +135,38 @@ $faqs = [
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
+
         body {
             font-family: 'Inter', sans-serif;
         }
-        
+
         .hero-gradient {
             background: linear-gradient(to right, #f8fafb 60%, #e8f0f9 40%);
         }
-        
+
         .course-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
-        
+
         .testimonial-card {
             transition: all 0.3s ease;
         }
-        
+
         .testimonial-card:hover {
             transform: scale(1.03);
         }
-        
+
         .faq-item {
             transition: all 0.3s ease;
         }
-        
+
         .faq-answer {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease;
         }
-        
+
         .faq-item.active .faq-answer {
             max-height: 500px;
         }
@@ -176,110 +176,85 @@ $faqs = [
 <body class="bg-background text-text">
 
 
-<!-- Hero Section for Sign Language Website -->
-<section class="relative bg-gradient-to-br from-[#154785] to-[#cfe1ff] text-[#ffffff] py-20 md:py-32 overflow-hidden">
-    <!-- Background Elements -->
-    <div class="absolute inset-0 pointer-events-none">
-        <!-- Soft Circles -->
-        <div class="absolute top-10 left-10 w-20 h-20 bg-white/50 rounded-full blur-lg"></div> 
-        <div class="absolute bottom-20 right-20 w-32 h-32 bg-white/40 rounded-full blur-xl"></div>
-        <div class="absolute top-1/3 left-1/2 w-16 h-16 bg-white/30 rounded-full blur-lg"></div>
+    <!-- Hero Section for Sign Language Website -->
+    <section class="relative bg-gradient-to-br from-[#154785] to-[#cfe1ff] text-[#ffffff] py-20 md:py-32 overflow-hidden">
+        <!-- Background Elements -->
+        <div class="absolute inset-0 pointer-events-none">
+            <!-- Soft Circles -->
+            <div class="absolute top-10 left-10 w-20 h-20 bg-white/50 rounded-full blur-lg"></div>
+            <div class="absolute bottom-20 right-20 w-32 h-32 bg-white/40 rounded-full blur-xl"></div>
+            <div class="absolute top-1/3 left-1/2 w-16 h-16 bg-white/30 rounded-full blur-lg"></div>
 
-        <!-- Abstract Lines -->
-        <div class="absolute bottom-10 left-1/4 w-32 h-1 bg-[#b7c5da]"></div>
-        <div class="absolute top-16 right-1/3 w-1 h-40 bg-white/40"></div>
+            <!-- Abstract Lines -->
+            <div class="absolute bottom-10 left-1/4 w-32 h-1 bg-[#b7c5da]"></div>
+            <div class="absolute top-16 right-1/3 w-1 h-40 bg-white/40"></div>
 
-        <!-- Arrows -->
-        <svg class="absolute bottom-16 left-12 w-16 h-16 text-[#ffffff] opacity-30" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L10.59 3.41 18.17 11H2v2h16.17l-7.59 7.59L12 22l10-10L12 2z"/>
-        </svg>
-        <svg class="absolute top-12 right-20 w-12 h-12 text-white/50 opacity-20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L14.41 4.41 6.83 12H22v2H6.83l7.58 7.59L12 22 2 12 12 2z"/>
-        </svg>
+            <!-- Arrows -->
+            <svg class="absolute bottom-16 left-12 w-16 h-16 text-[#ffffff] opacity-30" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L10.59 3.41 18.17 11H2v2h16.17l-7.59 7.59L12 22l10-10L12 2z" />
+            </svg>
+            <svg class="absolute top-12 right-20 w-12 h-12 text-white/50 opacity-20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L14.41 4.41 6.83 12H22v2H6.83l7.58 7.59L12 22 2 12 12 2z" />
+            </svg>
 
-        <!-- Dotted Pattern -->
-        <div class="absolute top-1/4 left-1/3 grid grid-cols-3 gap-2">
-            <div class="w-2 h-2 bg-[#b7c5da] rounded-full"></div>
-            <div class="w-2 h-2 bg-[#b7c5da] rounded-full"></div>
-            <div class="w-2 h-2 bg-[#b7c5da] rounded-full"></div>
-        </div>
-    </div>
-
-    <!-- Content -->
-    <div class="relative max-w-7xl mx-auto px-6 lg:px-8 grid md:grid-cols-2 gap-12 items-center">
-        <!-- Text Content -->
-        <div class="space-y-6">
-            <span class="inline-block bg-white/20 text-sm px-4 py-1 rounded-full">Breaking Barriers Through Communication</span>
-            <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">
-            "Hands That Speak, <span class="text-accent">Hearts That Connect."</span>
-            </h1>
-            <p class="text-lg text-white/90 max-w-lg">
-                Learn, connect, and communicate effortlessly with our interactive sign language courses. Empower inclusivity with technology.
-            </p>
-            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                <a href="#learn" class="bg-[#ffffff] hover:bg-[#154785] text-black hover:text-white px-8 py-3 rounded-md font-medium transition-all">
-                    Start Learning
-                </a>
-                <a href="#about" class="border border-white/50 hover:bg-white hover:text-primary px-8 py-3 rounded-md font-medium transition-all">
-                    Discover More
-                </a>
+            <!-- Dotted Pattern -->
+            <div class="absolute top-1/4 left-1/3 grid grid-cols-3 gap-2">
+                <div class="w-2 h-2 bg-[#b7c5da] rounded-full"></div>
+                <div class="w-2 h-2 bg-[#b7c5da] rounded-full"></div>
+                <div class="w-2 h-2 bg-[#b7c5da] rounded-full"></div>
             </div>
         </div>
-        
-        <!-- Image Section -->
-        <div class="relative">
-            <img src="/assets/home.jpg" alt="Sign Language Learning" class="w-full max-h-[400px] object-cover rounded-2xl shadow-lg">
-            <div class="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-lg p-4 rounded-lg shadow-md flex items-center space-x-3">
-                <div class="flex -space-x-2">
-                    <img src="https://randomuser.me/api/portraits/men/1.jpg" class="w-10 h-10 rounded-full border-2 border-white" alt="User">
-                    <img src="https://randomuser.me/api/portraits/women/2.jpg" class="w-10 h-10 rounded-full border-2 border-white" alt="User">
-                    <img src="https://randomuser.me/api/portraits/men/3.jpg" class="w-10 h-10 rounded-full border-2 border-white" alt="User">
+
+        <!-- Content -->
+        <div class="relative max-w-7xl mx-auto px-6 lg:px-8 grid md:grid-cols-2 gap-12 items-center">
+            <!-- Text Content -->
+            <div class="space-y-6">
+                <span class="inline-block bg-white/20 text-sm px-4 py-1 rounded-full">Breaking Barriers Through Communication</span>
+                <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">
+                    "Hands That Speak, <span class="text-accent ml-7">Hearts That Connect."</span>
+                </h1>
+                <p class="text-lg text-white/90 max-w-lg">
+                    Learn, connect, and communicate effortlessly with our interactive sign language courses. Empower inclusivity with technology.
+                </p>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="#learn" class="bg-[#ffffff] hover:bg-[#154785] text-[#154785] hover:text-white px-8 py-3 rounded-md font-medium transition-all">
+                        Start Learning
+                    </a>
+                    <a href="#about" class="border border-white/50 hover:bg-white hover:text-primary px-8 py-3 rounded-md font-medium transition-all">
+                        Discover More
+                    </a>
                 </div>
-                <p class="text-sm font-medium text-text">Join 15,000+ learners mastering sign language</p>
             </div>
+
+            <!-- Image Section -->
+            <div class="relative flex justify-center">
+    <img src="/assets/SCIENT.gif" 
+        alt="Sign Language Learning" 
+        class="w-full max-w-[600px] md:max-w-[500px] lg:max-w-[550px] h-auto object-cover rounded-2xl shadow-xl">
+</div>
+
         </div>
-    </div>
-</section>
+    </section>
 
 
-
-    <!-- Partners Section -->
-   <!-- <section class="py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-center text-xl font-semibold text-primary mb-12">TRUSTED BY LEADING COMPANIES</h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center justify-items-center opacity-60">
-                <img src="https://placehold.co/200x80?text=Sponsor+1" alt="Sponsor 1" class="h-12 grayscale hover:grayscale-0 transition-all duration-300">
-                <img src="https://placehold.co/200x80?text=Sponsor+2" alt="Sponsor 2" class="h-12 grayscale hover:grayscale-0 transition-all duration-300">
-                <img src="https://placehold.co/200x80?text=Sponsor+3" alt="Sponsor 3" class="h-12 grayscale hover:grayscale-0 transition-all duration-300">
-                <img src="https://placehold.co/200x80?text=Sponsor+4" alt="Sponsor 4" class="h-12 grayscale hover:grayscale-0 transition-all duration-300">
-                <img src="https://placehold.co/200x80?text=Sponsor+5" alt="Sponsor 5" class="h-12 grayscale hover:grayscale-0 transition-all duration-300">
-                <img src="https://placehold.co/200x80?text=Sponsor+6" alt="Sponsor 6" class="h-12 grayscale hover:grayscale-0 transition-all duration-300">
-            </div>
-        </div>
-    </section>-->
 
     <!-- Features Section -->
-<section class="relative py-20 bg-white overflow-hidden" id="features">
-    <!-- Top Wave Background -->
-    <div class="absolute top-0 left-0 w-full">
-        <svg class="w-full h-32 md:h-40 text-blue-50" fill="currentColor" viewBox="0 0 1440 320">
-            <path fill-opacity="1" d="M0,128L48,144C96,160,192,192,288,186.7C384,181,480,139,576,122.7C672,107,768,117,864,144C960,171,1056,213,1152,229.3C1248,245,1344,235,1392,229.3L1440,224L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
-        </svg>
-    </div>
+    <section class="relative py-20 bg-white overflow-hidden" id="features">
+        <!-- Top Wave Background -->
+        <div class="absolute top-0 left-0 w-screen">
+       <svg id="wave" style="transform:rotate(180deg); transition: 0.3s" viewBox="0 0 1440 170" version="1.1" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sw-gradient-0" x1="0" x2="0" y1="1" y2="0"><stop stop-color="rgba(160, 186, 224, 1)" offset="0%"></stop><stop stop-color="rgba(253.093, 253.093, 253.093, 1)" offset="100%"></stop></linearGradient></defs><path style="transform:translate(0, 0px); opacity:1" fill="url(#sw-gradient-0)" d="M0,68L30,62.3C60,57,120,45,180,45.3C240,45,300,57,360,70.8C420,85,480,102,540,102C600,102,660,85,720,90.7C780,96,840,125,900,116.2C960,108,1020,62,1080,36.8C1140,11,1200,6,1260,22.7C1320,40,1380,79,1440,82.2C1500,85,1560,51,1620,39.7C1680,28,1740,40,1800,56.7C1860,74,1920,96,1980,102C2040,108,2100,96,2160,90.7C2220,85,2280,85,2340,93.5C2400,102,2460,119,2520,107.7C2580,96,2640,57,2700,59.5C2760,62,2820,108,2880,107.7C2940,108,3000,62,3060,39.7C3120,17,3180,17,3240,36.8C3300,57,3360,96,3420,110.5C3480,125,3540,113,3600,99.2C3660,85,3720,68,3780,68C3840,68,3900,85,3960,82.2C4020,79,4080,57,4140,39.7C4200,23,4260,11,4290,5.7L4320,0L4320,170L4290,170C4260,170,4200,170,4140,170C4080,170,4020,170,3960,170C3900,170,3840,170,3780,170C3720,170,3660,170,3600,170C3540,170,3480,170,3420,170C3360,170,3300,170,3240,170C3180,170,3120,170,3060,170C3000,170,2940,170,2880,170C2820,170,2760,170,2700,170C2640,170,2580,170,2520,170C2460,170,2400,170,2340,170C2280,170,2220,170,2160,170C2100,170,2040,170,1980,170C1920,170,1860,170,1800,170C1740,170,1680,170,1620,170C1560,170,1500,170,1440,170C1380,170,1320,170,1260,170C1200,170,1140,170,1080,170C1020,170,960,170,900,170C840,170,780,170,720,170C660,170,600,170,540,170C480,170,420,170,360,170C300,170,240,170,180,170C120,170,60,170,30,170L0,170Z"></path></svg>
+        </div>
+        <!-- Bottom Wave Background -->
+        <div class="absolute bottom-0 left-0 w-full">
+        <svg id="wave" style="transform:rotate(0deg); transition: 0.3s" viewBox="0 0 1440 170" version="1.1" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sw-gradient-0" x1="0" x2="0" y1="1" y2="0"><stop stop-color="rgba(187, 241, 255, 1)" offset="0%"></stop><stop stop-color="rgba(253.093, 253.093, 253.093, 1)" offset="100%"></stop></linearGradient></defs><path style="transform:translate(0, 0px); opacity:1" fill="url(#sw-gradient-0)" d="M0,68L30,62.3C60,57,120,45,180,45.3C240,45,300,57,360,70.8C420,85,480,102,540,102C600,102,660,85,720,90.7C780,96,840,125,900,116.2C960,108,1020,62,1080,36.8C1140,11,1200,6,1260,22.7C1320,40,1380,79,1440,82.2C1500,85,1560,51,1620,39.7C1680,28,1740,40,1800,56.7C1860,74,1920,96,1980,102C2040,108,2100,96,2160,90.7C2220,85,2280,85,2340,93.5C2400,102,2460,119,2520,107.7C2580,96,2640,57,2700,59.5C2760,62,2820,108,2880,107.7C2940,108,3000,62,3060,39.7C3120,17,3180,17,3240,36.8C3300,57,3360,96,3420,110.5C3480,125,3540,113,3600,99.2C3660,85,3720,68,3780,68C3840,68,3900,85,3960,82.2C4020,79,4080,57,4140,39.7C4200,23,4260,11,4290,5.7L4320,0L4320,170L4290,170C4260,170,4200,170,4140,170C4080,170,4020,170,3960,170C3900,170,3840,170,3780,170C3720,170,3660,170,3600,170C3540,170,3480,170,3420,170C3360,170,3300,170,3240,170C3180,170,3120,170,3060,170C3000,170,2940,170,2880,170C2820,170,2760,170,2700,170C2640,170,2580,170,2520,170C2460,170,2400,170,2340,170C2280,170,2220,170,2160,170C2100,170,2040,170,1980,170C1920,170,1860,170,1800,170C1740,170,1680,170,1620,170C1560,170,1500,170,1440,170C1380,170,1320,170,1260,170C1200,170,1140,170,1080,170C1020,170,960,170,900,170C840,170,780,170,720,170C660,170,600,170,540,170C480,170,420,170,360,170C300,170,240,170,180,170C120,170,60,170,30,170L0,170Z"></path></svg>
+        </div>
 
-    <!-- Bottom Wave Background -->
-    <div class="absolute bottom-0 left-0 w-full">
-        <svg class="w-full h-32 md:h-40 text-blue-50" fill="currentColor" viewBox="0 0 1440 320">
-            <path fill-opacity="1" d="M0,64L48,96C96,128,192,192,288,186.7C384,181,480,139,576,122.7C672,107,768,117,864,144C960,171,1056,213,1152,229.3C1248,245,1344,235,1392,229.3L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-        </svg>
-    </div>
+        <!-- Floating Elements -->
+        <div class="absolute -top-10 left-10 w-24 h-24 bg-blue-100/30 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-10 right-20 w-20 h-20 bg-blue-100/30 rounded-full blur-2xl"></div>
 
-    <!-- Floating Elements -->
-    <div class="absolute -top-10 left-10 w-24 h-24 bg-blue-100/30 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-10 right-20 w-20 h-20 bg-blue-100/30 rounded-full blur-2xl"></div>
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <!--<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">-->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <!--<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">-->
             <div class="text-center max-w-3xl mx-auto mb-16">
                 <h2 class="text-3xl md:text-4xl font-bold text-primary mb-4">
                     ONLINE LEARNING FOR REAL LIFE
@@ -457,63 +432,10 @@ $faqs = [
         </div>
     </section>
 
-    <!-- Registration Section -->
-    <!-- <section class="py-16 bg-primary" id="register">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="text-white">
-                    <h2 class="text-3xl md:text-4xl font-bold mb-4">REGISTER YOUR ACCOUNT</h2>
-                    <p class="text-white/80 text-lg mb-6">Get free access to 50,000+ online courses and join our community of lifelong learners.</p>
-                    <div class="flex items-center space-x-4 mb-4">
-                        <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-check text-white"></i>
-                        </div>
-                        <span>Access to all basic courses</span>
-                    </div>
-                    <div class="flex items-center space-x-4 mb-4">
-                        <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-check text-white"></i>
-                        </div>
-                        <span>Free learning materials</span>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-check text-white"></i>
-                        </div>
-                        <span>Certification after completion</span>
-                    </div>
-                </div>
-                <div>
-                    <form class="bg-white p-8 rounded-xl shadow-lg">
-                        <h3 class="text-xl font-semibold text-primary mb-6">Create Your Free Account</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="fullname" class="block text-text-light mb-2 text-sm">Full Name</label>
-                                <input type="text" id="fullname" placeholder="John Doe" class="w-full px-4 py-3 rounded-md border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
-                            </div>
-                            <div>
-                                <label for="email" class="block text-text-light mb-2 text-sm">Email Address</label>
-                                <input type="email" id="email" placeholder="john@example.com" class="w-full px-4 py-3 rounded-md border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
-                            </div>
-                            <div>
-                                <label for="password" class="block text-text-light mb-2 text-sm">Password</label>
-                                <input type="password" id="password" placeholder="••••••••" class="w-full px-4 py-3 rounded-md border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition">
-                            </div>
-                            <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3 rounded-md transition-colors duration-200">
-                                Sign Up
-                            </button>
-                            <p class="text-center text-text-light text-sm">
-                                Already have an account? <a href="#" class="text-primary hover:underline">Log in</a>
-                            </p>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section> -->
+
 
     <!-- Footer -->
-    <footer class="bg-white pt-16 pb-8">
+    <!-- <footer class="bg-white pt-16 pb-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid md:grid-cols-4 gap-8 mb-12">
                 <div>
@@ -587,7 +509,7 @@ $faqs = [
                 </div>
             </div>
         </div>
-    </footer>
+    </footer> -->
 
     <!-- JavaScript -->
     <script>
@@ -602,10 +524,10 @@ $faqs = [
             question.addEventListener('click', () => {
                 const faqItem = question.parentElement;
                 const icon = question.querySelector('i');
-                
+
                 // Toggle active class
                 faqItem.classList.toggle('active');
-                
+
                 // Toggle icon rotation
                 if (faqItem.classList.contains('active')) {
                     icon.style.transform = 'rotate(180deg)';
@@ -619,17 +541,17 @@ $faqs = [
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
-                
+
                 const targetId = this.getAttribute('href');
                 if (targetId === '#') return;
-                
+
                 const targetElement = document.querySelector(targetId);
                 if (targetElement) {
                     window.scrollTo({
                         top: targetElement.offsetTop - 100,
                         behavior: 'smooth'
                     });
-                    
+
                     // Close mobile menu if open
                     const mobileMenu = document.getElementById('mobile-menu');
                     if (!mobileMenu.classList.contains('hidden')) {
@@ -639,6 +561,9 @@ $faqs = [
             });
         });
     </script>
+
+
+
 </body>
 
 </html>

@@ -212,7 +212,7 @@ $courses = [
             <div class="flex justify-between items-center py-4">
                 <!-- Logo -->
                 <div class="flex items-center text-[#1e5dac]">
-                <i class="fas fa-hands text-2xl mr-2"></i> <a href="/" class="text-2xl font-bold text-primary ">SILENT<span class="text-primary-dark">VOICE</span></a>
+                    <i class="fas fa-hands text-2xl mr-2"></i> <a href="/" class="text-2xl font-bold text-primary ">SILENT<span class="text-primary-dark">VOICE</span></a>
                 </div>
 
                 <!-- Desktop Navigation -->
@@ -242,7 +242,7 @@ $courses = [
                 }, array_keys($navItems), $navItems));
                 echo '</nav>';
                 ?>
-                
+
                 <div class="flex items-center space-x-4">
                     <div class="relative flex items-center">
                         <!-- Search Form -->
@@ -365,6 +365,9 @@ $courses = [
             break;
         case 'search':
             require 'components/search_result.php';
+            break;
+        case 'about':
+            require 'components/about.php';
             break;
         default:
             require 'components/notfound.php';
