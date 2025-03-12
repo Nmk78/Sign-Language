@@ -272,7 +272,7 @@ function formatTimeAgo($datetime)
                                     </h3>
 
                                     <!-- Course Description -->
-                                    <p class="text-gray-600 text-sm font-bold mb-3 line-clamp-2">Category : <?php echo $course['category']; ?> , Posted : <?php echo formatTimeAgo($course['created_at']) ?>
+                                    <p class="text-gray-600 text-sm mb-3 line-clamp-2 "><?php echo $course['description']; ?>
                                     </p>
                                 </div>
                                 <!-- Enrollment Form -->

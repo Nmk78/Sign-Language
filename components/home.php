@@ -262,6 +262,7 @@ $faqs = [
             LEFT JOIN course_enrollments ce ON c.id = ce.course_id
             GROUP BY c.id
         ";
+
             $stmt = $pdo->prepare($query);
             $stmt->execute();
             $pagedCourses = $stmt->fetchAll(PDO::FETCH_ASSOC);

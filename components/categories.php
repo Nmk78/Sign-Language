@@ -26,7 +26,7 @@ $categoryStmt = $pdo->query("SELECT DISTINCT category FROM courses WHERE categor
 $categories = $categoryStmt->fetchAll(PDO::FETCH_COLUMN);
 
 // Pagination
-$itemsPerPage = 9;
+$itemsPerPage = 6;
 $totalCourses = count($courses);
 $totalPages = ceil($totalCourses / $itemsPerPage);
 $currentPage = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
