@@ -208,6 +208,7 @@ $mysqli->close();
 
     <script>
         function toggleSave(courseId) {
+            console.log("courseId" , courseId);
             const button = document.querySelector(`button[onclick="toggleSave(${courseId})"]`);
             const icon = button.querySelector('svg');
 

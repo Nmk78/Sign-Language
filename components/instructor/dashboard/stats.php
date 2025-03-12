@@ -32,9 +32,16 @@ $teacher_id = $_SESSION['user']['user_id'];
 // Fetch classes
 $classes = [];
 if (!isset($db_error)) {
-    $stmt = $conn->prepare("SELECT id, title, status, 
-                          (SELECT COUNT(*) FROM course_enrollments WHERE course_id = courses.id) as student_count 
-                          FROM courses WHERE created_by = ? ORDER BY created_at DESC LIMIT 5");
+    $stmt = $conn->prepare("
+    SELECT c.id, c.title, c.status, COUNT(ce.course_id) AS student_count 
+    FROM courses c
+    LEFT JOIN course_enrollments ce ON c.id = ce.course_id
+    WHERE c.created_by = ?
+    GROUP BY c.id
+    ORDER BY c.created_at DESC
+    LIMIT 5
+");
+
     if ($stmt) {
         $stmt->bind_param("i", $teacher_id);
         $stmt->execute();
@@ -443,7 +450,7 @@ function timeAgo($datetime)
         <!-- TODO CHANGE grid col to 2  -->
         <?php
         $teacher_id = $_SESSION['user_id']; // Default for demo
-
+        
         // Database connection
         $conn = mysqli_connect("localhost", "root", "root", "sign_language");
         if (!$conn) {
@@ -452,21 +459,23 @@ function timeAgo($datetime)
 
         // Fetch classes (courses created by the user)
         $classes_stmt = $conn->prepare("
-    SELECT 
-        c.id,
-        c.title,
-        c.status,
-        (SELECT COUNT(DISTINCT cl.user_id) 
-         FROM completed_lessons cl 
-         JOIN lesson l ON cl.lesson_id = l.id 
-         WHERE l.course_id = c.id) AS student_count
-    FROM courses c
-    WHERE c.created_by = ?  -- created_by is the user_id of the creator
-    ORDER BY c.created_at DESC
-");
+            SELECT 
+                c.id,
+                c.title,
+                c.status,
+                (SELECT COUNT(DISTINCT cl.user_id) 
+                FROM completed_lessons cl 
+                JOIN lesson l ON cl.lesson_id = l.id 
+                WHERE l.course_id = c.id) AS student_count
+            FROM courses c
+            WHERE c.created_by = ?  -- created_by is the user_id of the creator
+            ORDER BY c.created_at DESC
+        ");
+
         if ($classes_stmt === false) {
             die("Prepare failed: " . $conn->error);
         }
+        
         $classes_stmt->bind_param("i", $teacher_id);
         $classes_stmt->execute();
         $classes_result = $classes_stmt->get_result();
@@ -475,36 +484,39 @@ function timeAgo($datetime)
 
         // Fetch recent activities (profile updates and completed lessons)
         $activities_stmt = $conn->prepare("
-   SELECT 
-        'profile' AS activity_type,
-        l.id AS activity_id,
-        NULL AS lesson_id,
-        l.timestamp AS activity_time,
-        'Profile updated' AS details,
-        u.username
-    FROM logs l
-    JOIN users u ON l.user_id = u.id
-    WHERE l.user_id = ? 
-    AND l.entity_type = 'profile' 
-    AND l.action = 'update'
-    
-    UNION ALL
-    
-    SELECT 
-        'lesson_completed' AS activity_type,
-        cl.id AS activity_id,
-        cl.lesson_id,
-        cl.completed_at AS activity_time,
-        CONCAT('Completed lesson \"', les.title, '\" (ID: ', cl.lesson_id, ') in \"', c.title, '\"') AS details,
-        u.username
-    FROM completed_lessons cl
-    JOIN users u ON cl.user_id = u.id
-    LEFT JOIN lesson les ON cl.lesson_id = les.id
-    LEFT JOIN courses c ON les.course_id = c.id
-    WHERE cl.user_id = ?
-    ORDER BY activity_time DESC
-    LIMIT 10
-");
+        SELECT * FROM (
+            SELECT 
+                'profile' AS activity_type,
+                l.id AS activity_id,
+                NULL AS lesson_id,
+                l.timestamp AS activity_time,
+                'Profile updated' AS details,
+                u.username
+            FROM logs l
+            JOIN users u ON l.user_id = u.id
+            WHERE l.user_id = ? 
+            AND l.entity_type = 'profile' 
+            AND l.action = 'update'
+            
+            UNION ALL
+            
+            SELECT 
+                'lesson_completed' AS activity_type,
+                cl.id AS activity_id,
+                cl.lesson_id,
+                cl.completed_at AS activity_time,
+                CONCAT('Added lesson \"', les.title, '\" (ID: ', cl.lesson_id, ') in \"', c.title, '\"') AS details,
+                u.username
+            FROM completed_lessons cl
+            JOIN users u ON cl.user_id = u.id
+            LEFT JOIN lesson les ON cl.lesson_id = les.id
+            LEFT JOIN courses c ON les.course_id = c.id
+            WHERE cl.user_id = ?
+        ) AS activities
+        ORDER BY activity_time DESC
+        LIMIT 10;
+        ");
+
         if ($activities_stmt === false) {
             die("Prepare failed: " . $conn->error);
         }
@@ -524,7 +536,8 @@ function timeAgo($datetime)
                 <div class="p-6 max-h-80 overflow-y-auto scrollbar-thin">
                     <?php if (empty($classes)): ?>
                         <p class="text-gray-500">You haven't created any classes yet.</p>
-                        <a href="#" class="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-500 hover:bg-blue-600">
+                        <a href="#"
+                            class="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-500 hover:bg-blue-600">
                             Create Your First Class
                         </a>
                     <?php else: ?>
@@ -532,12 +545,15 @@ function timeAgo($datetime)
                             <?php foreach ($classes as $class): ?>
                                 <li class="bg-gray-50 p-3 rounded-md hover:bg-gray-100 transition-colors">
                                     <div class="flex justify-between items-center">
-                                        <span class="font-medium text-gray-800"><?php echo htmlspecialchars($class['title']); ?></span>
-                                        <span class="text-xs px-2 py-1 rounded-full <?php echo $class['status'] === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'; ?>">
+                                        <span
+                                            class="font-medium text-gray-800"><?php echo htmlspecialchars($class['title']); ?></span>
+                                        <span
+                                            class="text-xs px-2 py-1 rounded-full <?php echo $class['status'] === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'; ?>">
                                             <?php echo ucfirst($class['status'] ?? 'Draft'); ?>
                                         </span>
                                     </div>
-                                    <div class="text-xs text-gray-500 mt-1"><?php echo $class['student_count'] ?? 0; ?> students enrolled</div>
+                                    <!-- <div class="text-xs text-gray-500 mt-1"><?php echo $class['student_count'] ?? 0; ?> students
+                                        enrolled</div> -->
                                 </li>
                             <?php endforeach; ?>
                         </ul>
@@ -558,12 +574,16 @@ function timeAgo($datetime)
                             <?php foreach ($activities as $activity): ?>
                                 <li class="flex items-start justify-between border-b pb-2 last:border-b-0">
                                     <div>
-                                        <h3 class="font-medium text-gray-800"><?php echo htmlspecialchars($activity['username']); ?>
-                                            <span class="text-gray-600 text-sm">(<?php echo htmlspecialchars($activity['activity_type'] === 'profile' ? 'updated profile' : 'completed lesson'); ?>)</span>
+                                        <h3 class="font-medium text-gray-800">
+                                            <?php echo htmlspecialchars($activity['username']); ?>
+                                            <span
+                                                class="text-gray-600 text-sm">(<?php echo htmlspecialchars($activity['activity_type'] === 'profile' ? 'updated profile' : 'completed lesson'); ?>)</span>
                                         </h3>
-                                        <p class="text-sm text-gray-600"><?php echo htmlspecialchars($activity['details']); ?></p>
+                                        <p class="text-sm text-gray-600"><?php echo htmlspecialchars($activity['details']); ?>
+                                        </p>
                                     </div>
-                                    <span class="text-xs text-gray-500"><?php echo date('F j, Y, g:i A', strtotime($activity['activity_time'])); ?></span>
+                                    <span
+                                        class="text-xs text-gray-500"><?php echo date('F j, Y, g:i A', strtotime($activity['activity_time'])); ?></span>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
@@ -589,81 +609,81 @@ function timeAgo($datetime)
 
     <script>
         // Initialize performance chart
-        document.addEventListener('DOMContentLoaded', function() {
-    // Chart data
-    const timeRanges = <?php echo json_encode(array_column($chart_data, 'time_range')) ?: '[]'; ?>;
-    const lessonCounts = <?php echo json_encode(array_column($chart_data, 'lesson_count')) ?: '[]'; ?>;
-    
-    console.log("🚀 ~ timeRanges:", timeRanges);
-    console.log("🚀 ~ lessonCounts:", lessonCounts);
-    
-    const chartContainer = document.getElementById('performanceChart');
+        document.addEventListener('DOMContentLoaded', function () {
+            // Chart data
+            const timeRanges = <?php echo json_encode(array_column($chart_data, 'time_range')) ?: '[]'; ?>;
+            const lessonCounts = <?php echo json_encode(array_column($chart_data, 'lesson_count')) ?: '[]'; ?>;
 
-    if (chartContainer && timeRanges.length > 0) {
-        const ctx = chartContainer.getContext('2d');
+            console.log("🚀 ~ timeRanges:", timeRanges);
+            console.log("🚀 ~ lessonCounts:", lessonCounts);
 
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: timeRanges, // Time range labels
-                datasets: [{
-                    label: 'Lesson Count',
-                    data: lessonCounts,
-                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                    borderColor: 'rgba(59, 130, 246, 1)',
-                    borderWidth: 2,
-                    tension: 0.3,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return value; // Show lesson count as is
+            const chartContainer = document.getElementById('performanceChart');
+
+            if (chartContainer && timeRanges.length > 0) {
+                const ctx = chartContainer.getContext('2d');
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: timeRanges, // Time range labels
+                        datasets: [{
+                            label: 'Lesson Count',
+                            data: lessonCounts,
+                            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function (value) {
+                                        return value; // Show lesson count as is
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return context.dataset.label + ': ' + context.parsed.y;
+                                    }
+                                }
                             }
                         }
                     }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ' + context.parsed.y;
-                            }
-                        }
-                    }
-                }
+                });
+            } else if (chartContainer) {
+                // Show message if no data is available
+                chartContainer.style.display = 'flex';
+                chartContainer.style.alignItems = 'center';
+                chartContainer.style.justifyContent = 'center';
+                chartContainer.innerHTML = '<p class="text-gray-500">No data available yet</p>';
             }
-        });
-    } else if (chartContainer) {
-        // Show message if no data is available
-        chartContainer.style.display = 'flex';
-        chartContainer.style.alignItems = 'center';
-        chartContainer.style.justifyContent = 'center';
-        chartContainer.innerHTML = '<p class="text-gray-500">No data available yet</p>';
-    }
 
-    // Add fade-in animation to elements
-    document.querySelectorAll('.fade-in').forEach((element, index) => {
-        element.style.animation = `fadeIn 0.5s ease-in-out ${0.1 * index}s forwards`;
-    });
-});
+            // Add fade-in animation to elements
+            document.querySelectorAll('.fade-in').forEach((element, index) => {
+                element.style.animation = `fadeIn 0.5s ease-in-out ${0.1 * index}s forwards`;
+            });
+        });
 
 
 
         // Toggle notifications panel
-        document.getElementById('notifications-button')?.addEventListener('click', function() {
+        document.getElementById('notifications-button')?.addEventListener('click', function () {
             // In a real application, you would toggle a notifications dropdown here
             alert('Notifications clicked - would show notifications in a real app');
         });
 
         // Toggle user menu
-        document.getElementById('user-menu-button')?.addEventListener('click', function() {
+        document.getElementById('user-menu-button')?.addEventListener('click', function () {
             // In a real application, you would toggle a dropdown menu here
             alert('User menu clicked - would show profile options in a real app');
         });
