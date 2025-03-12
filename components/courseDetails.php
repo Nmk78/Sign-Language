@@ -21,7 +21,7 @@ $course_id = isset($_GET['course']) ? intval($_GET['course']) : 0;
 $lesson_id = isset($_GET['lesson']) ? intval($_GET['lesson']) : 0;
 
 // Fetch course information
-$course_stmt = $conn->prepare("SELECT id, title, description, thumbnail_url, category, price FROM courses WHERE id = ?");
+$course_stmt = $conn->prepare("SELECT id, title, description, thumbnail_url, category, created_at, price FROM courses WHERE id = ?");
 $course_stmt->bind_param("i", $course_id);
 $course_stmt->execute();
 $course_result = $course_stmt->get_result();
@@ -272,7 +272,7 @@ function formatTimeAgo($datetime)
                                     </h3>
 
                                     <!-- Course Description -->
-                                    <p class="text-gray-600 text-sm mb-3 line-clamp-2"><?php echo $course['description']; ?>
+                                    <p class="text-gray-600 text-sm font-bold mb-3 line-clamp-2">Category : <?php echo $course['category']; ?> , Posted : <?php echo formatTimeAgo($course['created_at']) ?>
                                     </p>
                                 </div>
                                 <!-- Enrollment Form -->
