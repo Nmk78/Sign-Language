@@ -3,28 +3,35 @@ if (!function_exists(function: 'renderSideBar')) {
     function renderSideBar($activeTab = 'students')
     {
         // Define the tab names and icons
+        // $tabs = [
+        //     'statistics' => ['label' => 'Statistics', 'icon' => 'statistics'],
+        //     'courses' => [
+        //         'label' => 'Courses', 
+        //         'icon' => 'book',
+        //         'dropdown' => [
+        //             'Enrollments' => 'dashboard?tab=enrollements',
+        //             'Quiz' => '/dashboard?tab=quiz',
+        //         ]
+        //     ],
+        //     'students' => [
+        //         'label' => 'Students', 
+        //         'icon' => 'users',
+        //         'dropdown' => [
+        //             'All Students' => '#',
+        //             'Active Students' => '#',
+        //             'Inactive Students' => '#',
+        //             // 'Prospective Students' => '#'
+        //         ]
+        //     ],
+        // ];
+
         $tabs = [
             'statistics' => ['label' => 'Statistics', 'icon' => 'statistics'],
-            'courses' => [
-                'label' => 'Courses', 
-                'icon' => 'book',
-                'dropdown' => [
-                    'Enrollments' => 'dashboard?tab=enrollements',
-                    'Quiz' => '/dashboard?tab=quiz',
-                ]
-            ],
-            'students' => [
-                'label' => 'Students', 
-                'icon' => 'users',
-                'dropdown' => [
-                    'All Students' => '#',
-                    'Active Students' => '#',
-                    'Inactive Students' => '#',
-                    // 'Prospective Students' => '#'
-                ]
-            ],
+            'courses' => ['label' => 'Courses', 'icon' => 'book'],
+            'enrollments' => ['label' => 'Enrollments', 'icon' => 'list'],
+            'quiz' => ['label' => 'Quiz', 'icon' => 'pencil'],
+            'students' => ['label' => 'Students', 'icon' => 'users'],
         ];
-
         // Define active tab class
         $activeClass = 'bg-[#EEF2FF] text-[#1d4ed8]';
         $activeBg = 'bg-[#EEF2FF]';
@@ -42,7 +49,7 @@ if (!function_exists(function: 'renderSideBar')) {
 
             ?>
             <div class="flex flex-col z-30">
-                <div class="flex items-center gap-3 px-3 py-2 rounded-t-xl <?php echo $isActive; ?>">
+                <div class="flex items-center gap-3 px-3 py-2 rounded-xl <?php echo $isActive; ?>">
                     <div class="text-[#0e161b]">
                         <?php echo $icon; ?>
                     </div>
