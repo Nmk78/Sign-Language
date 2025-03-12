@@ -13,8 +13,20 @@ if ($conn->connect_error) {
 }
 
 // Query to fetch all users
-$sql = "SELECT * FROM users";
-$result = $conn->query($sql);
+$teacher_id = $_SESSION['user']['user_id']; // Get teacher ID from session
+
+$sql = "SELECT DISTINCT u.*
+        FROM users u
+        JOIN course_enrollments ce ON u.id = ce.user_id
+        JOIN courses c ON ce.course_id = c.id
+        WHERE u.role = 'student' AND c.created_by = ?";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $teacher_id);
+$stmt->execute();
+$result = $stmt->get_result(); // Fetch the result
+
+
 ?>
 
 <html>
@@ -29,26 +41,7 @@ $result = $conn->query($sql);
     <title>Galileo Design</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary': '#f5f5fd',                        'primary-dark': '#2A69A4',
-                        'secondary': '#7ED321',
-                        'accent': '#F5A623',
-                        'success': '#10B981',
-                        'warning': '#F1C40F',
-                        'error': '#E74C3C',
-                        'background': '#f8fafb',
-                        'surface': '#FFFFFF',
-                        'text': '#333333',
-                        'text-light': '#7F8C8D',
-                    }
-                }
-            }
-        }
-    </script>
+
 </head>
 
 <body class="">
@@ -108,7 +101,7 @@ $result = $conn->query($sql);
                             echo "</tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='5' class='px-4 py-2 text-center'>No users found</td></tr>";
+                        echo "<tr><td colspan='5' class='px-4 py-2 text-center'>No student found</td></tr>";
                     }
                     ?>
                 </tbody>
