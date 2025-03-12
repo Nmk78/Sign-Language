@@ -250,9 +250,9 @@ $faqs = [
         $stmt = $pdo->prepare($query);
         $stmt->execute();
         $pagedCourses = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo '<pre>';
-        print_r($pagedCourses);
-        echo '</pre>';
+        // echo '<pre>';
+        // print_r($pagedCourses);
+        // echo '</pre>';
 
         ?>
             <div class="w-full overflow-x-auto snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
