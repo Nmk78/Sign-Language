@@ -92,7 +92,7 @@ if (!isset($_SESSION['user'])) {
                 case 'quiz':
                     require 'instructor/dashboard/quiz.php';
                     break;
-                case 'enrollements':
+                case 'enrollments':
                     require 'instructor/dashboard/enroll.php';
                     break;
                 case 'students':

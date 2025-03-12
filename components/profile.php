@@ -87,6 +87,7 @@ $conn->close();
         // Function to update the URL with saved courses from localStorage
         function updateSavedCoursesUrl() {
             const savedCourses = JSON.parse(localStorage.getItem('savedCourses') || '[]');
+            console.log(savedCourses);
             const url = new URL(window.location.href);
             url.searchParams.set('savedCourses', JSON.stringify(savedCourses));
             window.history.replaceState({}, document.title, url);
