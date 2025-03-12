@@ -2,49 +2,76 @@
 // Database connection
 $host = 'localhost';
 $dbname = 'sign_language';
-$username = 'root';
+$username = 'root'; // Consider moving to a config file or env vars
 $password = 'root';
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Could not connect to the database $dbname :" . $e->getMessage());
+$mysqli = new mysqli($host, $username, $password, $dbname);
+if ($mysqli->connect_error) {
+    die("Could not connect to the database $dbname: " . $mysqli->connect_error);
 }
 
-// Fetch courses
-$stmt = $pdo->query("SELECT 
-                c.*,
-                COUNT(ce.id) as enrolled_students
-            FROM courses c
-            LEFT JOIN course_enrollments ce ON c.id = ce.course_id
-            GROUP BY c.id");
-$courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch distinct categories
-$categoryStmt = $pdo->query("SELECT DISTINCT category FROM courses WHERE category IS NOT NULL");
-$categories = $categoryStmt->fetchAll(PDO::FETCH_COLUMN);
-
-// Pagination
+// Pagination settings
 $itemsPerPage = 6;
-$totalCourses = count($courses);
-$totalPages = ceil($totalCourses / $itemsPerPage);
 $currentPage = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $offset = ($currentPage - 1) * $itemsPerPage;
 
 // Category filter
-$currentCategory = isset($_GET['category']) ? $_GET['category'] : '';
-if ($currentCategory) {
-    $filteredCourses = array_filter($courses, function ($course) use ($currentCategory) {
-        return $course['category'] === $currentCategory;
-    });
-} else {
-    $filteredCourses = $courses;
+$currentCategory = isset($_GET['category']) ? $mysqli->real_escape_string($_GET['category']) : '';
+
+// Fetch total courses for pagination
+$countQuery = "SELECT COUNT(*) FROM courses c WHERE ('$currentCategory' = '' OR c.category = '$currentCategory')";
+$countResult = $mysqli->query($countQuery);
+$totalCourses = $countResult->fetch_row()[0];
+$totalPages = ceil($totalCourses / $itemsPerPage);
+
+// Fetch courses with filtering and pagination
+$query = "
+    SELECT 
+        c.id, c.title, c.description, c.category, c.thumbnail_url, c.price, c.status, c.created_at,
+        u.id AS creator_id, u.username AS creator_name,
+        COUNT(DISTINCT ce.user_id) AS enrolled_students
+    FROM courses c
+    LEFT JOIN users u ON c.created_by = u.id
+    LEFT JOIN course_enrollments ce ON ce.course_id = c.id
+    WHERE ('$currentCategory' = '' OR c.category = '$currentCategory')
+    GROUP BY 
+        c.id, c.title, c.description, c.category, c.thumbnail_url, c.price, c.status, c.created_at,
+        u.id, u.username
+    ORDER BY c.created_at DESC
+    LIMIT $itemsPerPage OFFSET $offset
+";
+$result = $mysqli->query($query);
+
+if (!$result) {
+    die("Query failed: " . $mysqli->error);
 }
 
-$pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
-?>
+// Fetch courses into an array
+$courses = [];
+while ($row = $result->fetch_assoc()) {
+    $courses[] = $row;
+}
 
+// Fetch distinct categories
+$categoryQuery = "SELECT DISTINCT category FROM courses WHERE category IS NOT NULL";
+$categoryResult = $mysqli->query($categoryQuery);
+$categories = [];
+while ($row = $categoryResult->fetch_row()) {
+    $categories[] = $row[0];
+}
+
+// Output results
+if (empty($courses)) {
+    echo "No courses found.";
+} else {
+    echo '<pre>';
+    print_r($courses);
+    echo '</pre>';
+}
+
+// Close the connection
+$mysqli->close();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -123,16 +150,17 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
 
         <!-- Courses Grid -->
         <div id="coursesGrid" class="grid md:grid-cols-3 gap-8">
-            <?php foreach ($pagedCourses as $course): ?>
-                <a href="<?php echo '/courseDetails?course=' . htmlspecialchars($course['id']); ?>" class="bg-white rounded-xl overflow-hidden shadow-lg course-card transition-all duration-300">
+            <?php foreach ($courses as $course): ?>
+                <a href="/courseDetails?course=<?php echo htmlspecialchars($course['id']); ?>"
+                    class="bg-white rounded-xl flex flex-col overflow-hidden shadow-lg course-card transition-all duration-300">
                     <div class="relative">
                         <img src="<?php echo $course['thumbnail_url'] ? htmlspecialchars($course['thumbnail_url']) : 'https://via.placeholder.com/300x200.png?text=Course+Thumbnail'; ?>"
                             alt="<?php echo htmlspecialchars($course['title']); ?>"
                             class="w-full aspect-video object-cover">
-                        <!-- Duration could be added here if available in data -->
                         <div class="absolute top-4 right-4 rounded-full text-sm font-medium text-primary">
                             <button onclick="toggleSave(<?php echo $course['id']; ?>)"
-                                class="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none">
+                                class="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none"
+                                aria-label="Save course">
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                     class="h-6 w-6 transition-colors duration-300 ease-in-out text-blue-400"
                                     viewBox="0 0 24 24"
@@ -145,58 +173,24 @@ $pagedCourses = array_slice($filteredCourses, $offset, $itemsPerPage);
                             </button>
                         </div>
                     </div>
-                    <div class="p-6">
-                        <!-- Rating section - adding placeholder since original doesn't have rating -->
-                        <!-- <div class="flex items-center space-x-2 mb-3">
-                            <div class="flex">
-                                <?php
-                                // Using a default rating since it's not in original data
-                                $rating = $course['rating'] ?? 4.5;
-                                for ($i = 0; $i < 5; $i++): ?>
-                                    <?php if ($i < floor($rating)): ?>
-                                        <i class="fas fa-star text-warning text-sm"></i>
-                                    <?php elseif ($i < $rating): ?>
-                                        <i class="fas fa-star-half-alt text-warning text-sm"></i>
-                                    <?php else: ?>
-                                        <i class="far fa-star text-warning text-sm"></i>
-                                    <?php endif; ?>
-                                <?php endfor; ?>
-                            </div>
-                            <span class="text-text-light text-sm">(<?php echo $rating; ?>)</span>
-                        </div> -->
-
+                    <div class="p-6 flex flex-col">
                         <h3 class="font-semibold text-primary text-xl mb-2">
-                            <?php echo htmlspecialchars($course['title']); ?>
+                            <?php echo isset($course['title']) ? htmlspecialchars($course['title']) : 'Unknown Title'; ?>
                         </h3>
-
-                        <div class="flex items-center text-text-light text-sm mb-4">
-                            <i class="fas fa-users mr-2"></i>
-                            <span><?php echo number_format($course['enrolled_students']); ?> students</span>
-                        </div>
-
-                        <!-- <div class="flex justify-between items-center pt-4 border-t border-gray-100">
-                            <span class="text-primary font-bold text-xl">
-                                <?php echo $course['price'] ?? 'N/A'; ?>
-                            </span>
-                            <div class="flex items-center space-x-2">
-                                <button class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md text-sm transition-colors duration-200">
-                                    Enroll Now
-                                </button>
-                                <button onclick="toggleSave(<?php echo $course['id']; ?>)" 
-                                        class="p-2 rounded-full hover:bg-gray-100 transition-colors focus:outline-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" 
-                                        class="h-6 w-6 transition-colors duration-300 ease-in-out text-blue-400" 
-                                        viewBox="0 0 24 24" 
-                                        stroke="currentColor" 
-                                        stroke-width="2">
-                                        <path stroke-linecap="round" 
-                                            stroke-linejoin="round" 
-                                            d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                                    </svg>
-                                </button>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center text-text-light text-sm mb-4">
+                                <i class="fas fa-users mr-2"></i>
+                                <span><?php echo isset($course['enrolled_students']) && is_numeric($course['enrolled_students'])
+                                            ? number_format($course['enrolled_students'])
+                                            : '0'; ?> students</span>
                             </div>
-                        </div> -->
+                            <button onclick="window.location.href='/'" class="cursor-pointer text-primary z-40 hover:underline">
+                                By <?php echo isset($course['creator_name']) ? htmlspecialchars($course['creator_name']) : 'Unknown Creator'; ?>
+                            </button>
+
+                        </div>
                     </div>
+
                 </a>
             <?php endforeach; ?>
         </div>

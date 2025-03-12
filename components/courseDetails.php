@@ -548,7 +548,7 @@ function formatTimeAgo($datetime)
             </div>
 
             <!-- Modal Content -->
-            <div id="quizContent" class="p-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+            <div id="quizContent" class="p-3 max-h-[70vh] overflow-y-auto custom-scrollbar">
                 <!-- Quiz content will be loaded here -->
             </div>
         </div>
@@ -758,26 +758,51 @@ function formatTimeAgo($datetime)
                         document.getElementById("quizContent").innerHTML =
                             "<p class='text-gray-500'>No quizzes available for this lesson.</p>"
                     } else {
-                        let quizHtml = `<form id="quizForm" data-lesson-id="${currentLessonId}">`
+                        // let quizHtml = `<form id="quizForm" data-lesson-id="${currentLessonId}">`
+                        // data.forEach((quiz, index) => {
+                        //     quizHtml += `
+                        // <div id="quiz" class="border p-4 rounded-lg mb-4 bg-gray-50 shadow-md">
+                        //     <p class="font-semibold text-lg text-gray-800">${index + 1}. ${quiz.question}</p>
+                        //     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+                        //         <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
+                        //             <input type="radio" name="quiz_${quiz.id}" value="A" class="accent-green-500" required>
+                        //             <img src="${quiz.option_a}" class="h-12 w-auto rounded-md border">
+                        //         </label>
+                        //         <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
+                        //             <input type="radio" name="quiz_${quiz.id}" value="B" class="accent-green-500">
+                        //             <img src="${quiz.option_b}" class="h-12 w-auto rounded-md border">
+                        //         </label>
+                        //         <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
+                        //             <input type="radio" name="quiz_${quiz.id}" value="C" class="accent-green-500">
+                        //             <img src="${quiz.option_c}" class="h-12 w-auto rounded-md border">
+                        //         </label>
+                        //     </div>
+                        // </div>`
+
+                        let quizHtml = `<form id="quizForm" data-lesson-id="${currentLessonId}" class="space-y-6 max-w-2xl mx-auto">`;
                         data.forEach((quiz, index) => {
                             quizHtml += `
-                        <div id="quiz" class="border p-4 rounded-lg mb-4 bg-gray-50 shadow-md">
-                            <p class="font-semibold text-lg text-gray-800">${index + 1}. ${quiz.question}</p>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
-                                <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
-                                    <input type="radio" name="quiz_${quiz.id}" value="A" class="accent-green-500" required>
-                                    <img src="${quiz.option_a}" class="h-12 w-auto rounded-md border">
-                                </label>
-                                <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
-                                    <input type="radio" name="quiz_${quiz.id}" value="B" class="accent-green-500">
-                                    <img src="${quiz.option_b}" class="h-12 w-auto rounded-md border">
-                                </label>
-                                <label class="flex items-center space-x-3 bg-white p-2 rounded-md shadow-sm hover:bg-gray-100 cursor-pointer">
-                                    <input type="radio" name="quiz_${quiz.id}" value="C" class="accent-green-500">
-                                    <img src="${quiz.option_c}" class="h-12 w-auto rounded-md border">
-                                </label>
-                            </div>
-                        </div>`
+        <div id="quiz-${quiz.id}" class="border border-gray-200 p-6 rounded-xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl mb-6">
+            <p class="font-semibold text-xl text-gray-900 mb-4 flex items-center">
+                <span class="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-700 rounded-full mr-3 font-medium">${index + 1}</span>
+                ${quiz.question}
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                <label class="flex items-center space-x-4 bg-gray-50 p-3 rounded-lg shadow-sm cursor-pointer transition-all duration-200 hover:bg-gray-100 hover:scale-105">
+                    <input type="radio" name="quiz_${quiz.id}" value="A" class="w-5 h-5 accent-blue-600 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2" required>
+                    <img src="${quiz.option_a}" alt="Option A" class="h-16 w-auto object-cover rounded-md border border-gray-300">
+                </label>
+                <label class="flex items-center space-x-4 bg-gray-50 p-3 rounded-lg shadow-sm cursor-pointer transition-all duration-200 hover:bg-gray-100 hover:scale-105">
+                    <input type="radio" name="quiz_${quiz.id}" value="B" class="w-5 h-5 accent-blue-600 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+                    <img src="${quiz.option_b}" alt="Option B" class="h-16 w-auto object-cover rounded-md border border-gray-300">
+                </label>
+                <label class="flex items-center space-x-4 bg-gray-50 p-3 rounded-lg shadow-sm cursor-pointer transition-all duration-200 hover:bg-gray-100 hover:scale-105">
+                    <input type="radio" name="quiz_${quiz.id}" value="C" class="w-5 h-5 accent-blue-600 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+                    <img src="${quiz.option_c}" alt="Option C" class="h-16 w-auto object-cover rounded-md border border-gray-300">
+                </label>
+            </div>
+        </div>`;
+
                         })
 
                         quizHtml += `

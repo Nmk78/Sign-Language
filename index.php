@@ -375,6 +375,9 @@ $courses = [
         case 'contact':
             require 'components/contact.php';
             break;
+        case 'instructor':
+            require 'components/instructor/dashboard/profile.php';
+            break;
         default:
             require 'components/notfound.php';
             break;

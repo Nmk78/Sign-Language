@@ -80,9 +80,6 @@ if (!isset($_SESSION['user'])) {
             $tab = isset($_GET['tab']) ? $_GET['tab'] : '';
 
             switch ($tab) {
-                case 'dashboard':
-                    require "components/dashboard.php";
-                    break;
                 case 'profile':
                     require 'components/profile.php';
                     break;
@@ -92,7 +89,7 @@ if (!isset($_SESSION['user'])) {
                 case 'quiz':
                     require 'instructor/dashboard/quiz.php';
                     break;
-                case 'enrollements':
+                case 'enrollments':
                     require 'instructor/dashboard/enroll.php';
                     break;
                 case 'students':
