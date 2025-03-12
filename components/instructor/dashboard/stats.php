@@ -459,21 +459,23 @@ function timeAgo($datetime)
 
         // Fetch classes (courses created by the user)
         $classes_stmt = $conn->prepare("
-    SELECT 
-        c.id,
-        c.title,
-        c.status,
-        (SELECT COUNT(DISTINCT cl.user_id) 
-         FROM completed_lessons cl 
-         JOIN lesson l ON cl.lesson_id = l.id 
-         WHERE l.course_id = c.id) AS student_count
-    FROM courses c
-    WHERE c.created_by = ?  -- created_by is the user_id of the creator
-    ORDER BY c.created_at DESC
-");
+            SELECT 
+                c.id,
+                c.title,
+                c.status,
+                (SELECT COUNT(DISTINCT cl.user_id) 
+                FROM completed_lessons cl 
+                JOIN lesson l ON cl.lesson_id = l.id 
+                WHERE l.course_id = c.id) AS student_count
+            FROM courses c
+            WHERE c.created_by = ?  -- created_by is the user_id of the creator
+            ORDER BY c.created_at DESC
+        ");
+
         if ($classes_stmt === false) {
             die("Prepare failed: " . $conn->error);
         }
+        
         $classes_stmt->bind_param("i", $teacher_id);
         $classes_stmt->execute();
         $classes_result = $classes_stmt->get_result();
@@ -482,36 +484,39 @@ function timeAgo($datetime)
 
         // Fetch recent activities (profile updates and completed lessons)
         $activities_stmt = $conn->prepare("
-   SELECT 
-        'profile' AS activity_type,
-        l.id AS activity_id,
-        NULL AS lesson_id,
-        l.timestamp AS activity_time,
-        'Profile updated' AS details,
-        u.username
-    FROM logs l
-    JOIN users u ON l.user_id = u.id
-    WHERE l.user_id = ? 
-    AND l.entity_type = 'profile' 
-    AND l.action = 'update'
-    
-    UNION ALL
-    
-    SELECT 
-        'lesson_completed' AS activity_type,
-        cl.id AS activity_id,
-        cl.lesson_id,
-        cl.completed_at AS activity_time,
-        CONCAT('Completed lesson \"', les.title, '\" (ID: ', cl.lesson_id, ') in \"', c.title, '\"') AS details,
-        u.username
-    FROM completed_lessons cl
-    JOIN users u ON cl.user_id = u.id
-    LEFT JOIN lesson les ON cl.lesson_id = les.id
-    LEFT JOIN courses c ON les.course_id = c.id
-    WHERE cl.user_id = ?
-    ORDER BY activity_time DESC
-    LIMIT 10
-");
+        SELECT * FROM (
+            SELECT 
+                'profile' AS activity_type,
+                l.id AS activity_id,
+                NULL AS lesson_id,
+                l.timestamp AS activity_time,
+                'Profile updated' AS details,
+                u.username
+            FROM logs l
+            JOIN users u ON l.user_id = u.id
+            WHERE l.user_id = ? 
+            AND l.entity_type = 'profile' 
+            AND l.action = 'update'
+            
+            UNION ALL
+            
+            SELECT 
+                'lesson_completed' AS activity_type,
+                cl.id AS activity_id,
+                cl.lesson_id,
+                cl.completed_at AS activity_time,
+                CONCAT('Added lesson \"', les.title, '\" (ID: ', cl.lesson_id, ') in \"', c.title, '\"') AS details,
+                u.username
+            FROM completed_lessons cl
+            JOIN users u ON cl.user_id = u.id
+            LEFT JOIN lesson les ON cl.lesson_id = les.id
+            LEFT JOIN courses c ON les.course_id = c.id
+            WHERE cl.user_id = ?
+        ) AS activities
+        ORDER BY activity_time DESC
+        LIMIT 10;
+        ");
+
         if ($activities_stmt === false) {
             die("Prepare failed: " . $conn->error);
         }
