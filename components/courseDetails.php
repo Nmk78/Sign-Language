@@ -272,7 +272,11 @@ function formatTimeAgo($datetime)
                                     </h3>
 
                                     <!-- Course Description -->
-                                    <p class="text-gray-600 text-sm mb-3 line-clamp-2 "><?php echo $course['description']; ?>
+                                    <div class="flex space-x-8 font-semibold items-center">
+                                        <p class="text-gray-600 text-sm mb-3 line-clamp-2 ">Category: <?php echo $course['category']; ?>
+                                        <p class="text-gray-600 text-sm mb-3 line-clamp-2 ">Posted at: <?php echo formatTimeAgo($course['created_at']); ?>
+
+                                    </div>
                                     </p>
                                 </div>
                                 <!-- Enrollment Form -->
@@ -352,8 +356,8 @@ function formatTimeAgo($datetime)
                         <h3 class="text-lg font-semibold">Course Lessons</h3>
                         <div class="text-sm text-gray-500">
                             <span class="font-medium text-indigo-600"><?php echo count(array_filter($lessons, function ($l) {
-                                return isset($l['completed']) && $l['completed'];
-                            })); ?></span>
+                                                                            return isset($l['completed']) && $l['completed'];
+                                                                        })); ?></span>
                             <span>/</span>
                             <span><?php echo count($lessons); ?></span>
                             <span class="ml-1">completed</span>
@@ -396,7 +400,7 @@ function formatTimeAgo($datetime)
                                         : ($isActive
                                             ? 'bg-indigo-100 text-indigo-700'
                                             : 'bg-gray-100 text-gray-700'));
-                                ?>
+                            ?>
                                 <a href="?course=<?php echo $course_id; ?>&lesson=<?php echo $lesson['id']; ?>"
                                     class="<?php echo $cardClasses; ?> group">
 
@@ -576,7 +580,7 @@ function formatTimeAgo($datetime)
 
         // Handle comment form submission
         if (commentForm) {
-            commentForm.addEventListener('submit', function (e) {
+            commentForm.addEventListener('submit', function(e) {
                 e.preventDefault();
 
                 if (!commentText.value.trim()) {
@@ -654,7 +658,7 @@ function formatTimeAgo($datetime)
             });
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const userId = localStorage.getItem('id');
             if (userId) {
                 document.getElementById('userId').value = userId;
@@ -821,16 +825,16 @@ function formatTimeAgo($datetime)
             const userId = localStorage.getItem('id');
 
             fetch("handlers/submit_quiz.php", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    lesson_id: lessonId,
-                    userId: userId,
-                    answers: answers,
-                }),
-            })
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        lesson_id: lessonId,
+                        userId: userId,
+                        answers: answers,
+                    }),
+                })
                 .then((response) => response.json())
                 .then((results) => {
                     showResults(results)
